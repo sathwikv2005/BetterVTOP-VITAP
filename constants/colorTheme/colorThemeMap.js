@@ -24,7 +24,7 @@ export const colorThemeMap = {
 	},
 }
 
-export default async function getColorTheme() {
+export async function getColorTheme() {
 	let colorTheme = await AsyncStorage.getItem('colorTheme')
 
 	if (!colorTheme) {

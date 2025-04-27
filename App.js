@@ -1,13 +1,13 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { Text, View, ActivityIndicator } from 'react-native'
 import { Timetable } from './screens/Timetable'
-import getColorTheme from './constants/colorTheme/colorThemeMap'
 import Feather from '@expo/vector-icons/Feather'
 import Foundation from '@expo/vector-icons/Foundation'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { StatusBar } from 'expo-status-bar'
+import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 
 const Drawer = createDrawerNavigator()
 
@@ -16,18 +16,19 @@ function AttendanceScreen() {
 }
 
 export default function App() {
-	const [colorTheme, setColorTheme] = useState(null)
+	// Wrap everything with ColorThemeProvider
+	return (
+		<ColorThemeProvider>
+			<MainApp />
+		</ColorThemeProvider>
+	)
+}
 
-	useLayoutEffect(() => {
-		async function callGetColorTheme() {
-			const theme = await getColorTheme()
-			setColorTheme(theme)
-		}
-		callGetColorTheme()
-	}, [])
+function MainApp() {
+	const colorTheme = useContext(ColorThemeContext)
 
 	if (!colorTheme) {
-		// return a loading spinner
+		// This will display a loading spinner if the color theme hasn't been loaded yet
 		return (
 			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 				<ActivityIndicator size="large" />
@@ -35,6 +36,7 @@ export default function App() {
 		)
 	}
 
+	// Now that colorTheme is available, define your custom theme for Navigation
 	const MyTheme = {
 		...DefaultTheme,
 		colors: {
@@ -67,14 +69,14 @@ export default function App() {
 					name="timetable"
 					component={Timetable}
 					options={{
-						drawerLabel: ({ focused, color }) => (
+						drawerLabel: ({ focused }) => (
 							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 								<MaterialCommunityIcons name="timetable" size={22} color={colorTheme.main.text} />
 								<Text
 									style={{
 										marginLeft: 10,
 										color: focused ? colorTheme.main.primary : colorTheme.main.text,
-										fontWeight: focused ? 800 : 500,
+										fontWeight: focused ? '800' : '500',
 										fontSize: 16,
 									}}
 								>
@@ -88,18 +90,18 @@ export default function App() {
 					name="attendance"
 					component={AttendanceScreen}
 					options={{
-						drawerLabel: ({ focused, color }) => (
+						drawerLabel: ({ focused }) => (
 							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 								<Foundation name="target" size={22} color={colorTheme.main.text} />
 								<Text
 									style={{
 										marginLeft: 10,
 										color: focused ? colorTheme.main.primary : colorTheme.main.text,
-										fontWeight: focused ? 800 : 500,
+										fontWeight: focused ? '800' : '500',
 										fontSize: 16,
 									}}
 								>
-									Attendace
+									Attendance
 								</Text>
 							</View>
 						),
@@ -109,14 +111,14 @@ export default function App() {
 					name="settings"
 					component={AttendanceScreen}
 					options={{
-						drawerLabel: ({ focused, color }) => (
+						drawerLabel: ({ focused }) => (
 							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 								<Feather name="settings" size={22} color={colorTheme.main.text} />
 								<Text
 									style={{
 										marginLeft: 10,
 										color: focused ? colorTheme.main.primary : colorTheme.main.text,
-										fontWeight: focused ? 800 : 500,
+										fontWeight: focused ? '800' : '500',
 										fontSize: 16,
 									}}
 								>
