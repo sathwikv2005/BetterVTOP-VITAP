@@ -2,19 +2,15 @@ import React, { useContext } from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { Text, View, ActivityIndicator } from 'react-native'
-import { Timetable } from './screens/Timetable'
+import { Home } from './screens/Home'
 import Feather from '@expo/vector-icons/Feather'
-import Foundation from '@expo/vector-icons/Foundation'
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import Entypo from '@expo/vector-icons/Entypo'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
+import { AttendanceScreen } from './components/ui/Attendace'
 
 const Drawer = createDrawerNavigator()
-
-function AttendanceScreen() {
-	return <Text>Hello</Text>
-}
 
 export default function App() {
 	// Wrap everything with ColorThemeProvider
@@ -46,7 +42,7 @@ function MainApp() {
 			text: colorTheme.main.text,
 			primary: colorTheme.accent.primary,
 			card: colorTheme.main.primary,
-			border: colorTheme.accent.secondary,
+			border: colorTheme.main.text,
 			notification: colorTheme.accent.tertiary,
 		},
 	}
@@ -79,12 +75,12 @@ function MainApp() {
 				}}
 			>
 				<Drawer.Screen
-					name="timetable"
-					component={Timetable}
+					name="home"
+					component={Home}
 					options={{
 						drawerLabel: ({ focused }) => (
 							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-								<MaterialCommunityIcons name="timetable" size={22} color={colorTheme.main.text} />
+								<Entypo name="home" size={24} color={colorTheme.main.text} />
 								<Text
 									style={{
 										marginLeft: 10,
@@ -93,35 +89,14 @@ function MainApp() {
 										fontSize: 16,
 									}}
 								>
-									Time Table
+									Home
 								</Text>
 							</View>
 						),
-						headerTitle: 'Time Table',
+						headerTitle: 'Home',
 					}}
 				/>
-				<Drawer.Screen
-					name="attendance"
-					component={AttendanceScreen}
-					options={{
-						drawerLabel: ({ focused }) => (
-							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-								<Foundation name="target" size={22} color={colorTheme.main.text} />
-								<Text
-									style={{
-										marginLeft: 10,
-										color: focused ? colorTheme.main.primary : colorTheme.main.text,
-										fontWeight: focused ? '800' : '500',
-										fontSize: 16,
-									}}
-								>
-									Attendance
-								</Text>
-							</View>
-						),
-						headerTitle: 'Attendance',
-					}}
-				/>
+
 				<Drawer.Screen
 					name="settings"
 					component={Settings}
