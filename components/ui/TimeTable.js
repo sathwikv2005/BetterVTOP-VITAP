@@ -19,7 +19,7 @@ export function Timetable() {
 					tabBarStyle: {
 						backgroundColor: colorTheme.main.secondary,
 						elevation: 8, // Android shadow depth
-						shadowColor: colorTheme.main.text, // Android & iOS shadow color
+						shadowColor: colorTheme.accent.secondary, // Android & iOS shadow color
 						shadowOffset: { width: 0, height: 4 }, // iOS only
 						shadowOpacity: 0.3, // iOS only
 						shadowRadius: 5, // iOS only
