@@ -26,7 +26,6 @@ export const colorThemeMap = {
 
 export async function getColorTheme() {
 	let colorTheme = await AsyncStorage.getItem('colorTheme')
-
 	if (!colorTheme) {
 		colorTheme = {
 			main: 'dark',
@@ -35,7 +34,18 @@ export async function getColorTheme() {
 	} else {
 		colorTheme = JSON.parse(colorTheme)
 	}
+	if (!colorTheme.main) colorTheme.main = 'dark'
+	if (!colorTheme.accent) colorTheme.accent = 'red'
 
+	return {
+		main: colorThemeMap.main[colorTheme.main],
+		accent: colorThemeMap.accent[colorTheme.accent],
+	}
+}
+
+export function getNewColorTheme(colorTheme) {
+	if (!colorTheme.main) colorTheme.main = 'dark'
+	if (!colorTheme.accent) colorTheme.accent = 'red'
 	return {
 		main: colorThemeMap.main[colorTheme.main],
 		accent: colorThemeMap.accent[colorTheme.accent],

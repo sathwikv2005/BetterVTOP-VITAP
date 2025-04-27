@@ -31,5 +31,9 @@ export const ColorThemeProvider = ({ children }) => {
 		)
 	}
 
-	return <ColorThemeContext.Provider value={colorTheme}>{children}</ColorThemeContext.Provider>
+	return (
+		<ColorThemeContext.Provider value={{ colorTheme, setColorTheme }}>
+			{children}
+		</ColorThemeContext.Provider>
+	)
 }

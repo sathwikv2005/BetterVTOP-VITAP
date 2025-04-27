@@ -8,6 +8,7 @@ import Foundation from '@expo/vector-icons/Foundation'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
+import Settings from './screens/Settings'
 
 const Drawer = createDrawerNavigator()
 
@@ -25,7 +26,7 @@ export default function App() {
 }
 
 function MainApp() {
-	const colorTheme = useContext(ColorThemeContext)
+	const { colorTheme } = useContext(ColorThemeContext)
 
 	if (!colorTheme) {
 		// This will display a loading spinner if the color theme hasn't been loaded yet
@@ -63,6 +64,18 @@ function MainApp() {
 					drawerLabelStyle: {
 						color: colorTheme.main.text,
 					},
+					headerTitleStyle: {
+						color: colorTheme.accent.secondary,
+					},
+					headerStyle: {
+						backgroundColor: colorTheme.main.secondary, // your header background
+						elevation: 8, // Android shadow depth
+						shadowColor: colorTheme.main.text, // Android & iOS shadow color
+						shadowOffset: { width: 0, height: 4 }, // iOS only
+						shadowOpacity: 0.3, // iOS only
+						shadowRadius: 5, // iOS only
+					},
+					headerTintColor: colorTheme.accent.secondary,
 				}}
 			>
 				<Drawer.Screen
@@ -84,6 +97,7 @@ function MainApp() {
 								</Text>
 							</View>
 						),
+						headerTitle: 'Time Table',
 					}}
 				/>
 				<Drawer.Screen
@@ -105,11 +119,12 @@ function MainApp() {
 								</Text>
 							</View>
 						),
+						headerTitle: 'Attendance',
 					}}
 				/>
 				<Drawer.Screen
 					name="settings"
-					component={AttendanceScreen}
+					component={Settings}
 					options={{
 						drawerLabel: ({ focused }) => (
 							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -126,6 +141,7 @@ function MainApp() {
 								</Text>
 							</View>
 						),
+						headerTitle: 'Settings',
 					}}
 				/>
 			</Drawer.Navigator>

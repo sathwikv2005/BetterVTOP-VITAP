@@ -1,5 +1,7 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import { useContext } from 'react'
 import { Text } from 'react-native'
+import { ColorThemeContext } from '../context/ColorThemeContext'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -8,18 +10,26 @@ function Test() {
 }
 
 export function Timetable() {
+	const { colorTheme } = useContext(ColorThemeContext)
+
 	return (
 		<Tab.Navigator
 			screenOptions={{
 				tabBarStyle: {
-					backgroundColor: '#000000',
+					backgroundColor: colorTheme.main.secondary,
+					elevation: 8, // Android shadow depth
+					shadowColor: colorTheme.main.text, // Android & iOS shadow color
+					shadowOffset: { width: 0, height: 4 }, // iOS only
+					shadowOpacity: 0.3, // iOS only
+					shadowRadius: 5, // iOS only
 				},
 				tabBarIndicatorStyle: {
-					backgroundColor: 'red',
+					backgroundColor: colorTheme.accent.primary,
 					oppacity: '50%',
 				},
-				tabBarActiveTintColor: 'red',
-				tabBarInactiveTintColor: '#FFFFFF98',
+
+				tabBarActiveTintColor: colorTheme.accent.primary,
+				tabBarInactiveTintColor: colorTheme.main.tertiary,
 				tabBarBounces: true,
 			}}
 		>
