@@ -8,7 +8,6 @@ import Entypo from '@expo/vector-icons/Entypo'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
-import { AttendanceScreen } from './components/ui/Attendace'
 
 const Drawer = createDrawerNavigator()
 
@@ -33,7 +32,6 @@ function MainApp() {
 		)
 	}
 
-	// Now that colorTheme is available, define your custom theme for Navigation
 	const MyTheme = {
 		...DefaultTheme,
 		colors: {
@@ -51,6 +49,7 @@ function MainApp() {
 		<NavigationContainer theme={MyTheme}>
 			<StatusBar style="light" />
 			<Drawer.Navigator
+				id="RootDrawer"
 				screenOptions={{
 					drawerActiveBackgroundColor: colorTheme.accent.secondary,
 					drawerStyle: {
