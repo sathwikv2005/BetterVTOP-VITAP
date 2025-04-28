@@ -5,9 +5,11 @@ import { Text, View, ActivityIndicator } from 'react-native'
 import { Home } from './screens/Home'
 import Feather from '@expo/vector-icons/Feather'
 import Entypo from '@expo/vector-icons/Entypo'
+import Ionicons from '@expo/vector-icons/Ionicons'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
+import Login from './screens/Login'
 
 const Drawer = createDrawerNavigator()
 
@@ -93,6 +95,29 @@ function MainApp() {
 							</View>
 						),
 						headerTitle: 'Home',
+					}}
+				/>
+
+				<Drawer.Screen
+					name="login"
+					component={Login}
+					options={{
+						drawerLabel: ({ focused }) => (
+							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+								<Ionicons name="person" size={24} color={colorTheme.main.text} />
+								<Text
+									style={{
+										marginLeft: 10,
+										color: focused ? colorTheme.main.primary : colorTheme.main.text,
+										fontWeight: focused ? '800' : '500',
+										fontSize: 16,
+									}}
+								>
+									Login
+								</Text>
+							</View>
+						),
+						headerTitle: 'Login',
 					}}
 				/>
 
