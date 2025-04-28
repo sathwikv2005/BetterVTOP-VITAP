@@ -1,0 +1,15 @@
+{
+	"domain": "https://vtop.vitap.ac.in",
+	"vtopUrls": {
+		"login": "/vtop/login",
+		"homepage": "/vtop/content"
+	},
+	"backEndApi": {
+		"newCaptcha": "/vtop/get/new/captcha",
+		"prelogin": "/vtop/prelogin/setup",
+		"studentTimeTable": "/vtop/academics/common/StudentTimeTable",
+		"viewTimeTable": "/vtop/processViewTimeTable",
+		"ViewStudentAttendance": "/vtop/processViewStudentAttendance",
+		"ViewAttendanceDetail": "/vtop/processViewAttendanceDetail"
+	}
+}
