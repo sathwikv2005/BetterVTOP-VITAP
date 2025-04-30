@@ -9,16 +9,16 @@ export default function ClassItem({ item, ...props }) {
 	const styles = StyleSheet.create({
 		container: {
 			width: '90%',
-			height: 80,
+			height: 85,
 			borderRadius: 10,
 			overflow: 'hidden',
 			alignSelf: 'center',
-			marginBottom: '6%',
+			marginBottom: '3%',
 			flexDirection: 'row',
 			backgroundColor: colorTheme.accent.tertiary,
 			opacity: 0.8,
 			color: colorTheme.main.text,
-			elevation: 6,
+			elevation: 3,
 			shadowColor: colorTheme.accent.secondary,
 			shadowOffset: { width: -2, height: -4 },
 			shadowOpacity: 0.3,
@@ -39,21 +39,34 @@ export default function ClassItem({ item, ...props }) {
 		},
 		main: {
 			color: colorTheme.main.text,
-			opacity: 2,
-			fontSize: 22,
+			opacity: 3,
+			fontSize: 19,
 			fontWeight: 600,
 		},
 		sub: {
 			color: colorTheme.main.primary,
 			opacity: 1,
-			fontSize: 18,
+			fontSize: 16,
+			fontWeight: 600,
+		},
+		type: {
 			fontWeight: 500,
+			fontSize: 16,
+		},
+		lab: {
+			borderLeftWidth: 10,
+			borderLeftColor: colorTheme.main.text,
+		},
+		theory: {
+			borderLeftWidth: 10,
+			borderLeftColor: colorTheme.accent.secondary,
 		},
 	})
 
 	return (
 		<View style={styles.container}>
-			<View style={[styles.box, styles.left]}>
+			<View style={[styles.box, styles.left, item.type === 'lab' ? styles.lab : styles.theory]}>
+				<Text style={[styles.type]}>{item.type === 'lab' ? 'Lab' : 'Theory'}</Text>
 				<Text style={styles.main}>{item.courseCode}</Text>
 				<Text style={styles.sub}>{item.venue}</Text>
 			</View>

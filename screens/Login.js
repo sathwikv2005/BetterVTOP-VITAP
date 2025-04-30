@@ -56,7 +56,7 @@ export default function Login() {
 	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
-			width: '80%',
+			width: '90%',
 			alignSelf: 'center',
 			justifyContent: 'center',
 			flexDirection: 'column',
@@ -64,16 +64,16 @@ export default function Login() {
 		},
 		form: {
 			width: '100%',
-			height: 450,
+			height: 425,
 			backgroundColor: colorTheme.main.primary,
-			borderColor: colorTheme.accent.secondary,
+			// borderColor: colorTheme.accent.secondary,
 			borderWidth: 1,
+			marginTop: 10,
 			alignSelf: 'center',
-			justifyContent: 'center',
+			// justifyContent: 'center',
 			flexDirection: 'column',
 			alignItems: 'center',
 			borderRadius: 10,
-			marginBottom: '15%',
 			overflow: 'hidden',
 		},
 		box: {
@@ -99,9 +99,9 @@ export default function Login() {
 			color: colorTheme.main.primary,
 			fontSize: 16,
 			fontWeight: 600,
-			marginTop: 8,
+			marginTop: 0,
 			height: 40,
-			width: '85%',
+			width: '90%',
 			paddingHorizontal: 10,
 			borderRadius: 6,
 			overflow: 'hidden',
@@ -110,6 +110,7 @@ export default function Login() {
 			color: colorTheme.main.text,
 			fontSize: 24,
 			fontWeight: 800,
+			// marginBottom: 10,
 		},
 		captchaImage: {
 			marginTop: 8,
@@ -124,8 +125,13 @@ export default function Login() {
 			borderRadius: 8,
 			overflow: 'hidden',
 			padding: 8,
-			width: 70,
+			width: 90,
 			alignItems: 'center',
+			elevation: 5,
+			shadowColor: '#000',
+			shadowOffset: { width: 0, height: 4 },
+			shadowOpacity: 0.3,
+			shadowRadius: 4,
 		},
 		btnText: {
 			color: colorTheme.main.primary,
@@ -138,15 +144,21 @@ export default function Login() {
 		<Text style={{ color: colorTheme.main.text, fontSize: 20 }}>Loading...</Text>
 	) : (
 		<View style={styles.container}>
+			<Text style={styles.login}>Login to VTOP:</Text>
 			<View style={styles.form}>
-				<Text style={styles.login}>Login to VTOP</Text>
 				<View style={styles.box}>
-					<Text style={styles.username}>User Name:</Text>
-					<TextInput style={styles.input} onChangeText={onChangeUserName} value={userName} />
+					{/* <Text style={styles.username}>User Name:</Text> */}
+					<TextInput
+						placeholder="User Name"
+						style={styles.input}
+						onChangeText={onChangeUserName}
+						value={userName}
+					/>
 				</View>
 				<View style={styles.box}>
-					<Text style={styles.password}>Password:</Text>
+					{/* <Text style={styles.password}>Password:</Text> */}
 					<TextInput
+						placeholder="Password"
 						style={styles.input}
 						secureTextEntry={true}
 						onChangeText={onChangePassword}
@@ -158,6 +170,7 @@ export default function Login() {
 					<TextInput
 						style={[styles.input, { marginTop: 12 }]}
 						keyboardType=""
+						placeholder="Captcha"
 						onChangeText={onChangeCaptcha}
 						value={captcha}
 					/>

@@ -1,5 +1,5 @@
 export const whiteColors = {
 	primary: '#ffffff',
-	secondary: '#cccccc',
-	tertiary: '#999999',
+	secondary: '#CCC0C0FF',
+	tertiary: '#696969FF',
 }

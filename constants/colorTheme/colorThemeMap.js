@@ -9,6 +9,9 @@ import { yellowColors } from './accent/yellow'
 import { darkColors } from './main/dark'
 import { lightColors } from './main/light'
 
+const defaultMain = 'dark'
+const defaultAccent = 'red'
+
 export const colorThemeMap = {
 	main: {
 		dark: darkColors,
@@ -28,14 +31,14 @@ export async function getColorTheme() {
 	let colorTheme = await AsyncStorage.getItem('colorTheme')
 	if (!colorTheme) {
 		colorTheme = {
-			main: 'dark',
-			accent: 'red',
+			main: defaultMain,
+			accent: defaultAccent,
 		}
 	} else {
 		colorTheme = JSON.parse(colorTheme)
 	}
-	if (!colorTheme.main) colorTheme.main = 'dark'
-	if (!colorTheme.accent) colorTheme.accent = 'red'
+	if (!colorTheme.main) colorTheme.main = defaultMain
+	if (!colorTheme.accent) colorTheme.accent = defaultAccent
 
 	return {
 		main: colorThemeMap.main[colorTheme.main],
@@ -44,8 +47,8 @@ export async function getColorTheme() {
 }
 
 export function getNewColorTheme(colorTheme) {
-	if (!colorTheme.main) colorTheme.main = 'dark'
-	if (!colorTheme.accent) colorTheme.accent = 'red'
+	if (!colorTheme.main) colorTheme.main = defaultMain
+	if (!colorTheme.accent) colorTheme.accent = defaultAccent
 	return {
 		main: colorThemeMap.main[colorTheme.main],
 		accent: colorThemeMap.accent[colorTheme.accent],
