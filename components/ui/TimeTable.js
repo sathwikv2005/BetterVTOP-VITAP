@@ -49,34 +49,52 @@ export function Timetable() {
 					<Tab.Screen
 						name="MON"
 						component={TimeTableDisplay}
-						initialParams={{ data: timetable.filter((item) => item.day === 'MON') }}
+						initialParams={{
+							data: timetable.filter((item) => item.day === 'MON'),
+							day: 'MON',
+						}}
 					/>
 				)}
 
 				<Tab.Screen
 					name="TUE"
 					component={TimeTableDisplay}
-					initialParams={{ data: timetable.filter((item) => item.day === 'TUE') }}
+					initialParams={{
+						data: timetable.filter((item) => item.day === 'TUE'),
+						day: 'TUE',
+					}}
 				/>
 				<Tab.Screen
 					name="WED"
 					component={TimeTableDisplay}
-					initialParams={{ data: timetable.filter((item) => item.day === 'WED') }}
+					initialParams={{
+						data: timetable.filter((item) => item.day === 'WED'),
+						day: 'WED',
+					}}
 				/>
 				<Tab.Screen
 					name="THU"
 					component={TimeTableDisplay}
-					initialParams={{ data: timetable.filter((item) => item.day === 'THU') }}
+					initialParams={{
+						data: timetable.filter((item) => item.day === 'THU'),
+						day: 'THU',
+					}}
 				/>
 				<Tab.Screen
 					name="FRI"
 					component={TimeTableDisplay}
-					initialParams={{ data: timetable.filter((item) => item.day === 'FRI') }}
+					initialParams={{
+						data: timetable.filter((item) => item.day === 'FRI'),
+						day: 'FRI',
+					}}
 				/>
 				<Tab.Screen
 					name="SAT"
 					component={TimeTableDisplay}
-					initialParams={{ data: timetable.filter((item) => item.day === 'SAT') }}
+					initialParams={{
+						data: timetable.filter((item) => item.day === 'SAT'),
+						day: 'SAT',
+					}}
 				/>
 			</Tab.Navigator>
 		</>

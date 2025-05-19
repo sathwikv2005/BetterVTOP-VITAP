@@ -3,8 +3,15 @@ import { ColorThemeContext } from '../context/ColorThemeContext'
 import { useContext } from 'react'
 import { StyleSheet } from 'react-native'
 
-export default function ClassItem({ item, ...props }) {
+export default function ClassItem({ item, day, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const hour = new Date().getHours()
+	const minutes = new Date().getMinutes()
+	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+	var todayIndex = new Date().getDay()
+
+	const routeName = weekdayMap[todayIndex]
 
 	const styles = StyleSheet.create({
 		container: {
@@ -15,8 +22,7 @@ export default function ClassItem({ item, ...props }) {
 			alignSelf: 'center',
 			marginBottom: '3%',
 			flexDirection: 'row',
-			backgroundColor: colorTheme.accent.tertiary,
-			opacity: 0.8,
+			backgroundColor: colorTheme.main.primary,
 			color: colorTheme.main.text,
 			elevation: 3,
 			shadowColor: colorTheme.accent.secondary,
@@ -39,33 +45,71 @@ export default function ClassItem({ item, ...props }) {
 		},
 		main: {
 			color: colorTheme.main.text,
-			opacity: 3,
+
 			fontSize: 19,
 			fontWeight: 600,
 		},
 		sub: {
-			color: colorTheme.main.primary,
-			opacity: 1,
-			fontSize: 16,
-			fontWeight: 600,
+			color: colorTheme.main.text,
+
+			fontSize: 14,
+			fontWeight: 400,
 		},
 		type: {
-			fontWeight: 500,
-			fontSize: 16,
+			fontWeight: 400,
+			color: colorTheme.main.text,
+			fontSize: 14,
 		},
-		lab: {
+		complete: {
+			borderLeftWidth: 10,
+
+			borderLeftColor: colorTheme.main.tertiary,
+		},
+		ongoing: {
+			borderLeftWidth: 10,
+			borderLeftColor: colorTheme.accent.primary,
+			opacity: 1,
+		},
+		upcoming: {
 			borderLeftWidth: 10,
 			borderLeftColor: colorTheme.main.text,
+			opacity: 1,
 		},
-		theory: {
-			borderLeftWidth: 10,
-			borderLeftColor: colorTheme.accent.secondary,
+		completeOpacity: {
+			opacity: 0.7,
+		},
+		ongoingOpacity: {
+			opacity: 1,
+		},
+		upcomingOpacity: {
+			opacity: 0.8,
 		},
 	})
 
+	const startHour = parseInt(item.timings.start.split(':')[0])
+	const startMinute = parseInt(item.timings.start.split(':')[1])
+	const endHour = parseInt(item.timings.end.split(':')[0])
+	const endMinute = parseInt(item.timings.end.split(':')[1])
+
+	const currentTotalMinutes = hour * 60 + minutes
+	const startTotalMinutes = startHour * 60 + startMinute
+	const endTotalMinutes = endHour * 60 + endMinute
+
+	let borderStyle, opacity
+	if (currentTotalMinutes > endTotalMinutes) {
+		borderStyle = styles.complete
+		opacity = styles.completeOpacity
+	} else if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes <= endTotalMinutes) {
+		borderStyle = styles.ongoing
+		opacity = styles.ongoingOpacity
+	} else {
+		borderStyle = styles.upcoming
+		opacity = styles.upcomingOpacity
+	}
+
 	return (
-		<View style={styles.container}>
-			<View style={[styles.box, styles.left, item.type === 'lab' ? styles.lab : styles.theory]}>
+		<View style={[styles.container, opacity]}>
+			<View style={[styles.box, styles.left, borderStyle]}>
 				<Text style={[styles.type]}>{item.type === 'lab' ? 'Lab' : 'Theory'}</Text>
 				<Text style={styles.main}>{item.courseCode}</Text>
 				<Text style={styles.sub}>{item.venue}</Text>

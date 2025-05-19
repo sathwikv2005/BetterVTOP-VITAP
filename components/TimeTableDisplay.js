@@ -7,7 +7,7 @@ import ClassItem from './ClassItem'
 
 export default function TimeTableDisplay({ route }) {
 	const { colorTheme } = useContext(ColorThemeContext)
-	let { data } = route.params
+	let { data, day } = route.params
 
 	if (!data || data.length === 0 || data[0].classes.length === 0) {
 		return <Text style={{ color: 'white' }}>No classes for this day!</Text>
@@ -50,7 +50,7 @@ export default function TimeTableDisplay({ route }) {
 			contentContainerStyle={styles.list}
 			data={sortedClasses}
 			keyExtractor={(item) => item.class}
-			renderItem={({ item }) => <ClassItem item={item} />}
+			renderItem={({ item }) => <ClassItem item={item} day={day} />}
 			refreshing={refreshing}
 			onRefresh={onRefresh}
 		/>
