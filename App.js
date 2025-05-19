@@ -94,7 +94,7 @@ function MainApp() {
 								</Text>
 							</View>
 						),
-						headerTitle: 'Home',
+						headerTitle: 'Timetable',
 					}}
 				/>
 

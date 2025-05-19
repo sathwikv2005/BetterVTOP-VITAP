@@ -1,5 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useContext } from 'react'
+import { useNavigation, useRoute, useNavigationState } from '@react-navigation/native'
+import { useEffect } from 'react'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import Feather from '@expo/vector-icons/Feather'
 import { ColorThemeContext } from '../context/ColorThemeContext'
@@ -10,6 +12,22 @@ const Tab = createBottomTabNavigator()
 
 export function Home() {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const navigation = useNavigation()
+
+	const state = useNavigationState((state) => state)
+	const tabIndex = state.routes.find((r) => r.name === 'home')?.state?.index || 0
+	const tabRouteName =
+		state.routes.find((r) => r.name === 'home')?.state?.routeNames?.[tabIndex] || 'Timetable'
+
+	useEffect(() => {
+		let title = 'Timetable'
+		if (tabRouteName === 'timetable') title = 'Timetable'
+		else if (tabRouteName === 'attendance') title = 'Attendance'
+
+		navigation.setOptions({
+			headerTitle: title,
+		})
+	}, [tabRouteName])
 
 	return (
 		<Tab.Navigator
