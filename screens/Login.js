@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useCallback } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { View, Text } from 'react-native'
 import { StyleSheet } from 'react-native'
@@ -10,28 +11,49 @@ import { Alert } from 'react-native'
 
 export default function Login() {
 	const { colorTheme } = useContext(ColorThemeContext)
-	const [loading, setLoading] = useState(true)
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState(false)
 	const [userName, setUserName] = useState('')
 	const [password, setPassword] = useState('')
-	const [captcha, setCaptcha] = useState('')
-	const [captchaUri, setCaptchaUri] = useState(null)
 
-	const [preLogin, setPreLogin] = useState(null)
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		let isActive = true
 
-	useEffect(() => {
-		async function getPreLogin() {
-			setLoading(true)
-			const data = await getCaptcha()
-			if (data.error) {
-				console.log(data.error)
-				return Alert.alert('Login setup failed', 'Failed to login!. Please try again later.')
-			}
-			setPreLogin(data)
-			setCaptchaUri(data.captcha)
-			setLoading(false)
-		}
-		getPreLogin()
-	}, [])
+	// 		async function getPreLogin() {
+	// 			setLoading(true)
+	// 			const data = await getCaptcha()
+
+	// 			if (!isActive) {
+	// 				setLoading(false)
+	// 				return
+	// 			}
+
+	// 			if (data.error) {
+	// 				console.log(data.error)
+	// 				setCaptcha('')
+	// 				setCaptchaUri('')
+	// 				setPreLogin(null)
+	// 				setLoading(false)
+	// 				return Alert.alert(
+	// 					'Login setup failed',
+	// 					`Failed to login! Please try again later. \n error: ${data.error}`
+	// 				)
+	// 			}
+
+	// 			setPreLogin(data)
+	// 			setCaptchaUri(data.captcha)
+	// 			setLoading(false)
+	// 		}
+
+	// 		getPreLogin()
+	// 		setLoading(false)
+	// 		// Optional cleanup
+	// 		return () => {
+	// 			isActive = false
+	// 		}
+	// 	}, []) // Will re-run on focus and when `error` changes
+	// )
 
 	function onChangeUserName(newUserName) {
 		setUserName(newUserName)
@@ -39,15 +61,19 @@ export default function Login() {
 	function onChangePassword(newPassword) {
 		setPassword(newPassword)
 	}
-	function onChangeCaptcha(newCaptcha) {
-		setCaptcha(newCaptcha.toUpperCase())
-	}
+
 	async function handleLogin() {
 		setLoading(true)
-		const data = await vtopLogin(userName, password, captcha, preLogin.csrf, preLogin.jsessionId)
+		setError(false)
+		const data = await vtopLogin(userName, password)
 		if (data.error) {
 			console.log(data.error)
-			return Alert.alert('Login failed', 'Failed to login!. Please try again later.')
+			setLoading(false)
+			setError(true)
+			return Alert.alert(
+				'Login setup failed',
+				`Failed to login! Please try again later. \n error: ${data.error}`
+			)
 		}
 		setLoading(false)
 		return Alert.alert('Login successful')
@@ -68,7 +94,7 @@ export default function Login() {
 			backgroundColor: colorTheme.main.primary,
 			// borderColor: colorTheme.accent.secondary,
 			borderWidth: 1,
-			marginTop: 10,
+			marginTop: 25,
 			alignSelf: 'center',
 			// justifyContent: 'center',
 			flexDirection: 'column',
@@ -78,7 +104,10 @@ export default function Login() {
 		},
 		box: {
 			padding: 8,
+			marginTop: 5,
 			width: '100%',
+			display: 'flex',
+			flexDirection: 'row',
 			justifyContent: 'center',
 			alignItems: 'center',
 		},
@@ -86,12 +115,12 @@ export default function Login() {
 			color: colorTheme.main.text,
 			fontSize: 18,
 			fontWeight: 400,
-			width: '90%',
+			// width: '50%',
 		},
 		password: {
 			color: colorTheme.main.text,
 			fontSize: 18,
-			width: '90%',
+			// width: '50%',
 			fontWeight: 400,
 		},
 		input: {
@@ -101,10 +130,12 @@ export default function Login() {
 			fontWeight: 600,
 			marginTop: 0,
 			height: 40,
-			width: '90%',
+			width: '65%',
 			paddingHorizontal: 10,
+			marginLeft: 'auto',
 			borderRadius: 6,
 			overflow: 'hidden',
+			alignSelf: 'flex-end',
 		},
 		login: {
 			color: colorTheme.main.text,
@@ -120,12 +151,12 @@ export default function Login() {
 			height: 60,
 		},
 		btn: {
-			marginTop: 15,
+			marginTop: 30,
 			backgroundColor: colorTheme.accent.secondary,
 			borderRadius: 8,
 			overflow: 'hidden',
 			padding: 8,
-			width: 90,
+			width: '70%',
 			alignItems: 'center',
 			elevation: 5,
 			shadowColor: '#000',
@@ -147,7 +178,7 @@ export default function Login() {
 			<Text style={styles.login}>Login to VTOP:</Text>
 			<View style={styles.form}>
 				<View style={styles.box}>
-					{/* <Text style={styles.username}>User Name:</Text> */}
+					<Text style={styles.username}>Username:</Text>
 					<TextInput
 						placeholder="User Name"
 						style={styles.input}
@@ -156,7 +187,7 @@ export default function Login() {
 					/>
 				</View>
 				<View style={styles.box}>
-					{/* <Text style={styles.password}>Password:</Text> */}
+					<Text style={styles.password}>Password:</Text>
 					<TextInput
 						placeholder="Password"
 						style={styles.input}
@@ -165,21 +196,15 @@ export default function Login() {
 						value={password}
 					/>
 				</View>
-				<View style={styles.box}>
-					<Image style={styles.captchaImage} source={{ uri: captchaUri }} />
-					<TextInput
-						style={[styles.input, { marginTop: 12 }]}
-						keyboardType=""
-						placeholder="Captcha"
-						onChangeText={onChangeCaptcha}
-						value={captcha}
-					/>
-				</View>
+
 				<View style={styles.btn}>
 					<Pressable
 						onPress={handleLogin}
 						style={({ pressed }) => ({
 							opacity: pressed ? 0.5 : 1,
+							width: '100%',
+							alignItems: 'center', // center text horizontally
+							justifyContent: 'center', // center text vertically if needed
 						})}
 						android_ripple={{
 							color: colorTheme.accent.primary,

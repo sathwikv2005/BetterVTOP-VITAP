@@ -1,9 +1,11 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Text } from 'react-native'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
-import { timetable } from '../../sample/timetable'
+// import { timetable } from '../../sample/timetable'
 import TimeTableDisplay from '../TimeTableDisplay'
+import { getTimeTable } from '../../util/VTOP/timeTable'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -13,8 +15,21 @@ function Test() {
 
 export function Timetable() {
 	const { colorTheme } = useContext(ColorThemeContext)
-
+	const [timetable, setTimetable] = useState([])
+	const [loading, setLoading] = useState(true)
 	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+	useEffect(() => {
+		async function getCachedTimetable() {
+			setLoading(true)
+			let data = await JSON.parse(await AsyncStorage.getItem('timetable'))
+
+			if (!data) data = []
+			setTimetable(data)
+			setLoading(false)
+		}
+		getCachedTimetable().then(() => setLoading(false))
+	}, [])
 
 	var todayIndex = new Date().getDay()
 	if (todayIndex === 0) todayIndex = 1
@@ -22,81 +37,87 @@ export function Timetable() {
 
 	const initialRouteName = weekdayMap[todayIndex]
 
-	return (
-		<>
-			<Tab.Navigator
-				initialRouteName={initialRouteName}
-				screenOptions={{
-					tabBarStyle: {
-						backgroundColor: colorTheme.main.secondary,
-						elevation: 8, // Android shadow depth
-						shadowColor: colorTheme.accent.secondary, // Android & iOS shadow color
-						shadowOffset: { width: 0, height: 4 }, // iOS only
-						shadowOpacity: 0.3, // iOS only
-						shadowRadius: 5, // iOS only
-					},
-					tabBarIndicatorStyle: {
-						backgroundColor: colorTheme.accent.primary,
-						oppacity: '50%',
-					},
+	return loading ? (
+		<Text style={{ color: colorTheme.main.text, fontSize: 20 }}>Loading...</Text>
+	) : (
+		<Tab.Navigator
+			initialRouteName={initialRouteName}
+			screenOptions={{
+				tabBarStyle: {
+					backgroundColor: colorTheme.main.secondary,
+					elevation: 8, // Android shadow depth
+					shadowColor: colorTheme.accent.secondary, // Android & iOS shadow color
+					shadowOffset: { width: 0, height: 4 }, // iOS only
+					shadowOpacity: 0.3, // iOS only
+					shadowRadius: 5, // iOS only
+				},
+				tabBarIndicatorStyle: {
+					backgroundColor: colorTheme.accent.primary,
+					oppacity: '50%',
+				},
 
-					tabBarActiveTintColor: colorTheme.accent.primary,
-					tabBarInactiveTintColor: colorTheme.main.tertiary,
-					tabBarBounces: true,
+				tabBarActiveTintColor: colorTheme.accent.primary,
+				tabBarInactiveTintColor: colorTheme.main.tertiary,
+				tabBarBounces: true,
+			}}
+		>
+			{timetable.length === 6 && (
+				<Tab.Screen
+					name="MON"
+					component={TimeTableDisplay}
+					initialParams={{
+						setTimetable,
+						data: timetable.filter((item) => item.day === 'MON'),
+						day: 'MON',
+					}}
+				/>
+			)}
+
+			<Tab.Screen
+				name="TUE"
+				component={TimeTableDisplay}
+				initialParams={{
+					setTimetable,
+					data: timetable.filter((item) => item.day === 'TUE'),
+					day: 'TUE',
 				}}
-			>
-				{timetable.length === 6 && (
-					<Tab.Screen
-						name="MON"
-						component={TimeTableDisplay}
-						initialParams={{
-							data: timetable.filter((item) => item.day === 'MON'),
-							day: 'MON',
-						}}
-					/>
-				)}
-
-				<Tab.Screen
-					name="TUE"
-					component={TimeTableDisplay}
-					initialParams={{
-						data: timetable.filter((item) => item.day === 'TUE'),
-						day: 'TUE',
-					}}
-				/>
-				<Tab.Screen
-					name="WED"
-					component={TimeTableDisplay}
-					initialParams={{
-						data: timetable.filter((item) => item.day === 'WED'),
-						day: 'WED',
-					}}
-				/>
-				<Tab.Screen
-					name="THU"
-					component={TimeTableDisplay}
-					initialParams={{
-						data: timetable.filter((item) => item.day === 'THU'),
-						day: 'THU',
-					}}
-				/>
-				<Tab.Screen
-					name="FRI"
-					component={TimeTableDisplay}
-					initialParams={{
-						data: timetable.filter((item) => item.day === 'FRI'),
-						day: 'FRI',
-					}}
-				/>
-				<Tab.Screen
-					name="SAT"
-					component={TimeTableDisplay}
-					initialParams={{
-						data: timetable.filter((item) => item.day === 'SAT'),
-						day: 'SAT',
-					}}
-				/>
-			</Tab.Navigator>
-		</>
+			/>
+			<Tab.Screen
+				name="WED"
+				component={TimeTableDisplay}
+				initialParams={{
+					setTimetable,
+					data: timetable.filter((item) => item.day === 'WED'),
+					day: 'WED',
+				}}
+			/>
+			<Tab.Screen
+				name="THU"
+				component={TimeTableDisplay}
+				initialParams={{
+					setTimetable,
+					data: timetable.filter((item) => item.day === 'THU'),
+					day: 'THU',
+				}}
+			/>
+			<Tab.Screen
+				name="FRI"
+				component={TimeTableDisplay}
+				initialParams={{
+					setTimetable,
+					data: timetable.filter((item) => item.day === 'FRI'),
+					day: 'FRI',
+				}}
+			/>
+			<Tab.Screen
+				name="SAT"
+				component={TimeTableDisplay}
+				initialParams={{
+					setTimetable,
+					data: timetable.filter((item) => item.day === 'SAT'),
+					day: 'SAT',
+				}}
+			/>
+		</Tab.Navigator>
 	)
 }

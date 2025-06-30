@@ -1,5 +1,7 @@
 import { Text, View } from 'react-native'
 import { ColorThemeContext } from '../context/ColorThemeContext'
+import Fontisto from '@expo/vector-icons/Fontisto'
+import Entypo from '@expo/vector-icons/Entypo'
 import { useContext } from 'react'
 import { StyleSheet } from 'react-native'
 
@@ -51,7 +53,7 @@ export default function ClassItem({ item, day, ...props }) {
 		},
 		sub: {
 			color: colorTheme.main.text,
-
+			marginTop: 8,
 			fontSize: 14,
 			fontWeight: 400,
 		},
@@ -84,6 +86,10 @@ export default function ClassItem({ item, day, ...props }) {
 		upcomingOpacity: {
 			opacity: 0.8,
 		},
+		icon: {
+			fontSize: 20,
+			marginTop: 4,
+		},
 	})
 
 	const startHour = parseInt(item.timings.start.split(':')[0])
@@ -96,7 +102,10 @@ export default function ClassItem({ item, day, ...props }) {
 	const endTotalMinutes = endHour * 60 + endMinute
 
 	let borderStyle, opacity
-	if (currentTotalMinutes > endTotalMinutes) {
+	if (routeName !== day) {
+		borderStyle = styles.complete
+		opacity = styles.completeOpacity
+	} else if (currentTotalMinutes > endTotalMinutes) {
 		borderStyle = styles.complete
 		opacity = styles.completeOpacity
 	} else if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes <= endTotalMinutes) {
@@ -110,8 +119,14 @@ export default function ClassItem({ item, day, ...props }) {
 	return (
 		<View style={[styles.container, opacity]}>
 			<View style={[styles.box, styles.left, borderStyle]}>
-				<Text style={[styles.type]}>{item.type === 'lab' ? 'Lab' : 'Theory'}</Text>
-				<Text style={styles.main}>{item.courseCode}</Text>
+				<View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+					{item.type === 'lab' ? (
+						<Fontisto name="laboratory" style={styles.icon} color={colorTheme.main.text} />
+					) : (
+						<Entypo name="open-book" style={styles.icon} color={colorTheme.main.text} />
+					)}
+					<Text style={styles.main}>{item.courseCode}</Text>
+				</View>
 				<Text style={styles.sub}>{item.venue}</Text>
 			</View>
 			<View style={[styles.box, styles.right]}>

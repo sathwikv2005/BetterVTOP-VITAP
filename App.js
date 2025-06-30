@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
+import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { Text, View, ActivityIndicator } from 'react-native'
 import { Home } from './screens/Home'
@@ -48,7 +49,7 @@ function MainApp() {
 	}
 
 	return (
-		<NavigationContainer theme={MyTheme}>
+		<NavigationContainer ref={navigationRef} theme={MyTheme}>
 			<StatusBar style="light" />
 			<Drawer.Navigator
 				id="RootDrawer"

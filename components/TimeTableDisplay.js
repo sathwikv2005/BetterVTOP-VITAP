@@ -4,33 +4,31 @@ import { ColorThemeContext } from '../context/ColorThemeContext'
 import { StyleSheet } from 'react-native'
 import { FlatList } from 'react-native'
 import ClassItem from './ClassItem'
+import { getTimeTable } from '../util/VTOP/timeTable'
+import { Alert } from 'react-native'
 
 export default function TimeTableDisplay({ route }) {
 	const { colorTheme } = useContext(ColorThemeContext)
-	let { data, day } = route.params
-
-	if (!data || data.length === 0 || data[0].classes.length === 0) {
-		return <Text style={{ color: 'white' }}>No classes for this day!</Text>
-	}
+	let { data, day, setTimetable } = route.params
 
 	const sortedClasses = useMemo(() => {
 		// Only sort once when component mounts or data changes
+		if (!data[0] || !data[0].classes) return []
 		return sortClasses(data[0])
 	}, [data])
 
 	const [refreshing, setRefreshing] = useState(false)
 
 	// Pull-to-refresh handler
-	const onRefresh = useCallback(() => {
+	const onRefresh = useCallback(async () => {
 		setRefreshing(true)
 
-		//TODO: handle refresh
+		const data = await getTimeTable()
 
-		// Simulate an async data refresh
-		setTimeout(() => {
-			setRefreshing(false)
-			console.log('Data refreshed!')
-		}, 2000)
+		setTimetable(data)
+
+		setRefreshing(false)
+		Alert.alert('Timetable refreshed!')
 	}, [])
 
 	const styles = StyleSheet.create({
@@ -41,6 +39,12 @@ export default function TimeTableDisplay({ route }) {
 			flexDirection: 'column',
 			alignContent: 'center',
 			alignSelf: 'center',
+		},
+		emptyText: {
+			color: 'white',
+			textAlign: 'center',
+			marginTop: 50,
+			fontSize: 18,
 		},
 	})
 
@@ -53,11 +57,15 @@ export default function TimeTableDisplay({ route }) {
 			renderItem={({ item }) => <ClassItem item={item} day={day} />}
 			refreshing={refreshing}
 			onRefresh={onRefresh}
+			ListEmptyComponent={<Text style={styles.emptyText}>No classes for this day!</Text>}
 		/>
 	)
 }
 
 function sortClasses(data) {
+	if (!data || data.classes.length === 0) {
+		return []
+	}
 	const sorted = data.classes.slice().sort((a, b) => a.timings.start.localeCompare(b.timings.start))
 
 	const merged = []
