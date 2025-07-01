@@ -43,7 +43,6 @@ export async function getAttendance(overrideSemID) {
 			if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
 
 		const html = await response.text()
-		console.log(html)
 		const document = parseDocument(html)
 
 		const attendance = parseAttendance(document)
@@ -56,7 +55,10 @@ export async function getAttendance(overrideSemID) {
 			})
 		)
 
-		return attendance
+		return {
+			attendance,
+			createdAt: getTime(),
+		}
 	} catch (err) {
 		console.error('Error fetching attendance:', err)
 		return { error: err }
