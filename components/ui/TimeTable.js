@@ -42,7 +42,11 @@ export function Timetable() {
 	const initialRouteName = weekdayMap[todayIndex]
 
 	return loading ? (
-		<Text style={{ color: colorTheme.main.text, fontSize: 20 }}>Loading...</Text>
+		<Text
+			style={{ color: colorTheme.main.text, fontSize: 20, textAlign: 'center', marginTop: '50%' }}
+		>
+			Loading...
+		</Text>
 	) : (
 		<Tab.Navigator
 			initialRouteName={initialRouteName}
