@@ -6,29 +6,33 @@ import { FlatList } from 'react-native'
 import ClassItem from './ClassItem'
 import { getTimeTable } from '../util/VTOP/timeTable'
 import { Alert } from 'react-native'
+import { getAllData } from '../util/VTOP/getAllData'
 
 export default function TimeTableDisplay({ route }) {
 	const { colorTheme } = useContext(ColorThemeContext)
-	let { data, day, setTimetable } = route.params
-
+	let { data, day, setTimetable, setLastUpdated, lastUpdated } = route.params
 	const sortedClasses = useMemo(() => {
 		// Only sort once when component mounts or data changes
 		if (!data[0] || !data[0].classes) return []
 		return sortClasses(data[0])
 	}, [data])
-
 	const [refreshing, setRefreshing] = useState(false)
 
 	// Pull-to-refresh handler
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true)
 
-		const data = await getTimeTable()
-
-		setTimetable(data)
-
+		const data = await getAllData()
+		if (data.error) {
+			console.log(data.error)
+			setRefreshing(false)
+			return Alert.alert('Failed to login, please try again.')
+		}
+		console.log(data)
+		setTimetable(data.timetable.timetable)
+		setLastUpdated(data.timetable.createdAt)
 		setRefreshing(false)
-		Alert.alert('Timetable refreshed!')
+		Alert.alert('Timetable & Attendance refreshed!')
 	}, [])
 
 	const styles = StyleSheet.create({
@@ -46,19 +50,31 @@ export default function TimeTableDisplay({ route }) {
 			marginTop: 50,
 			fontSize: 18,
 		},
+		lastUpdated: {
+			color: colorTheme.main.tertiary,
+			alignSelf: 'center',
+			// top: -25,
+		},
 	})
 
 	return (
-		<FlatList
-			style={{ backgroundColor: colorTheme.main.primary }}
-			contentContainerStyle={styles.list}
-			data={sortedClasses}
-			keyExtractor={(item) => item.class}
-			renderItem={({ item }) => <ClassItem item={item} day={day} />}
-			refreshing={refreshing}
-			onRefresh={onRefresh}
-			ListEmptyComponent={<Text style={styles.emptyText}>No classes for this day!</Text>}
-		/>
+		<View>
+			<FlatList
+				style={{ backgroundColor: colorTheme.main.primary }}
+				contentContainerStyle={styles.list}
+				data={sortedClasses}
+				keyExtractor={(item) => item.class}
+				renderItem={({ item }) => <ClassItem item={item} day={day} />}
+				refreshing={refreshing}
+				onRefresh={onRefresh}
+				ListEmptyComponent={<Text style={styles.emptyText}>No classes for this day!</Text>}
+				ListFooterComponent={
+					<View style={{ paddingTop: 20, alignItems: 'center' }}>
+						<Text style={styles.lastUpdated}>Last updated on {lastUpdated}</Text>
+					</View>
+				}
+			/>
+		</View>
 	)
 }
 

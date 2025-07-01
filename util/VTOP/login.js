@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
+import { fetchVtopData } from './getAllData'
 
 // Fetch captcha + pre-login setup
 export async function getCaptcha() {

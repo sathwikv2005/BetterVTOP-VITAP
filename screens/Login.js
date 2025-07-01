@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState, useCallback } from 'react'
-import { useFocusEffect } from '@react-navigation/native'
+import { useContext, useEffect, useState } from 'react'
 import { ColorThemeContext } from '../context/ColorThemeContext'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { View, Text } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { TextInput } from 'react-native'
@@ -8,6 +8,7 @@ import { Image } from 'react-native'
 import { Pressable } from 'react-native'
 import { getCaptcha, vtopLogin } from '../util/VTOP/login'
 import { Alert } from 'react-native'
+import { fetchVtopData } from '../util/VTOP/getAllData'
 
 export default function Login() {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -16,44 +17,17 @@ export default function Login() {
 	const [userName, setUserName] = useState('')
 	const [password, setPassword] = useState('')
 
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		let isActive = true
-
-	// 		async function getPreLogin() {
-	// 			setLoading(true)
-	// 			const data = await getCaptcha()
-
-	// 			if (!isActive) {
-	// 				setLoading(false)
-	// 				return
-	// 			}
-
-	// 			if (data.error) {
-	// 				console.log(data.error)
-	// 				setCaptcha('')
-	// 				setCaptchaUri('')
-	// 				setPreLogin(null)
-	// 				setLoading(false)
-	// 				return Alert.alert(
-	// 					'Login setup failed',
-	// 					`Failed to login! Please try again later. \n error: ${data.error}`
-	// 				)
-	// 			}
-
-	// 			setPreLogin(data)
-	// 			setCaptchaUri(data.captcha)
-	// 			setLoading(false)
-	// 		}
-
-	// 		getPreLogin()
-	// 		setLoading(false)
-	// 		// Optional cleanup
-	// 		return () => {
-	// 			isActive = false
-	// 		}
-	// 	}, []) // Will re-run on focus and when `error` changes
-	// )
+	useEffect(() => {
+		async function getSavedCred() {
+			const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
+				'username',
+				'password',
+			])
+			setUserName(savedUsername)
+			setPassword(savedPassword)
+		}
+		getSavedCred()
+	}, [])
 
 	function onChangeUserName(newUserName) {
 		setUserName(newUserName)
@@ -75,8 +49,9 @@ export default function Login() {
 				`Failed to login! Please try again later. \n error: ${data.error}`
 			)
 		}
+		const vtopData = await fetchVtopData()
 		setLoading(false)
-		return Alert.alert('Login successful')
+		return Alert.alert('Login successful', 'Data fetched')
 	}
 
 	const styles = StyleSheet.create({
@@ -211,7 +186,7 @@ export default function Login() {
 							borderless: false,
 						}}
 					>
-						<Text style={styles.btnText}>Login</Text>
+						<Text style={styles.btnText}>Get VTOP data</Text>
 					</Pressable>
 				</View>
 			</View>

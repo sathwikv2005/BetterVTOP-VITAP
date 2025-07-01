@@ -4,18 +4,15 @@ import { Text } from 'react-native'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 // import { timetable } from '../../sample/timetable'
 import TimeTableDisplay from '../TimeTableDisplay'
-import { getTimeTable } from '../../util/VTOP/timeTable'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { getTime } from '../../util/getTime'
 
 const Tab = createMaterialTopTabNavigator()
-
-function Test() {
-	return <Text>Test</Text>
-}
 
 export function Timetable() {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [timetable, setTimetable] = useState([])
+	const [lastUpdated, setLastUpdated] = useState([])
 	const [loading, setLoading] = useState(true)
 	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
@@ -24,16 +21,23 @@ export function Timetable() {
 			setLoading(true)
 			let data = await JSON.parse(await AsyncStorage.getItem('timetable'))
 
-			if (!data) data = []
-			setTimetable(data)
+			if (!data)
+				data = {
+					timetable: [],
+					createdAt: getTime(),
+				}
+			setTimetable(data.timetable)
+			setLastUpdated(data.createdAt)
 			setLoading(false)
 		}
 		getCachedTimetable().then(() => setLoading(false))
-	}, [])
+	}, [lastUpdated])
 
 	var todayIndex = new Date().getDay()
 	if (todayIndex === 0) todayIndex = 1
-	if (timetable.length !== 6 && todayIndex < 2) todayIndex = 2
+
+	if (!timetable || timetable === undefined) setTimetable([])
+	if (timetable && timetable?.length !== 6 && todayIndex < 2) todayIndex = 2
 
 	const initialRouteName = weekdayMap[todayIndex]
 
@@ -67,6 +71,8 @@ export function Timetable() {
 					component={TimeTableDisplay}
 					initialParams={{
 						setTimetable,
+						setLastUpdated,
+						lastUpdated,
 						data: timetable.filter((item) => item.day === 'MON'),
 						day: 'MON',
 					}}
@@ -78,6 +84,8 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					setLastUpdated,
+					lastUpdated,
 					data: timetable.filter((item) => item.day === 'TUE'),
 					day: 'TUE',
 				}}
@@ -87,6 +95,8 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					setLastUpdated,
+					lastUpdated,
 					data: timetable.filter((item) => item.day === 'WED'),
 					day: 'WED',
 				}}
@@ -96,6 +106,8 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					setLastUpdated,
+					lastUpdated,
 					data: timetable.filter((item) => item.day === 'THU'),
 					day: 'THU',
 				}}
@@ -105,6 +117,8 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					setLastUpdated,
+					lastUpdated,
 					data: timetable.filter((item) => item.day === 'FRI'),
 					day: 'FRI',
 				}}
@@ -114,6 +128,8 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					setLastUpdated,
+					lastUpdated,
 					data: timetable.filter((item) => item.day === 'SAT'),
 					day: 'SAT',
 				}}

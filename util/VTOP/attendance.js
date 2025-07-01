@@ -3,12 +3,10 @@ import { parseDocument } from 'htmlparser2'
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
-import { parseTimeTable } from '../parse/parseTimeTable'
-import { vtopLogin } from './login'
-import { Alert } from 'react-native'
+import { parseAttendance } from '../parse/parseAttendance'
 import { getTime } from '../getTime'
 
-export async function getTimeTable(overrideSemID) {
+export async function getAttendance(overrideSemID) {
 	try {
 		const [[, csrf], [, jsessionId], [, username]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -26,7 +24,7 @@ export async function getTimeTable(overrideSemID) {
 		params.append('semesterSubId', semID)
 		params.append('authorizedID', username.toUpperCase())
 		params.append('x', new Date().toUTCString())
-		const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.viewTimeTable, {
+		const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.ViewStudentAttendance, {
 			method: 'POST',
 			headers: {
 				...Headers,
@@ -41,27 +39,26 @@ export async function getTimeTable(overrideSemID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			return goToDrawerTab('login')
 		}
-		if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
+		if (!response.ok)
+			if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
 
 		const html = await response.text()
+		console.log(html)
 		const document = parseDocument(html)
 
-		const timetable = parseTimeTable(document)
+		const attendance = parseAttendance(document)
 
 		await AsyncStorage.setItem(
-			'timetable',
+			'attendance',
 			JSON.stringify({
-				timetable,
+				attendance,
 				createdAt: getTime(),
 			})
 		)
-		// console.log(timetable[0])
-		return {
-			timetable,
-			createdAt: getTime(),
-		}
+
+		return attendance
 	} catch (err) {
-		console.error('Error fetching time table:', err)
+		console.error('Error fetching attendance:', err)
 		return { error: err }
 	}
 }
