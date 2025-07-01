@@ -13,17 +13,14 @@ export default {
 		splash: {
 			image: './assets/splash-icon.png',
 			resizeMode: 'contain',
-			backgroundColor: '#ffffff',
+			backgroundColor: '#000000',
 		},
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
 		},
 		android: {
-			adaptiveIcon: {
-				foregroundImage: './assets/adaptive-icon.png',
-				backgroundColor: '#ffffff',
-			},
+			icon: './assets/icon.png',
 			package: 'com.anonymous.BetterVTOP',
 		},
 		web: {
