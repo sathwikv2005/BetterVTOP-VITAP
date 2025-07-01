@@ -94,9 +94,9 @@ export default function Settings() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.heading}>Color Theme (Beta)</Text>
+			<Text style={styles.heading}>Color Theme</Text>
 
-			<View style={styles.setting}>
+			{/* <View style={styles.setting}>
 				<Text style={styles.label}>Main Color:</Text>
 				<DropDownPicker
 					dropDownDirection="AUTO"
@@ -121,7 +121,7 @@ export default function Settings() {
 					setValue={setMainValue}
 					onChangeValue={handleMainThemeChange}
 				/>
-			</View>
+			</View> */}
 
 			<View style={styles.setting}>
 				<Text style={styles.label}>Accent Color:</Text>
