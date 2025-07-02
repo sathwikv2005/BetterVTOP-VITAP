@@ -9,7 +9,10 @@ import { formatCourseTitle } from '../util/formatCourseTitle'
 export default function AttendanceItem({ data, minPercent, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
-
+	console.log(data)
+	const splitData = data.courseDetails.split('-')
+	const courseCode = splitData[0]
+	const courseTitle = splitData[1]
 	const style = StyleSheet.create({
 		container: {
 			width: '95%',
@@ -55,9 +58,13 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 			fontWeight: 600,
 		},
 		percentage: {
-			fontSize: 17,
+			fontSize: 16,
 			fontWeight: 600,
-			marginRight: 5,
+			backgroundColor: colorTheme.main.text,
+			borderRadius: 5,
+			padding: 3,
+			paddingHorizontal: 8,
+			marginRight: -2,
 		},
 		green: {
 			color: '#01BD39FF',
@@ -83,12 +90,13 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 		},
 		details: {
 			flexDirection: 'row',
-			justifyContent: 'space-around',
-			marginTop: -5,
+			justifyContent: 'space-between',
+			marginTop: -8,
 		},
-		detailsBox: {
-			width: '50%',
-		},
+		// detailsBox: {
+		// 	width: '50%',
+		// },
+		buffer: {},
 		icon: {
 			fontSize: 18,
 			marginTop: 0,
@@ -111,7 +119,7 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 							/>
 						)}
 						<Text style={[style.mainText, style.headerText]}>
-							{formatCourseTitle(data.courseDetails)}
+							{formatCourseTitle(courseTitle, 35)}
 						</Text>
 					</View>
 					<Text style={[style.percentage, attendanceGreen ? style.green : style.red]}>
@@ -134,7 +142,7 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 								attendanceGreen ? style.green : style.red,
 							]}
 						>
-							{attendanceGreen ? 'Can skip' : 'Need to Attend'}
+							{attendanceGreen ? 'Can Skip' : 'Must Attend'}
 						</Text>
 						<Text
 							style={[
