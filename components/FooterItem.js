@@ -11,7 +11,7 @@ export default function FooterItem({ lastUpdated, style, savedSem, ...props }) {
 			<Text style={style}>Last updated on {lastUpdated}</Text>
 			<Text style={style}>{savedSem ? savedSem.sem : ''}</Text>
 			<Pressable onPress={() => goToDrawerTab('settings')}>
-				<Text style={[style, { color: colorTheme.accent.secondary }]}>change semister</Text>
+				<Text style={[style, { color: colorTheme.accent.secondary }]}>change semester</Text>
 			</Pressable>
 		</View>
 	)

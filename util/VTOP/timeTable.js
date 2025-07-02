@@ -17,6 +17,7 @@ export async function getTimeTable(overrideSemID) {
 			'sem',
 		])
 		const sem = await JSON.parse(savedSem)
+		console.log(sem)
 		const semID = overrideSemID || sem?.semID
 		if (!csrf || !jsessionId || !username || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])

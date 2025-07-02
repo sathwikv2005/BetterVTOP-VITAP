@@ -9,7 +9,7 @@ import { formatCourseTitle } from '../util/formatCourseTitle'
 export default function AttendanceItem({ data, minPercent, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
-	console.log(data)
+
 	const splitData = data.courseDetails.split('-')
 	const courseCode = splitData[0]
 	const courseTitle = splitData[1]
