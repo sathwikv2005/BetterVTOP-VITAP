@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { Text, View } from 'react-native'
+import { Pressable, Text, View, Modal } from 'react-native'
 import { FlatList } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
@@ -18,23 +18,41 @@ export function Attendance() {
 	const [refreshing, setRefreshing] = useState(false)
 	const [lastUpdated, setLastUpdated] = useState(getTime())
 	const [attendance, setAttendance] = useState([])
+	const [attendanceData, setAttendanceData] = useState([])
 	const [savedSem, setSavedSem] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [minPercentage, setMinPercentage] = useState(75)
 
+	const [selectedItem, setSelectedItem] = useState(null)
+	const [courseItem, setCourseItem] = useState(null)
+	const [modalVisible, setModalVisible] = useState(false)
+
+	const openModal = (item) => {
+		console.log(item)
+		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
+		console.log(target)
+		setSelectedItem(item)
+		setCourseItem(target)
+		setModalVisible(true)
+	}
+
+	const closeModal = () => {
+		setModalVisible(false)
+		setSelectedItem(null)
+	}
+
 	useEffect(() => {
 		async function getCachedAttendance() {
 			setLoading(true)
-			const [[, attendanceStr], [, minPercentStr], [, semStr]] = await AsyncStorage.multiGet([
-				'attendance',
-				'minPercent',
-				'sem',
-			])
+			const [[, attendanceStr], [, attendanceDataStr], [, minPercentStr], [, semStr]] =
+				await AsyncStorage.multiGet(['attendance', 'attendanceData', 'minPercent', 'sem'])
 			console.log(semStr)
 			const data = await JSON.parse(attendanceStr)
+			const savedAttendanceData = JSON.parse(attendanceDataStr)
 			const cachedMinPercentage = parseInt(minPercentStr)
 			const sem = (await JSON.parse(semStr)) || null
 			setSavedSem(sem)
+			setAttendanceData(savedAttendanceData.attendanceData)
 			if (cachedMinPercentage && !isNaN(cachedMinPercentage)) setMinPercentage(cachedMinPercentage)
 
 			if (!data) data = []
@@ -108,6 +126,30 @@ export function Attendance() {
 			gap: 5,
 			// justifyContent: 'space-around',
 		},
+		modalOverlay: {
+			flex: 1,
+			backgroundColor: 'rgba(0,0,0,0.5)',
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
+		modalContent: {
+			backgroundColor: '#fff',
+			padding: 20,
+			borderRadius: 10,
+			width: '80%',
+		},
+		modalTitle: {
+			fontSize: 18,
+			fontWeight: 'bold',
+			marginBottom: 10,
+		},
+		closeButton: {
+			marginTop: 20,
+			alignSelf: 'flex-end',
+		},
+		closeText: {
+			color: 'blue',
+		},
 	})
 
 	async function onChangeMinPercent(newMinPercent) {
@@ -136,7 +178,11 @@ export function Attendance() {
 				contentContainerStyle={styles.list}
 				data={attendance}
 				keyExtractor={(item) => item.classDetails}
-				renderItem={({ item }) => <AttendanceItem data={item} minPercent={minPercentage} />}
+				renderItem={({ item }) => (
+					<Pressable onPress={() => openModal(item)}>
+						<AttendanceItem data={item} minPercent={minPercentage} />
+					</Pressable>
+				)}
 				refreshing={refreshing}
 				onRefresh={onRefresh}
 				ListEmptyComponent={
@@ -147,6 +193,35 @@ export function Attendance() {
 				}
 				ListFooterComponentStyle={{ flexGrow: 1 }}
 			/>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={modalVisible}
+				onRequestClose={closeModal}
+			>
+				<View style={styles.modalOverlay}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>Attendance Details</Text>
+						<Text>Course: {courseItem?.courseDetails}</Text>
+						<Text>Faculty: {courseItem?.faculty}</Text>
+						<Text>Attended: {courseItem?.attendance.attended}</Text>
+						<Text>Absent: {courseItem?.attendance.absent}</Text>
+						<Text>On Duty: {courseItem?.attendance.onduty}</Text>
+						<Text>
+							Not Posted:{' '}
+							{courseItem?.attendance.total -
+								courseItem?.attendance.attended -
+								courseItem?.attendance.absent}
+						</Text>
+						<Text>Total: {courseItem?.attendance.total}</Text>
+						<Text>Percentage: {courseItem?.attendance.percentage}%</Text>
+						<Text>CAT2/FAT: {selectedItem?.cat2FatPercentage}%</Text>
+						<Pressable onPress={closeModal} style={styles.closeButton}>
+							<Text style={styles.closeText}>Close</Text>
+						</Pressable>
+					</View>
+				</View>
+			</Modal>
 		</View>
 	)
 }

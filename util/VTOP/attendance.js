@@ -57,7 +57,9 @@ export async function getAttendance(overrideSemID) {
 				createdAt: getTime(),
 			})
 		)
+
 		const attendanceData = await getAttendanceDetails()
+
 		return {
 			attendance,
 			attendanceData,
@@ -84,6 +86,14 @@ export async function getAttendanceDetails() {
 		)
 
 		// const attendanceData = [await fetchAttendanceDetails('AM_CSE1005_00100', 'ETH')]
+
+		await AsyncStorage.setItem(
+			'attendanceData',
+			JSON.stringify({
+				attendanceData,
+				createdAt: getTime(),
+			})
+		)
 
 		return attendanceData
 	} catch (err) {
@@ -144,10 +154,7 @@ export async function fetchAttendanceDetails(ID, type) {
 
 		await AsyncStorage.setItem(`attendance-${ID}-${type}`, JSON.stringify({ attendanceData }))
 
-		return {
-			attendanceData,
-			createdAt: getTime(),
-		}
+		return attendanceData
 	} catch (err) {
 		console.error('Error getting attendance details:', err)
 		return { error: err }
