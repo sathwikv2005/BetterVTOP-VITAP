@@ -10,7 +10,7 @@ export default function ClassItem({ item, day, ...props }) {
 	const hour = new Date().getHours()
 	const minutes = new Date().getMinutes()
 	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-
+	console.log(item)
 	var todayIndex = new Date().getDay()
 
 	const routeName = weekdayMap[todayIndex]
@@ -57,6 +57,9 @@ export default function ClassItem({ item, day, ...props }) {
 			fontSize: 14,
 			fontWeight: 400,
 		},
+		highlights: {
+			color: colorTheme.accent.primary,
+		},
 		type: {
 			fontWeight: 400,
 			color: colorTheme.main.text,
@@ -98,9 +101,9 @@ export default function ClassItem({ item, day, ...props }) {
 	const endMinute = parseInt(item.timings.end.split(':')[1])
 
 	const currentTotalMinutes = hour * 60 + minutes
-	const startTotalMinutes = startHour * 60 + startMinute
+	const startTotalMinutes = startHour * 60 + startMinute - 5
 	const endTotalMinutes = endHour * 60 + endMinute
-
+	let isOngoing = false
 	let borderStyle, opacity
 	if (routeName !== day) {
 		borderStyle = styles.complete
@@ -111,6 +114,7 @@ export default function ClassItem({ item, day, ...props }) {
 	} else if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes <= endTotalMinutes) {
 		borderStyle = styles.ongoing
 		opacity = styles.ongoingOpacity
+		isOngoing = true
 	} else {
 		borderStyle = styles.upcoming
 		opacity = styles.upcomingOpacity
@@ -121,11 +125,19 @@ export default function ClassItem({ item, day, ...props }) {
 			<View style={[styles.box, styles.left, borderStyle]}>
 				<View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
 					{item.type === 'lab' ? (
-						<Fontisto name="laboratory" style={styles.icon} color={colorTheme.main.text} />
+						<Fontisto
+							name="laboratory"
+							style={styles.icon}
+							color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
+						/>
 					) : (
-						<Entypo name="open-book" style={styles.icon} color={colorTheme.main.text} />
+						<Entypo
+							name="open-book"
+							style={styles.icon}
+							color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
+						/>
 					)}
-					<Text style={styles.main}>{item.courseCode}</Text>
+					<Text style={[styles.main, isOngoing ? styles.highlights : '']}>{item.courseCode}</Text>
 				</View>
 				<Text style={styles.sub}>{item.venue}</Text>
 			</View>
