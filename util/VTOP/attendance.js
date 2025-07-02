@@ -5,6 +5,7 @@ import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
 import { parseAttendance } from '../parse/parseAttendance'
 import { getTime } from '../getTime'
+import { parseAttendanceByID } from '../parse/parseAttendanceDetails'
 
 export async function getAttendance(overrideSemID) {
 	try {
@@ -56,13 +57,99 @@ export async function getAttendance(overrideSemID) {
 				createdAt: getTime(),
 			})
 		)
-
+		const attendanceData = await getAttendanceDetails()
 		return {
 			attendance,
+			attendanceData,
 			createdAt: getTime(),
 		}
 	} catch (err) {
 		console.error('Error fetching attendance:', err)
+		return { error: err }
+	}
+}
+
+export async function getAttendanceDetails() {
+	try {
+		const cached = await AsyncStorage.getItem('attendance')
+		const attendanceArray = cached ? JSON.parse(cached).attendance : null
+
+		if (!attendanceArray || attendanceArray.length === 0) {
+			console.log('No cached attendance')
+			return goToDrawerTab('login')
+		}
+
+		const attendanceData = await Promise.all(
+			attendanceArray.map(({ courseID, classType }) => fetchAttendanceDetails(courseID, classType))
+		)
+
+		// const attendanceData = [await fetchAttendanceDetails('AM_CSE1005_00100', 'ETH')]
+
+		return attendanceData
+	} catch (err) {
+		console.error('Error getting attendance details:', err)
+		return { error: err }
+	}
+}
+
+export async function fetchAttendanceDetails(ID, type) {
+	try {
+		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
+			'csrfToken',
+			'sessionId',
+			'username',
+			'sem',
+		])
+		const sem = await JSON.parse(savedSem)
+		const semID = sem?.semID
+		if (!csrf || !jsessionId || !username || !semID) {
+			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			return goToDrawerTab('login')
+		}
+
+		const params = new URLSearchParams()
+		params.append('_csrf', csrf)
+		params.append('semesterSubId', semID)
+		params.append('registerNumber', username.toUpperCase())
+		params.append('authorizedID', username.toUpperCase())
+		params.append('courseId', ID)
+		params.append('courseType', type)
+		params.append('x', new Date().toUTCString())
+		const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.ViewAttendanceDetail, {
+			method: 'POST',
+			headers: {
+				...Headers,
+				Cookie: `JSESSIONID=${jsessionId}`,
+			},
+			credentials: 'omit',
+			body: params.toString(),
+		})
+
+		if (response.status === 404) {
+			console.log(await response.text())
+			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			return goToDrawerTab('login')
+		}
+		if (!response.ok)
+			if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
+
+		const html = await response.text()
+		const document = parseDocument(html)
+
+		const attendanceData = parseAttendanceByID(document)
+		// console.log('attendance data:')
+		// console.log(attendanceData)
+		// console.log('attendance data log:')
+		// console.log(attendanceData.attendance.log)
+
+		await AsyncStorage.setItem(`attendance-${ID}-${type}`, JSON.stringify({ attendanceData }))
+
+		return {
+			attendanceData,
+			createdAt: getTime(),
+		}
+	} catch (err) {
+		console.error('Error getting attendance details:', err)
 		return { error: err }
 	}
 }

@@ -28,6 +28,7 @@ export function parseAttendance(doc) {
 			attended: getSpanText(cols[5]),
 			totalClasses: getSpanText(cols[6]),
 			percentage: getSpanText(cols[7])?.replace('%', ''),
+			cat2FatPercentage: getSpanText(cols[8])?.replace('%', ''),
 			semesterId,
 			courseID,
 			classType,

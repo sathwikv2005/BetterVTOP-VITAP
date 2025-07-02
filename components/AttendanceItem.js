@@ -9,7 +9,7 @@ import { formatCourseTitle } from '../util/formatCourseTitle'
 export default function AttendanceItem({ data, minPercent, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
-
+	const btwExamsGreen = parseInt(data.cat2FatPercentage) >= parseInt(minPercent)
 	const splitData = data.courseDetails.split('-')
 	const courseCode = splitData[0]
 	const courseTitle = splitData[1]
@@ -90,13 +90,19 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 		},
 		details: {
 			flexDirection: 'row',
-			justifyContent: 'space-between',
+			justifyContent: 'space-evenly',
 			marginTop: -8,
 		},
 		// detailsBox: {
 		// 	width: '50%',
 		// },
-		buffer: {},
+		detailsBox: {
+			width: '33%',
+		},
+		buffer: {
+			flexDirection: 'row-reverse',
+		},
+
 		icon: {
 			fontSize: 18,
 			marginTop: 0,
@@ -129,30 +135,58 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 
 				<View style={[style.box, style.details]}>
 					<View style={[style.attended, style.detailsBox]}>
-						<Text style={[style.mainText]}>Attended</Text>
-						<Text style={[style.mainText]}>
-							{data.attended}/{data.totalClasses}
-						</Text>
+						<View style={[style.backGround]}>
+							<Text style={[style.mainText]}>Attended</Text>
+							<Text style={[style.mainText]}>
+								{data.attended}/{data.totalClasses}
+							</Text>
+						</View>
+					</View>
+					<View style={[style.betweenExams, style.detailsBox]}>
+						<View style={[style.backGround]}>
+							<Text
+								style={[
+									style.mainText,
+									{ textAlign: 'center' },
+									btwExamsGreen ? style.green : style.red,
+								]}
+							>
+								Btw Exams
+							</Text>
+							<Text
+								style={[
+									style.mainText,
+									{ textAlign: 'center' },
+									btwExamsGreen ? style.green : style.red,
+								]}
+							>
+								{data.cat2FatPercentage}%
+							</Text>
+						</View>
 					</View>
 					<View style={[style.buffer, style.detailsBox]}>
-						<Text
-							style={[
-								style.mainText,
-								{ textAlign: 'center' },
-								attendanceGreen ? style.green : style.red,
-							]}
-						>
-							{attendanceGreen ? 'Can Skip' : 'Must Attend'}
-						</Text>
-						<Text
-							style={[
-								style.mainText,
-								{ textAlign: 'center' },
-								attendanceGreen ? style.green : style.red,
-							]}
-						>
-							{calcBufferClasses(minPercent, data.attended, data.totalClasses)}
-						</Text>
+						<View style={[style.backGround]}>
+							<View style={[style.bufferBox]}>
+								<Text
+									style={[
+										style.mainText,
+										{ textAlign: 'center' },
+										attendanceGreen ? style.green : style.red,
+									]}
+								>
+									{attendanceGreen ? 'Can Skip' : 'Must Attend'}
+								</Text>
+								<Text
+									style={[
+										style.mainText,
+										{ textAlign: 'center' },
+										attendanceGreen ? style.green : style.red,
+									]}
+								>
+									{calcBufferClasses(minPercent, data.attended, data.totalClasses)}
+								</Text>
+							</View>
+						</View>
 					</View>
 				</View>
 			</View>
