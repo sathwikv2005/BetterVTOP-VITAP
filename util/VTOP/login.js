@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
+import VtopConfig from '../../vtop_config.json'
 import { fetchVtopData } from './getAllData'
 
 // Fetch captcha + pre-login setup
@@ -28,6 +29,9 @@ export async function getCaptcha() {
 
 // Login to VTOP
 export async function vtopLogin(username, password) {
+	const isLoggedIn = await checkLogin()
+
+	if (isLoggedIn) return { message: 'Already Logged In.' }
 	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
 		'username',
 		'password',
@@ -73,5 +77,33 @@ export async function vtopLogin(username, password) {
 		await AsyncStorage.multiRemove(['csrfToken', 'sessionId', 'username'])
 		console.error('Error in vtopLogin:', error)
 		return { error: 'Failed to login' }
+	}
+}
+
+export async function checkLogin() {
+	try {
+		const [[, csrf], [, jsessionId], [, username]] = await AsyncStorage.multiGet([
+			'csrfToken',
+			'sessionId',
+			'username',
+		])
+
+		const response = await fetch(
+			VtopConfig.domain + VtopConfig.vtopUrls.homepage + `?_csrf=${csrf}`,
+			{
+				method: 'GET',
+				headers: {
+					...Headers,
+					Cookie: `JSESSIONID=${jsessionId}`,
+				},
+				credentials: 'omit',
+			}
+		)
+		if (!response.ok) return false
+		console.log('Already loggedIn')
+		return true
+	} catch (err) {
+		console.log(err)
+		return false
 	}
 }
