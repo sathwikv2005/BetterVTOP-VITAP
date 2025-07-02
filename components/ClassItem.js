@@ -46,7 +46,7 @@ export default function ClassItem({ item, day, ...props }) {
 			marginLeft: 10,
 		},
 		right: {
-			marginTop: 5,
+			marginTop: 7,
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 		},
@@ -59,13 +59,13 @@ export default function ClassItem({ item, day, ...props }) {
 		main: {
 			color: colorTheme.main.text,
 
-			fontSize: 16,
-			fontWeight: 600,
+			fontSize: 15,
+			fontWeight: 500,
 		},
 		sub: {
 			color: colorTheme.main.text,
 			marginTop: 2,
-			fontSize: 14,
+			fontSize: 13,
 			fontWeight: 400,
 		},
 		highlights: {
