@@ -7,16 +7,18 @@ import ClassItem from './ClassItem'
 import { getTimeTable } from '../util/VTOP/timeTable'
 import { Alert } from 'react-native'
 import { getAllData } from '../util/VTOP/getAllData'
+import FooterItem from './FooterItem.js'
 
 export default function TimeTableDisplay({ route }) {
 	const { colorTheme } = useContext(ColorThemeContext)
-	let { data, day, setTimetable, setLastUpdated, lastUpdated } = route.params
+	const [refreshing, setRefreshing] = useState(false)
+
+	let { data, day, setTimetable, setLastUpdated, lastUpdated, savedSem } = route.params
 	const sortedClasses = useMemo(() => {
 		// Only sort once when component mounts or data changes
 		if (!data[0] || !data[0].classes) return []
 		return sortClasses(data[0])
 	}, [data])
-	const [refreshing, setRefreshing] = useState(false)
 
 	// Pull-to-refresh handler
 	const onRefresh = useCallback(async () => {
@@ -53,7 +55,7 @@ export default function TimeTableDisplay({ route }) {
 		lastUpdated: {
 			color: colorTheme.main.tertiary,
 			alignSelf: 'center',
-			marginTop: '-4%',
+			flexGrow: 1,
 		},
 	})
 
@@ -69,10 +71,9 @@ export default function TimeTableDisplay({ route }) {
 				onRefresh={onRefresh}
 				ListEmptyComponent={<Text style={styles.emptyText}>No classes for this day!</Text>}
 				ListFooterComponent={
-					<View style={{ paddingTop: 20, alignItems: 'center' }}>
-						<Text style={styles.lastUpdated}>Last updated on {lastUpdated}</Text>
-					</View>
+					<FooterItem style={styles.lastUpdated} lastUpdated={lastUpdated} savedSem={savedSem} />
 				}
+				ListFooterComponentStyle={{ flexGrow: 1 }}
 			/>
 		</View>
 	)

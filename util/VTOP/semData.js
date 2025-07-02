@@ -3,12 +3,11 @@ import { parseDocument } from 'htmlparser2'
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
-import { parseTimeTable } from '../parse/parseTimeTable'
-import { vtopLogin } from './login'
 import { Alert } from 'react-native'
 import { getTime } from '../getTime'
+import { parseSemesterOptions } from '../parse/parseSemData'
 
-export async function getTimeTable(overrideSemID) {
+export async function getSemData() {
 	try {
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -16,27 +15,30 @@ export async function getTimeTable(overrideSemID) {
 			'username',
 			'sem',
 		])
-		const sem = await JSON.parse(savedSem)
-		const semID = overrideSemID || sem?.semID
-		if (!csrf || !jsessionId || !username || !semID) {
+		console.log(savedSem)
+		if (!csrf || !jsessionId || !username) {
+			console.log(csrf, jsessionId, username)
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			return goToDrawerTab('login')
 		}
 
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
-		params.append('semesterSubId', semID)
+		params.append('verifyMenu', 'true')
 		params.append('authorizedID', username.toUpperCase())
-		params.append('x', new Date().toUTCString())
-		const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.viewTimeTable, {
-			method: 'POST',
-			headers: {
-				...Headers,
-				Cookie: `JSESSIONID=${jsessionId}`,
-			},
-			credentials: 'omit',
-			body: params.toString(),
-		})
+		params.append('x', `@(new Date().toUTCString())`)
+		const response = await fetch(
+			VtopConfig.domain + VtopConfig.backEndApi.commonStudentAttendance,
+			{
+				method: 'POST',
+				headers: {
+					...Headers,
+					Cookie: `JSESSIONID=${jsessionId}`,
+				},
+				credentials: 'omit',
+				body: params.toString(),
+			}
+		)
 
 		if (response.status === 404) {
 			console.log(await response.text())
@@ -48,22 +50,25 @@ export async function getTimeTable(overrideSemID) {
 		const html = await response.text()
 		const document = parseDocument(html)
 
-		const timetable = parseTimeTable(document)
+		const semData = parseSemesterOptions(document)
 
 		await AsyncStorage.setItem(
-			'timetable',
+			'semData',
 			JSON.stringify({
-				timetable,
+				semData,
 				createdAt: getTime(),
 			})
 		)
-		// console.log(timetable[0])
+		if (!savedSem || savedSem === null) {
+			await AsyncStorage.setItem('sem', JSON.stringify(semData[0]))
+		}
+		// console.log(semData[0])
 		return {
-			timetable,
+			semData,
 			createdAt: getTime(),
 		}
 	} catch (err) {
-		console.error('Error fetching time table:', err)
+		console.error('Error fetching sem data:', err)
 		return { error: err }
 	}
 }

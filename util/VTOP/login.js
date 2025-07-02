@@ -87,7 +87,7 @@ export async function checkLogin() {
 			'sessionId',
 			'username',
 		])
-
+		if (!csrf || !jsessionId || !username) return false
 		const response = await fetch(
 			VtopConfig.domain + VtopConfig.vtopUrls.homepage + `?_csrf=${csrf}`,
 			{

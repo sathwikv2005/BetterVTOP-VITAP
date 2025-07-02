@@ -8,6 +8,7 @@
 	"backEndApi": {
 		"newCaptcha": "/vtop/get/new/captcha",
 		"prelogin": "/vtop/prelogin/setup",
+		"commonStudentAttendance": "/vtop/academics/common/StudentAttendance",
 		"studentTimeTable": "/vtop/academics/common/StudentTimeTable",
 		"viewTimeTable": "/vtop/processViewTimeTable",
 		"ViewStudentAttendance": "/vtop/processViewStudentAttendance",

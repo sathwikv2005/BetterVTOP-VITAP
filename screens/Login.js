@@ -147,7 +147,11 @@ export default function Login() {
 	})
 
 	return loading ? (
-		<Text style={{ color: colorTheme.main.text, fontSize: 20 }}>Loading...</Text>
+		<Text
+			style={{ color: colorTheme.main.text, fontSize: 20, textAlign: 'center', marginTop: '50%' }}
+		>
+			Loading...
+		</Text>
 	) : (
 		<View style={styles.container}>
 			<Text style={styles.login}>Login to VTOP:</Text>

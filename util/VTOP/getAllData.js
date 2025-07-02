@@ -1,6 +1,7 @@
 import { goToDrawerTab } from '../goToDrawerTab'
 import { getAttendance } from './attendance'
 import { vtopLogin } from './login'
+import { getSemData } from './semData'
 import { getTimeTable } from './timeTable'
 
 export async function getAllData() {
@@ -15,11 +16,14 @@ export async function getAllData() {
 }
 
 export async function fetchVtopData() {
+	const semData = await getSemData()
+	if (semData.error) return semData
 	const timetable = await getTimeTable()
 	if (timetable.error) return timetable
 	const attendance = await getAttendance()
 	if (attendance.error) return attendance
 	return {
+		semData,
 		timetable,
 		attendance,
 	}

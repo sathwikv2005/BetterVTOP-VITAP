@@ -9,20 +9,30 @@ import AttendanceItem from '../AttendanceItem'
 import { Alert } from 'react-native'
 import { getAllData } from '../../util/VTOP/getAllData.js'
 import { getTime } from '../../util/getTime.js'
+import FooterItem from '../FooterItem.js'
 
 export function Attendance() {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [refreshing, setRefreshing] = useState(false)
 	const [lastUpdated, setLastUpdated] = useState(getTime())
 	const [attendance, setAttendance] = useState([])
+	const [savedSem, setSavedSem] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [minPercentage, setMinPercentage] = useState(75)
 
 	useEffect(() => {
 		async function getCachedAttendance() {
 			setLoading(true)
-			let data = await JSON.parse(await AsyncStorage.getItem('attendance'))
-			let cachedMinPercentage = parseInt(await AsyncStorage.getItem('minPercent'))
+			const [[, attendanceStr], [, minPercentStr], [, semStr]] = await AsyncStorage.multiGet([
+				'attendance',
+				'minPercent',
+				'sem',
+			])
+			console.log(semStr)
+			const data = await JSON.parse(attendanceStr)
+			const cachedMinPercentage = parseInt(minPercentStr)
+			const sem = (await JSON.parse(semStr)) || null
+			setSavedSem(sem)
 			if (cachedMinPercentage && !isNaN(cachedMinPercentage)) setMinPercentage(cachedMinPercentage)
 
 			if (!data) data = []
@@ -131,9 +141,7 @@ export function Attendance() {
 					<Text style={styles.emptyText}>No data available. Please try refreshing.</Text>
 				}
 				ListFooterComponent={
-					<View style={{ marginVertical: 20, marginBottom: 50, alignItems: 'center' }}>
-						<Text style={styles.lastUpdated}>Last updated on {lastUpdated}</Text>
-					</View>
+					<FooterItem style={styles.lastUpdated} lastUpdated={lastUpdated} savedSem={savedSem} />
 				}
 				ListFooterComponentStyle={{ flexGrow: 1 }}
 			/>

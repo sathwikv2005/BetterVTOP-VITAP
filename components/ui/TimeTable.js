@@ -12,6 +12,7 @@ const Tab = createMaterialTopTabNavigator()
 export function Timetable() {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [timetable, setTimetable] = useState([])
+	const [savedSem, setSavedSem] = useState(null)
 	const [lastUpdated, setLastUpdated] = useState([])
 	const [loading, setLoading] = useState(true)
 	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -20,7 +21,8 @@ export function Timetable() {
 		async function getCachedTimetable() {
 			setLoading(true)
 			let data = await JSON.parse(await AsyncStorage.getItem('timetable'))
-
+			let sem = await JSON.parse(await AsyncStorage.getItem('sem'))
+			if (sem) setSavedSem(sem)
 			if (!data)
 				data = {
 					timetable: [],
@@ -75,6 +77,7 @@ export function Timetable() {
 					component={TimeTableDisplay}
 					initialParams={{
 						setTimetable,
+						savedSem,
 						setLastUpdated,
 						lastUpdated,
 						data: timetable.filter((item) => item.day === 'MON'),
@@ -88,6 +91,7 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					savedSem,
 					setLastUpdated,
 					lastUpdated,
 					data: timetable.filter((item) => item.day === 'TUE'),
@@ -99,6 +103,7 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					savedSem,
 					setLastUpdated,
 					lastUpdated,
 					data: timetable.filter((item) => item.day === 'WED'),
@@ -110,6 +115,7 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					savedSem,
 					setLastUpdated,
 					lastUpdated,
 					data: timetable.filter((item) => item.day === 'THU'),
@@ -121,6 +127,7 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					savedSem,
 					setLastUpdated,
 					lastUpdated,
 					data: timetable.filter((item) => item.day === 'FRI'),
@@ -132,6 +139,7 @@ export function Timetable() {
 				component={TimeTableDisplay}
 				initialParams={{
 					setTimetable,
+					savedSem,
 					setLastUpdated,
 					lastUpdated,
 					data: timetable.filter((item) => item.day === 'SAT'),

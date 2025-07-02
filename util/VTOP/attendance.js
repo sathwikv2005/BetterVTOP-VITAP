@@ -8,12 +8,14 @@ import { getTime } from '../getTime'
 
 export async function getAttendance(overrideSemID) {
 	try {
-		const [[, csrf], [, jsessionId], [, username]] = await AsyncStorage.multiGet([
+		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
 			'username',
+			'sem',
 		])
-		const semID = overrideSemID || 'AP2024254'
+		const sem = await JSON.parse(savedSem)
+		const semID = overrideSemID || sem?.semID
 		if (!csrf || !jsessionId || !username || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			return goToDrawerTab('login')
