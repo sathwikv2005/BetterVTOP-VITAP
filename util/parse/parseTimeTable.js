@@ -3,7 +3,7 @@ import { selectAll, selectOne } from 'css-select'
 export function parseTimeTable(document) {
 	const table = selectOne('#timeTableStyle', document)
 	const rows = selectAll('tr', table)
-
+	const courseMap = getCourseTitleMap(document)
 	// Extract time slots
 	const thTimeCells = selectAll('td', rows[0]).slice(2)
 	const thEndTimeCells = selectAll('td', rows[1]).slice(2)
@@ -46,6 +46,7 @@ export function parseTimeTable(document) {
 					type: 'theory',
 					slot: textArray[0],
 					courseCode: textArray[1],
+					courseTitle: courseMap[textArray[1]].split('-')[1] || textArray[1],
 					venue,
 					class: text,
 					timings: {
@@ -69,6 +70,7 @@ export function parseTimeTable(document) {
 					type: 'lab',
 					slot: textArray[0],
 					courseCode: textArray[1],
+					courseTitle: courseMap[textArray[1]].split('-')[1] || textArray[1],
 					venue,
 					class: text,
 					timings: {
@@ -85,4 +87,26 @@ export function parseTimeTable(document) {
 	}
 
 	return timetable
+}
+
+export function getCourseTitleMap(document) {
+	const courseMap = {}
+
+	const rows = selectAll('#getStudentDetails table tr', document)
+
+	for (let row of rows) {
+		const cols = selectAll('td', row)
+		if (cols.length < 3) continue
+
+		const courseCell = cols[2]
+		const textLines = courseCell.children
+			.filter((c) => c.name === 'p')
+			.map((p) => p.children[0]?.data?.trim())
+
+		if (!textLines[0]) continue
+		const [code, title] = textLines[0].split(' - ')
+		if (code && title) courseMap[code.trim()] = `${code.trim()} - ${title.trim()}`
+	}
+
+	return courseMap
 }

@@ -4,6 +4,7 @@ import Fontisto from '@expo/vector-icons/Fontisto'
 import Entypo from '@expo/vector-icons/Entypo'
 import { useContext } from 'react'
 import { StyleSheet } from 'react-native'
+import { formatCourseTitle } from '../util/formatCourseTitle'
 
 export default function AttendanceItem({ data, minPercent, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -170,13 +171,4 @@ function classesNeeded(a, t, p) {
 function classesCanSkip(a, t, p) {
 	const x = (a * 100) / p - t
 	return Math.floor(x >= 0 ? x : 0)
-}
-
-function formatCourseTitle(title, maxLength = 30) {
-	const parts = title.split(' - ')
-	const trimmed = parts.slice(0, 2).join(' ')
-
-	if (trimmed.length <= maxLength) return trimmed
-
-	return trimmed.slice(0, maxLength - 3).trimEnd() + '...'
 }

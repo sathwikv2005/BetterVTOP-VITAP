@@ -4,6 +4,7 @@ import Fontisto from '@expo/vector-icons/Fontisto'
 import Entypo from '@expo/vector-icons/Entypo'
 import { useContext } from 'react'
 import { StyleSheet } from 'react-native'
+import { formatCourseTitle } from '../util/formatCourseTitle'
 
 export default function ClassItem({ item, day, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -23,7 +24,8 @@ export default function ClassItem({ item, day, ...props }) {
 			overflow: 'hidden',
 			alignSelf: 'center',
 			marginBottom: '3%',
-			flexDirection: 'row',
+			flexDirection: 'column',
+			justifyContent: 'space-between',
 			backgroundColor: colorTheme.main.primary,
 			color: colorTheme.main.text,
 			elevation: 3,
@@ -35,25 +37,34 @@ export default function ClassItem({ item, day, ...props }) {
 		box: {
 			padding: 8,
 			paddingHorizontal: 20,
-			width: '50%',
+			// width: '50%',
 			justifyContent: 'center',
 			flexDirection: 'column',
 		},
 		left: {
-			alignItems: 'flex-start',
+			marginTop: 10,
+			marginLeft: 10,
 		},
 		right: {
-			alignItems: 'flex-end',
+			marginTop: 5,
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+		},
+		title: {
+			color: colorTheme.main.text,
+			marginLeft: -7,
+			fontSize: 16,
+			fontWeight: 600,
 		},
 		main: {
 			color: colorTheme.main.text,
 
-			fontSize: 19,
+			fontSize: 16,
 			fontWeight: 600,
 		},
 		sub: {
 			color: colorTheme.main.text,
-			marginTop: 8,
+			marginTop: 2,
 			fontSize: 14,
 			fontWeight: 400,
 		},
@@ -90,8 +101,15 @@ export default function ClassItem({ item, day, ...props }) {
 			opacity: 0.8,
 		},
 		icon: {
-			fontSize: 20,
+			fontSize: 17,
 			marginTop: 4,
+		},
+		timings: {
+			flexDirection: 'row',
+			textAlign: 'center',
+			justifyContent: 'center',
+			alignContent: 'center',
+			gap: 5,
 		},
 	})
 
@@ -122,28 +140,35 @@ export default function ClassItem({ item, day, ...props }) {
 
 	return (
 		<View style={[styles.container, opacity]}>
-			<View style={[styles.box, styles.left, borderStyle]}>
-				<View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
-					{item.type === 'lab' ? (
-						<Fontisto
-							name="laboratory"
-							style={styles.icon}
-							color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
-						/>
-					) : (
-						<Entypo
-							name="open-book"
-							style={styles.icon}
-							color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
-						/>
-					)}
-					<Text style={[styles.main, isOngoing ? styles.highlights : '']}>{item.courseCode}</Text>
+			<View style={[{ height: '100%' }, borderStyle]}>
+				<View style={[styles.left]}>
+					<View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+						{item.type === 'lab' ? (
+							<Fontisto
+								name="laboratory"
+								style={styles.icon}
+								color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
+							/>
+						) : (
+							<Entypo
+								name="open-book"
+								style={styles.icon}
+								color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
+							/>
+						)}
+						<Text style={[styles.title, isOngoing ? styles.highlights : '']}>
+							{formatCourseTitle(item.courseTitle, 35)}
+						</Text>
+					</View>
 				</View>
-				<Text style={styles.sub}>{item.venue}</Text>
-			</View>
-			<View style={[styles.box, styles.right]}>
-				<Text style={styles.main}>{item.timings.start}</Text>
-				<Text style={styles.sub}>{item.timings.end}</Text>
+				<View style={[styles.box, styles.right]}>
+					<Text style={styles.main}>{item.venue}</Text>
+					<View style={[styles.timings]}>
+						<Text style={styles.main}>{item.timings.start}</Text>
+						<Text style={styles.main}>-</Text>
+						<Text style={styles.sub}>{item.timings.end}</Text>
+					</View>
+				</View>
 			</View>
 		</View>
 	)
