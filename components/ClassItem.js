@@ -23,7 +23,7 @@ export default function ClassItem({ item, day, ...props }) {
 			borderRadius: 10,
 			overflow: 'hidden',
 			alignSelf: 'center',
-			marginBottom: '3%',
+			marginBottom: '5%',
 			flexDirection: 'column',
 			justifyContent: 'space-between',
 			backgroundColor: colorTheme.main.primary,

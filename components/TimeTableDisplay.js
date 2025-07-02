@@ -53,7 +53,7 @@ export default function TimeTableDisplay({ route }) {
 		lastUpdated: {
 			color: colorTheme.main.tertiary,
 			alignSelf: 'center',
-			// top: -25,
+			marginTop: '-4%',
 		},
 	})
 
