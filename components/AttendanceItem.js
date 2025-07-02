@@ -14,7 +14,7 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 		container: {
 			width: '95%',
 			height: 105,
-			borderRadius: 10,
+			borderRadius: 5,
 			overflow: 'hidden',
 			alignSelf: 'center',
 			marginBottom: '5%',

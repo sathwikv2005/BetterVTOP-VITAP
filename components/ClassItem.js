@@ -28,7 +28,7 @@ export default function ClassItem({ item, day, ...props }) {
 			justifyContent: 'space-between',
 			backgroundColor: colorTheme.main.primary,
 			color: colorTheme.main.text,
-			elevation: 10,
+			elevation: 5,
 			shadowColor: colorTheme.accent.primary,
 			shadowOffset: { width: -2, height: -4 },
 			shadowOpacity: 0.3,
