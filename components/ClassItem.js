@@ -11,7 +11,7 @@ export default function ClassItem({ item, day, ...props }) {
 	const hour = new Date().getHours()
 	const minutes = new Date().getMinutes()
 	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-	console.log(item)
+
 	var todayIndex = new Date().getDay()
 
 	const routeName = weekdayMap[todayIndex]
