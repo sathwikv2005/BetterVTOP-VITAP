@@ -14,8 +14,8 @@ export default function ColorTheme() {
 	const [prevMainValue, setPrevMainValue] = useState('dark')
 
 	const [accentOpen, setAccentOpen] = useState(false)
-	const [accentValue, setAccentValue] = useState('red')
-	const [prevAccentValue, setPrevAccentValue] = useState('red')
+	const [accentValue, setAccentValue] = useState('blue')
+	const [prevAccentValue, setPrevAccentValue] = useState('blue')
 
 	const mainItems = [
 		{ label: 'Dark', value: 'dark' },

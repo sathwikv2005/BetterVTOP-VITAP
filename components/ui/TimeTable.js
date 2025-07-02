@@ -6,11 +6,13 @@ import { ColorThemeContext } from '../../context/ColorThemeContext'
 import TimeTableDisplay from '../TimeTableDisplay'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getTime } from '../../util/getTime'
+import { ForceUpdateContext } from '../../context/ForceUpdateContext'
 
 const Tab = createMaterialTopTabNavigator()
 
 export function Timetable() {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const { trigger } = useContext(ForceUpdateContext)
 	const [timetable, setTimetable] = useState([])
 	const [savedSem, setSavedSem] = useState(null)
 	const [lastUpdated, setLastUpdated] = useState([])
@@ -33,7 +35,7 @@ export function Timetable() {
 			setLoading(false)
 		}
 		getCachedTimetable().then(() => setLoading(false))
-	}, [lastUpdated])
+	}, [lastUpdated, trigger])
 
 	var todayIndex = new Date().getDay()
 	if (todayIndex === 0) todayIndex = 1

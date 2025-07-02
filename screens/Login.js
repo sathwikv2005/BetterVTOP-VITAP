@@ -9,9 +9,11 @@ import { Pressable } from 'react-native'
 import { getCaptcha, vtopLogin } from '../util/VTOP/login'
 import { Alert } from 'react-native'
 import { fetchVtopData } from '../util/VTOP/getAllData'
+import { ForceUpdateContext } from '../context/ForceUpdateContext'
 
 export default function Login() {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState(false)
 	const [userName, setUserName] = useState('')
@@ -50,6 +52,8 @@ export default function Login() {
 			)
 		}
 		const vtopData = await fetchVtopData()
+		forceUpdate()
+		console.log(trigger)
 		setLoading(false)
 		return Alert.alert('Login successful', 'Data fetched')
 	}

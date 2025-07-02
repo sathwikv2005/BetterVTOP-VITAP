@@ -10,9 +10,11 @@ import { Alert } from 'react-native'
 import { getAllData } from '../../util/VTOP/getAllData.js'
 import { getTime } from '../../util/getTime.js'
 import FooterItem from '../FooterItem.js'
+import { ForceUpdateContext } from '../../context/ForceUpdateContext.js'
 
 export function Attendance() {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const { trigger } = useContext(ForceUpdateContext)
 	const [refreshing, setRefreshing] = useState(false)
 	const [lastUpdated, setLastUpdated] = useState(getTime())
 	const [attendance, setAttendance] = useState([])
@@ -41,7 +43,7 @@ export function Attendance() {
 			setLoading(false)
 		}
 		getCachedAttendance().then(() => setLoading(false))
-	}, [])
+	}, [lastUpdated, trigger])
 
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true)

@@ -11,15 +11,17 @@ import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
 import Login from './screens/Login'
+import { ForceUpdateProvider } from './context/ForceUpdateContext'
 
 const Drawer = createDrawerNavigator()
 
 export default function App() {
-	// Wrap everything with ColorThemeProvider
 	return (
-		<ColorThemeProvider>
-			<MainApp />
-		</ColorThemeProvider>
+		<ForceUpdateProvider>
+			<ColorThemeProvider>
+				<MainApp />
+			</ColorThemeProvider>
+		</ForceUpdateProvider>
 	)
 }
 

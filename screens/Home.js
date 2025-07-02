@@ -7,13 +7,14 @@ import Feather from '@expo/vector-icons/Feather'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { Attendance } from '../components/ui/Attendace'
 import { Timetable } from '../components/ui/TimeTable'
+import { ForceUpdateContext } from '../context/ForceUpdateContext'
 
 const Tab = createBottomTabNavigator()
 
 export function Home() {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const navigation = useNavigation()
-
+	const { trigger } = useContext(ForceUpdateContext)
 	const state = useNavigationState((state) => state)
 	const tabIndex = state.routes.find((r) => r.name === 'home')?.state?.index || 0
 	const tabRouteName =
@@ -27,7 +28,7 @@ export function Home() {
 		navigation.setOptions({
 			headerTitle: title,
 		})
-	}, [tabRouteName])
+	}, [tabRouteName, trigger])
 
 	return (
 		<Tab.Navigator
