@@ -10,7 +10,7 @@ import { darkColors } from './main/dark'
 import { lightColors } from './main/light'
 
 const defaultMain = 'dark'
-const defaultAccent = 'red'
+const defaultAccent = 'blue'
 
 export const colorThemeMap = {
 	main: {
