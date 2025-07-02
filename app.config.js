@@ -1,8 +1,8 @@
 import 'dotenv/config'
-
+const variant = process.env.APP_VARIANT || 'prod'
 export default {
 	expo: {
-		name: 'BetterVTOP',
+		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
 		slug: 'BetterVTOP',
 		version: '1.0.0',
 		orientation: 'portrait',
@@ -21,7 +21,7 @@ export default {
 		},
 		android: {
 			icon: './assets/icon.png',
-			package: 'com.anonymous.BetterVTOP',
+			package: variant === 'dev' ? 'com.anonymous.BetterVTOP.dev' : 'com.anonymous.BetterVTOP',
 		},
 		web: {
 			favicon: './assets/favicon.png',
