@@ -5,9 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import DropDownPicker from 'react-native-dropdown-picker'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import { ForceUpdateContext } from '../context/ForceUpdateContext'
 
 export default function SemSelection() {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const { trigger } = useContext(ForceUpdateContext)
 	const [dropDown, setDropDown] = useState(false)
 	const [filteredSemData, setFilteredSemData] = useState(null)
 
@@ -27,7 +29,7 @@ export default function SemSelection() {
 			filterSemData(savedSemData.semData)
 		}
 		getSemData()
-	}, [])
+	}, [trigger])
 
 	async function handleSemChange(newSemID) {
 		if (prevSem === newSemID) return
