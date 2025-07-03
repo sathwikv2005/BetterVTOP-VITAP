@@ -4,13 +4,16 @@ import { Text, StyleSheet, View } from 'react-native'
 import { Modalize } from 'react-native-modalize'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Dimensions } from 'react-native'
+import Fontisto from '@expo/vector-icons/Fontisto'
+import Entypo from '@expo/vector-icons/Entypo'
+import { formatCourseTitle } from '../util/formatCourseTitle'
 
 const { height } = Dimensions.get('window')
 
 const AttendanceDetails = forwardRef(
 	({ selectedItem, courseItem, colorTheme, minPercent }, ref) => {
 		if (!courseItem || !selectedItem) return null
-
+		console.log(selectedItem)
 		const courseDetailsData = courseItem?.courseDetails.split('-')
 		const courseTitle = courseDetailsData[1]
 		const courseCode = courseDetailsData[0]
@@ -29,12 +32,22 @@ const AttendanceDetails = forwardRef(
 				width: '90%',
 				alignSelf: 'center',
 			},
+			titleBox: {
+				flexDirection: 'row',
+				justifyContent: 'center',
+				gap: 5,
+				marginTop: 10,
+				marginBottom: 15,
+			},
+			icon: {
+				// marginTop: 0,
+				fontSize: 24,
+			},
 			title: {
 				fontSize: 18,
 				fontWeight: '600',
 				color: colorTheme.accent.primary,
 				textAlign: 'center',
-				marginBottom: 10,
 			},
 			text: {
 				color: colorTheme.main.text,
@@ -146,7 +159,22 @@ const AttendanceDetails = forwardRef(
 					{selectedItem && courseItem ? (
 						<View>
 							<View style={styles.container}>
-								<Text style={styles.title}>{courseTitle}</Text>
+								<View style={styles.titleBox}>
+									{selectedItem.classType.includes('T') ? (
+										<Entypo
+											name="open-book"
+											style={styles.icon}
+											color={colorTheme.accent.primary}
+										/>
+									) : (
+										<Fontisto
+											name="laboratory"
+											style={styles.icon}
+											color={colorTheme.accent.primary}
+										/>
+									)}
+									<Text style={styles.title}>{formatCourseTitle(courseTitle, 37)}</Text>
+								</View>
 
 								<View style={styles.courseDetails}>
 									<Text style={[styles.text, styles.courseDetailsText]}>
