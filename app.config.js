@@ -4,7 +4,13 @@ export default {
 	expo: {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
 		slug: 'BetterVTOP',
-		version: '1.0.0',
+		version: '0.1.0',
+		android: {
+			versionCode: 1,
+		},
+		ios: {
+			buildNumber: '1',
+		},
 		orientation: 'portrait',
 		icon: './assets/icon.png',
 		backgroundColor: '#000000',

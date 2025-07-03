@@ -51,7 +51,7 @@ export default function SemSelection() {
 	}
 
 	const styles = StyleSheet.create({
-		container: { padding: 20, width: '100%', zIndex: 999 },
+		container: { padding: 20, paddingVertical: 0, width: '100%' },
 		heading: { color: colorTheme.main.text, fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
 		setting: {
 			width: '95%',

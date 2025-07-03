@@ -74,8 +74,8 @@ export default function ColorTheme() {
 			: accentItems
 
 	const styles = StyleSheet.create({
-		container: { padding: 20, width: '100%' },
-		heading: { color: colorTheme.main.text, fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+		container: { padding: 20, paddingVertical: 0, width: '100%' },
+		heading: { color: colorTheme.main.text, fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
 		setting: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
 		label: { color: colorTheme.main.text, fontSize: 18, width: '70%' },
 		picker: {
