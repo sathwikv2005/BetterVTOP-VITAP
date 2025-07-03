@@ -59,7 +59,7 @@ export async function getAttendance(overrideSemID) {
 		)
 
 		const attendanceData = await getAttendanceDetails()
-
+		if (attendanceData.error) return attendanceData
 		return {
 			attendance,
 			attendanceData,

@@ -28,9 +28,8 @@ export function Attendance() {
 	const [modalVisible, setModalVisible] = useState(false)
 
 	const openModal = (item) => {
-		console.log(item)
 		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
-		console.log(target)
+
 		setSelectedItem(item)
 		setCourseItem(target)
 		setModalVisible(true)
@@ -46,16 +45,20 @@ export function Attendance() {
 			setLoading(true)
 			const [[, attendanceStr], [, attendanceDataStr], [, minPercentStr], [, semStr]] =
 				await AsyncStorage.multiGet(['attendance', 'attendanceData', 'minPercent', 'sem'])
-			console.log(semStr)
-			const data = await JSON.parse(attendanceStr)
-			const savedAttendanceData = JSON.parse(attendanceDataStr)
-			const cachedMinPercentage = parseInt(minPercentStr)
-			const sem = (await JSON.parse(semStr)) || null
-			setSavedSem(sem)
-			setAttendanceData(savedAttendanceData.attendanceData)
-			if (cachedMinPercentage && !isNaN(cachedMinPercentage)) setMinPercentage(cachedMinPercentage)
 
-			if (!data) data = []
+			let data = await JSON.parse(attendanceStr)
+			let savedAttendanceData = JSON.parse(attendanceDataStr)
+			let cachedMinPercentage = parseInt(minPercentStr)
+			if (!cachedMinPercentage || isNaN(cachedMinPercentage)) cachedMinPercentage = 75
+			let sem = (await JSON.parse(semStr)) || null
+			setSavedSem(sem)
+			if (!savedAttendanceData) savedAttendanceData = { attendanceData: [], createdAt: getTime() }
+			setAttendanceData(savedAttendanceData.attendanceData)
+
+			setMinPercentage(cachedMinPercentage)
+
+			if (!data) data = { attendance: [], createdAt: getTime() }
+
 			setAttendance(data.attendance)
 			setLastUpdated(data.createdAt)
 			setLoading(false)
