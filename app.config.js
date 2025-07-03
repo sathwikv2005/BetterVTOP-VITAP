@@ -4,7 +4,7 @@ export default {
 	expo: {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
 		slug: 'BetterVTOP',
-		version: '0.1.0',
+		version: '0.2.0',
 		android: {
 			versionCode: 1,
 		},

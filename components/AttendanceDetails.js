@@ -1,19 +1,45 @@
-// components/AttendanceDetails.js
-import { forwardRef } from 'react'
-import { Text, StyleSheet, View } from 'react-native'
+import { forwardRef, useEffect, useState } from 'react'
+import { Text, StyleSheet, View, Pressable } from 'react-native'
 import { Modalize } from 'react-native-modalize'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Dimensions } from 'react-native'
 import Fontisto from '@expo/vector-icons/Fontisto'
 import Entypo from '@expo/vector-icons/Entypo'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
+import Foundation from '@expo/vector-icons/Foundation'
 import { formatCourseTitle } from '../util/formatCourseTitle'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const { height } = Dimensions.get('window')
 
 const AttendanceDetails = forwardRef(
-	({ selectedItem, courseItem, colorTheme, minPercent }, ref) => {
-		if (!courseItem || !selectedItem) return null
-		console.log(selectedItem)
+	({ selectedItem, courseItem, colorTheme, minPercent, userUpdated, setUserUpdated }, ref) => {
+		if (!courseItem || !selectedItem)
+			return (
+				<Modalize ref={ref} snapPoint={0} scrollViewProps={{ showsVerticalScrollIndicator: false }}>
+					<Text
+						style={{ textAlign: 'center', padding: 20, color: colorTheme?.main?.text || '#fff' }}
+					>
+						No data
+					</Text>
+				</Modalize>
+			)
+		// console.log(selectedItem)
+		const [loading, setLoading] = useState(true)
+		const [tooltipVisible, setTooltipVisible] = useState(false)
+		const [tooltipText, setTooltipText] = useState('')
+		const [userPercent, setUserPercent] = useState(0)
+
+		useEffect(() => {
+			async function getUserUpdatedData() {
+				const percent = callUserPercent()
+
+				setUserPercent(percent)
+				setLoading(false)
+			}
+			getUserUpdatedData()
+		}, [userUpdated])
+
 		const courseDetailsData = courseItem?.courseDetails.split('-')
 		const courseTitle = courseDetailsData[1]
 		const courseCode = courseDetailsData[0]
@@ -21,6 +47,55 @@ const AttendanceDetails = forwardRef(
 
 		const attendanceGreen = parseInt(courseItem.attendance.percentage) >= parseInt(minPercent)
 		const btwExamsGreen = parseInt(selectedItem.cat2FatPercentage) >= parseInt(minPercent)
+
+		async function handleResetPress(item) {
+			// console.log(item)
+			let arr = []
+
+			if (userUpdated) arr = userUpdated.filter((x) => x.id !== `${item.date}#${item.time}`)
+
+			await AsyncStorage.setItem(
+				`${selectedItem.courseID}-${selectedItem.classType}`,
+				JSON.stringify(arr)
+			)
+			setUserUpdated(arr)
+		}
+
+		function callUserPercent() {
+			let attended = parseInt(courseItem.attendance.attended)
+			let total = courseItem.attendance.attended + courseItem.attendance.absent
+			if (!selectedItem.classType.includes('T')) {
+				attended /= 2
+				total /= 2
+			}
+			if (userUpdated) {
+				total += userUpdated.filter((x) => x.original.toLowerCase() === 'not posted')?.length
+				const userData = userUpdated.filter((x) => x.isPresent === true)?.length
+
+				attended += userData
+			}
+
+			return Math.ceil((attended * 100) / total)
+		}
+
+		async function handlePresentPress(item, isPresent) {
+			let arr = []
+			if (userUpdated) arr = [...userUpdated]
+			const updateObj = {
+				date: item.date,
+				time: item.time,
+				id: `${item.date}#${item.time}`,
+				isPresent,
+				status: isPresent ? 'Present' : 'Absent',
+				original: item.status,
+			}
+			arr.push(updateObj)
+			await AsyncStorage.setItem(
+				`${selectedItem.courseID}-${selectedItem.classType}`,
+				JSON.stringify(arr)
+			)
+			setUserUpdated(arr)
+		}
 
 		const styles = StyleSheet.create({
 			content: {
@@ -116,6 +191,49 @@ const AttendanceDetails = forwardRef(
 				color: colorTheme.accent.primary,
 				// textAlign: 'left',
 			},
+			buttonsText: {
+				color: colorTheme.main.text,
+				fontSize: 13,
+				textAlign: 'center',
+			},
+			buttonsBox: {
+				flexDirection: 'column',
+				gap: 5,
+				alignItems: 'center',
+				textAlign: 'center',
+			},
+			buttons: {
+				flexDirection: 'row',
+				gap: 15,
+			},
+			btnIcon: {
+				fontSize: 30,
+			},
+			userPercentBox: {
+				flexDirection: 'row',
+				textAlign: 'center',
+				justifyContent: 'center',
+				marginBottom: 5,
+				gap: 5,
+			},
+			userPercentText: {
+				color: colorTheme.main.text,
+				fontWeight: '500',
+			},
+			userPercent: {
+				color: colorTheme.accent.primary,
+				fontWeight: '600',
+			},
+			userStatus: {
+				flexDirection: 'row',
+				justifyContent: 'center',
+				alignItems: 'center',
+				gap: 4,
+			},
+			userDataInfo: {
+				marginTop: 3,
+				fontSize: 15,
+			},
 		})
 
 		const renderRow = (label, value) => (
@@ -140,121 +258,263 @@ const AttendanceDetails = forwardRef(
 			</View>
 		)
 
-		return (
-			<Modalize
-				ref={ref}
-				snapPoint={height * 0.6}
-				handleStyle={{
-					backgroundColor: attendanceGreen || btwExamsGreen ? '#48FF00FF' : '#DA2C00FF',
-				}}
-				modalStyle={{
-					backgroundColor: colorTheme.main.secondary,
-					borderTopColor: attendanceGreen || btwExamsGreen ? '#48FF00FF' : '#DA2C00FF',
-					borderTopWidth: 3,
-					elevation: 5,
-				}}
-				scrollViewProps={{ showsVerticalScrollIndicator: false }}
-			>
-				<ScrollView contentContainerStyle={styles.content}>
-					{selectedItem && courseItem ? (
-						<View>
-							<View style={styles.container}>
-								<View style={styles.titleBox}>
-									{selectedItem.classType.includes('T') ? (
-										<Entypo
-											name="open-book"
-											style={styles.icon}
-											color={colorTheme.accent.primary}
-										/>
-									) : (
-										<Fontisto
-											name="laboratory"
-											style={styles.icon}
-											color={colorTheme.accent.primary}
-										/>
-									)}
-									<Text style={styles.title}>{formatCourseTitle(courseTitle, 37)}</Text>
-								</View>
+		function renderAction(entry, isPresent, userUpdated) {
+			if (isPresent) return null
+			if (userUpdated)
+				return (
+					<View style={[styles.buttonsBox]}>
+						<Text style={[styles.buttonsText]}>Reset</Text>
+						<Pressable onPress={() => handleResetPress(entry)}>
+							<FontAwesome
+								name="refresh"
+								size={24}
+								style={[styles.btnIcon]}
+								color={colorTheme.accent.primary}
+							/>
+						</Pressable>
+					</View>
+				)
 
-								<View style={styles.courseDetails}>
-									<Text style={[styles.text, styles.courseDetailsText]}>
-										{courseCode}
-										{courseTypeData}
-									</Text>
-									<Text style={[styles.text, styles.courseDetailsText]}>{courseItem.faculty}</Text>
-								</View>
-
-								<View style={styles.attendanceDetails}>
-									<View style={styles.attendanceDetailsBox}>
-										{renderRow(
-											'Attended',
-											`${courseItem.attendance.attended}/${courseItem.attendance.total}`
-										)}
-										{renderRow(
-											'Not Posted',
-											`${
-												courseItem.attendance.total -
-												courseItem.attendance.attended -
-												courseItem.attendance.absent
-											}`
-										)}
-									</View>
-									<View style={styles.attendanceDetailsBox}>
-										{renderRow('Absent', courseItem.attendance.absent)}
-										{renderRow('On Duty', courseItem.attendance.onduty)}
-									</View>
-								</View>
-
-								<View style={styles.percentageDetails}>
-									{renderPercentageRow(
-										'Percentage',
-										`${courseItem.attendance.percentage}%`,
-										attendanceGreen
-									)}
-									{selectedItem.cat2FatPercentage &&
-										renderPercentageRow(
-											'CAT2/FAT',
-											`${selectedItem.cat2FatPercentage}%`,
-											btwExamsGreen
-										)}
-								</View>
-							</View>
-							<View style={{ marginTop: 20, width: '100%' }}>
-								<ScrollView horizontal>
-									<View>
-										<View style={[styles.logRow, styles.logHeader]}>
-											<Text style={[styles.logCell, styles.headerText]}>Date/Time</Text>
-											<Text style={[styles.logCell, styles.headerText]}>Status</Text>
-											<Text style={[styles.logCell, styles.headerText]}>Action</Text>
-											<Text style={[styles.logCell, styles.headerText]}>Reason</Text>
-										</View>
-										<ScrollView style={{ maxHeight: height * 0.45 }}>
-											{courseItem.attendance.log.map((entry, index) => (
-												<View key={index} style={styles.logRow}>
-													<Text style={styles.logCell}>
-														{entry.date}, {entry.day}
-														{'\n'}
-														{entry.time}, {entry.slot}
-													</Text>
-													<Text
-														style={[styles.logCell, entry.isPresent ? styles.green : styles.red]}
-													>
-														{entry.status}
-													</Text>
-													<Text style={styles.logCell}>{'Coming soon'}</Text>
-													<Text style={styles.logCell}>{entry.reason ? entry.reason : '-'}</Text>
-												</View>
-											))}
-										</ScrollView>
-									</View>
-								</ScrollView>
-							</View>
+			if (!isPresent)
+				return (
+					<View style={[styles.buttonsBox]}>
+						<Text style={[styles.buttonsText]}>Present?</Text>
+						<View style={[styles.buttons]}>
+							<Pressable onPress={() => handlePresentPress(entry, true)}>
+								<FontAwesome
+									name="check-circle"
+									size={24}
+									style={[styles.btnIcon]}
+									color={colorTheme.accent.primary}
+								/>
+							</Pressable>
+							<Pressable onPress={() => handlePresentPress(entry, false)}>
+								<Entypo
+									name="circle-with-cross"
+									size={24}
+									style={[styles.btnIcon]}
+									color={colorTheme.accent.primary}
+								/>
+							</Pressable>
 						</View>
-					) : (
-						<Text style={styles.text}>No data</Text>
+					</View>
+				)
+		}
+
+		return loading ? (
+			<Text
+				style={{ color: colorTheme.main.text, fontSize: 20, textAlign: 'center', marginTop: '50%' }}
+			>
+				Loading...
+			</Text>
+		) : (
+			<>
+				<Modalize
+					ref={ref}
+					snapPoint={height * 0.6}
+					handleStyle={{
+						backgroundColor: attendanceGreen || btwExamsGreen ? '#48FF00FF' : '#DA2C00FF',
+					}}
+					modalStyle={{
+						backgroundColor: colorTheme.main.secondary,
+						borderTopColor: attendanceGreen || btwExamsGreen ? '#48FF00FF' : '#DA2C00FF',
+						borderTopWidth: 3,
+						elevation: 5,
+					}}
+					scrollViewProps={{ showsVerticalScrollIndicator: false }}
+				>
+					<ScrollView contentContainerStyle={styles.content}>
+						{selectedItem && courseItem ? (
+							<View>
+								<View style={styles.container}>
+									<View style={styles.titleBox}>
+										{selectedItem.classType.includes('T') ? (
+											<Entypo
+												name="open-book"
+												style={styles.icon}
+												color={colorTheme.accent.primary}
+											/>
+										) : (
+											<Fontisto
+												name="laboratory"
+												style={styles.icon}
+												color={colorTheme.accent.primary}
+											/>
+										)}
+										<Text style={styles.title}>{formatCourseTitle(courseTitle, 37)}</Text>
+									</View>
+
+									<View style={styles.courseDetails}>
+										<Text style={[styles.text, styles.courseDetailsText]}>
+											{courseCode}
+											{courseTypeData}
+										</Text>
+										<Text style={[styles.text, styles.courseDetailsText]}>
+											{courseItem.faculty}
+										</Text>
+									</View>
+
+									<View style={styles.attendanceDetails}>
+										<View style={styles.attendanceDetailsBox}>
+											{renderRow(
+												'Attended',
+												`${courseItem.attendance.attended}/${courseItem.attendance.total}`
+											)}
+											{renderRow(
+												'Not Posted',
+												`${
+													courseItem.attendance.total -
+													courseItem.attendance.attended -
+													courseItem.attendance.absent
+												}`
+											)}
+										</View>
+										<View style={styles.attendanceDetailsBox}>
+											{renderRow('Absent', courseItem.attendance.absent)}
+											{renderRow('On Duty', courseItem.attendance.onduty)}
+										</View>
+									</View>
+
+									<View style={styles.percentageDetails}>
+										{renderPercentageRow(
+											'Percentage',
+											`${courseItem.attendance.percentage}%`,
+											attendanceGreen
+										)}
+										{selectedItem.cat2FatPercentage &&
+											renderPercentageRow(
+												'CAT2/FAT',
+												`${selectedItem.cat2FatPercentage}%`,
+												btwExamsGreen
+											)}
+									</View>
+								</View>
+								<View style={{ marginTop: 20, width: '100%' }}>
+									{userUpdated && (
+										<View style={[styles.userPercentBox]}>
+											<Text style={[styles.userPercentText]}>User calculated percentage: </Text>
+											<Pressable
+												onPress={() => {
+													setTooltipText(
+														`This percentage is based on the attendance data you manually modified below.`
+													)
+
+													setTooltipVisible(true)
+												}}
+												style={[styles.userStatus]}
+											>
+												<Text style={[styles.userPercent]}>{userPercent}%</Text>
+												<Foundation
+													name="info"
+													style={styles.userDataInfo}
+													color={colorTheme.accent.primary}
+												/>
+											</Pressable>
+										</View>
+									)}
+									<ScrollView horizontal>
+										<View>
+											<View style={[styles.logRow, styles.logHeader]}>
+												<Text style={[styles.logCell, styles.headerText]}>Date/Time</Text>
+												<Text style={[styles.logCell, styles.headerText]}>Status</Text>
+												<Text style={[styles.logCell, styles.headerText]}>Action</Text>
+												<Text style={[styles.logCell, styles.headerText]}>Reason</Text>
+											</View>
+											<ScrollView style={{ maxHeight: height * 0.45 }}>
+												{courseItem.attendance.log.map((entry, index) => {
+													const usrUpdated = userUpdated?.find(
+														(x) => x.id === `${entry.date}#${entry.time}`
+													)
+
+													return (
+														<View key={index} style={styles.logRow}>
+															<Text style={styles.logCell}>
+																{entry.date}, {entry.day}
+																{'\n'}
+																{entry.time}, {entry.slot}
+															</Text>
+															{usrUpdated ? (
+																<Pressable
+																	onPress={() => {
+																		setTooltipText(
+																			`This class was marked as '${usrUpdated.status}' by you.\nOriginal VTOP status: '${entry.status}'.\n\nThis change will be automatically removed once the official VTOP data matches your input.`
+																		)
+
+																		setTooltipVisible(true)
+																	}}
+																	style={[styles.logCell, styles.userStatus]}
+																>
+																	<Text
+																		style={[
+																			styles.userDataCell,
+																			{ color: colorTheme.accent.primary },
+																		]}
+																	>
+																		{usrUpdated.status}
+																	</Text>
+																	<Foundation
+																		name="info"
+																		style={styles.userDataInfo}
+																		color={colorTheme.accent.primary}
+																	/>
+																</Pressable>
+															) : (
+																<Text
+																	style={[
+																		styles.logCell,
+																		entry.isPresent ? styles.green : styles.red,
+																		usrUpdated ? { color: colorTheme.accent.primary } : '',
+																	]}
+																>
+																	{entry.status}
+																</Text>
+															)}
+															<Text style={styles.logCell}>
+																{renderAction(entry, entry.isPresent, usrUpdated)}
+															</Text>
+															<Text style={styles.logCell}>
+																{entry.reason ? entry.reason : '-'}
+															</Text>
+														</View>
+													)
+												})}
+											</ScrollView>
+										</View>
+									</ScrollView>
+								</View>
+							</View>
+						) : (
+							<Text style={styles.text}>No data</Text>
+						)}
+					</ScrollView>
+					{tooltipVisible && (
+						<View
+							style={{
+								position: 'absolute',
+								top: height * 0.4,
+								left: '5%',
+								width: '90%',
+								padding: 10,
+								backgroundColor: colorTheme.main.primary,
+								borderRadius: 8,
+								borderColor: colorTheme.accent.primary,
+								borderWidth: 1,
+								zIndex: 999,
+							}}
+						>
+							<Text style={{ color: colorTheme.main.text, textAlign: 'center', marginBottom: 10 }}>
+								{tooltipText}
+							</Text>
+							<Pressable
+								onPress={() => setTooltipVisible(false)}
+								style={{ alignSelf: 'center', paddingVertical: 4, paddingHorizontal: 10 }}
+							>
+								<Text style={{ color: colorTheme.accent.primary, fontWeight: '500' }}>Close</Text>
+							</Pressable>
+						</View>
 					)}
-				</ScrollView>
-			</Modalize>
+				</Modalize>
+			</>
 		)
 	}
 )

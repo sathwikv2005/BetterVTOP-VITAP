@@ -154,6 +154,30 @@ export async function fetchAttendanceDetails(ID, type) {
 
 		await AsyncStorage.setItem(`attendance-${ID}-${type}`, JSON.stringify({ attendanceData }))
 
+		if (cachedDataStr) {
+			const cachedData = JSON.parse(cachedDataStr)
+			let newData = []
+
+			for (const item of cachedData) {
+				const vtopData = attendanceData.attendance.log.find(
+					(x) => x.date === item.date && x.time === item.time
+				)
+
+				// If still not posted, keep user's override
+				if (!vtopData || vtopData.status.toLowerCase() === 'not posted') {
+					newData.push(item)
+					continue
+				}
+
+				// If user override differs from actual VTOP data, keep it
+				if (vtopData.isPresent !== item.isPresent) {
+					newData.push(item)
+				}
+			}
+
+			await AsyncStorage.setItem(`${ID}-${type}`, JSON.stringify(newData))
+		}
+
 		return attendanceData
 	} catch (err) {
 		console.error('Error getting attendance details:', err)

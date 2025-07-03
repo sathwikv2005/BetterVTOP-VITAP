@@ -23,6 +23,7 @@ export function Attendance() {
 	const [lastUpdated, setLastUpdated] = useState(getTime())
 	const [attendance, setAttendance] = useState([])
 	const [attendanceData, setAttendanceData] = useState([])
+	const [userUpdated, setUserUpdated] = useState(null)
 	const [savedSem, setSavedSem] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [minPercentage, setMinPercentage] = useState(75)
@@ -32,8 +33,12 @@ export function Attendance() {
 
 	const sheetRef = useRef(null)
 
-	const openSheet = (item) => {
+	const openSheet = async (item) => {
 		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
+		const userUpdatedDataStr = await AsyncStorage.getItem(`${item.courseID}-${item.classType}`)
+		console.log(`${item.courseID}-${item.classType} >> `, userUpdatedDataStr)
+		const userUpdatedData = JSON.parse(userUpdatedDataStr)
+		setUserUpdated(userUpdatedData)
 		setSelectedItem(item)
 		setCourseItem(target)
 		sheetRef.current?.open()
@@ -177,6 +182,8 @@ export function Attendance() {
 				courseItem={courseItem}
 				colorTheme={colorTheme}
 				minPercent={minPercentage}
+				userUpdated={userUpdated && userUpdated.length > 0 ? userUpdated : null}
+				setUserUpdated={setUserUpdated}
 			/>
 		</View>
 	)
