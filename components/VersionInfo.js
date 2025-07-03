@@ -25,8 +25,8 @@ export default function VersionInfo() {
 	}
 
 	const handleGithubPress = () => {
-		// Linking.openURL('https://github.com/sathwikv2005/BetterVTOP')
-		Linking.openURL('https://github.com/sathwikv2005')
+		Linking.openURL('https://github.com/sathwikv2005/BetterVTOP-VITAP')
+		// Linking.openURL('https://github.com/sathwikv2005')
 	}
 
 	const styles = StyleSheet.create({
