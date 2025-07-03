@@ -5,7 +5,7 @@ import VersionInfo from '../components/VersionInfo'
 
 export default function Settings() {
 	return (
-		<View>
+		<View style={[{ marginTop: 20 }]}>
 			<SemSelection />
 			<ColorTheme />
 			<VersionInfo />
