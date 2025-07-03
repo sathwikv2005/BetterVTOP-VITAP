@@ -1,4 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
+import { Modalize } from 'react-native-modalize'
+import { useRef } from 'react'
+import { ScrollView } from 'react-native-gesture-handler'
 import { Pressable, Text, View, Modal } from 'react-native'
 import { FlatList } from 'react-native'
 import { StyleSheet } from 'react-native'
@@ -11,6 +14,7 @@ import { getAllData } from '../../util/VTOP/getAllData.js'
 import { getTime } from '../../util/getTime.js'
 import FooterItem from '../FooterItem.js'
 import { ForceUpdateContext } from '../../context/ForceUpdateContext.js'
+import AttendanceDetails from '../AttendanceDetails.js'
 
 export function Attendance() {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -25,19 +29,14 @@ export function Attendance() {
 
 	const [selectedItem, setSelectedItem] = useState(null)
 	const [courseItem, setCourseItem] = useState(null)
-	const [modalVisible, setModalVisible] = useState(false)
 
-	const openModal = (item) => {
+	const sheetRef = useRef(null)
+
+	const openSheet = (item) => {
 		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
-
 		setSelectedItem(item)
 		setCourseItem(target)
-		setModalVisible(true)
-	}
-
-	const closeModal = () => {
-		setModalVisible(false)
-		setSelectedItem(null)
+		sheetRef.current?.open()
 	}
 
 	useEffect(() => {
@@ -129,30 +128,6 @@ export function Attendance() {
 			gap: 5,
 			// justifyContent: 'space-around',
 		},
-		modalOverlay: {
-			flex: 1,
-			backgroundColor: 'rgba(0,0,0,0.5)',
-			justifyContent: 'center',
-			alignItems: 'center',
-		},
-		modalContent: {
-			backgroundColor: '#fff',
-			padding: 20,
-			borderRadius: 10,
-			width: '80%',
-		},
-		modalTitle: {
-			fontSize: 18,
-			fontWeight: 'bold',
-			marginBottom: 10,
-		},
-		closeButton: {
-			marginTop: 20,
-			alignSelf: 'flex-end',
-		},
-		closeText: {
-			color: 'blue',
-		},
 	})
 
 	async function onChangeMinPercent(newMinPercent) {
@@ -182,7 +157,7 @@ export function Attendance() {
 				data={attendance}
 				keyExtractor={(item) => item.classDetails}
 				renderItem={({ item }) => (
-					<Pressable onPress={() => openModal(item)}>
+					<Pressable onPress={() => openSheet(item)}>
 						<AttendanceItem data={item} minPercent={minPercentage} />
 					</Pressable>
 				)}
@@ -196,35 +171,13 @@ export function Attendance() {
 				}
 				ListFooterComponentStyle={{ flexGrow: 1 }}
 			/>
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={modalVisible}
-				onRequestClose={closeModal}
-			>
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContent}>
-						<Text style={styles.modalTitle}>Attendance Details</Text>
-						<Text>Course: {courseItem?.courseDetails}</Text>
-						<Text>Faculty: {courseItem?.faculty}</Text>
-						<Text>Attended: {courseItem?.attendance.attended}</Text>
-						<Text>Absent: {courseItem?.attendance.absent}</Text>
-						<Text>On Duty: {courseItem?.attendance.onduty}</Text>
-						<Text>
-							Not Posted:{' '}
-							{courseItem?.attendance.total -
-								courseItem?.attendance.attended -
-								courseItem?.attendance.absent}
-						</Text>
-						<Text>Total: {courseItem?.attendance.total}</Text>
-						<Text>Percentage: {courseItem?.attendance.percentage}%</Text>
-						<Text>CAT2/FAT: {selectedItem?.cat2FatPercentage}%</Text>
-						<Pressable onPress={closeModal} style={styles.closeButton}>
-							<Text style={styles.closeText}>Close</Text>
-						</Pressable>
-					</View>
-				</View>
-			</Modal>
+			<AttendanceDetails
+				ref={sheetRef}
+				selectedItem={selectedItem}
+				courseItem={courseItem}
+				colorTheme={colorTheme}
+				minPercent={minPercentage}
+			/>
 		</View>
 	)
 }

@@ -1,4 +1,6 @@
 import React, { useContext } from 'react'
+import 'react-native-gesture-handler'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
@@ -17,11 +19,13 @@ const Drawer = createDrawerNavigator()
 
 export default function App() {
 	return (
-		<ForceUpdateProvider>
-			<ColorThemeProvider>
-				<MainApp />
-			</ColorThemeProvider>
-		</ForceUpdateProvider>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<ForceUpdateProvider>
+				<ColorThemeProvider>
+					<MainApp />
+				</ColorThemeProvider>
+			</ForceUpdateProvider>
+		</GestureHandlerRootView>
 	)
 }
 
