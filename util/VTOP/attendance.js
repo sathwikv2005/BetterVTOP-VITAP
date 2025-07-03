@@ -153,7 +153,7 @@ export async function fetchAttendanceDetails(ID, type) {
 		// console.log(attendanceData.attendance.log)
 
 		await AsyncStorage.setItem(`attendance-${ID}-${type}`, JSON.stringify({ attendanceData }))
-
+		const cachedDataStr = await AsyncStorage.getItem(`${ID}-${type}`)
 		if (cachedDataStr) {
 			const cachedData = JSON.parse(cachedDataStr)
 			let newData = []
