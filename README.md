@@ -2,7 +2,7 @@
 
 **BetterVTOP** is an unofficial, student-made companion app for VIT AP’s VTOP portal. Designed with a clean UI and student-focused experience, it provides fast access to your attendance, timetable, and academic data — all in one place.
 
-## 👉 You can download and try the APK from the [Releases page](https://github.com/username/repo-name/releases).
+## 👉 You can download and try the APK from the [Releases page](https://github.com/sathwikv2005/BetterVTOP-VITAP/releases).
 
 ## 📱 Features
 
