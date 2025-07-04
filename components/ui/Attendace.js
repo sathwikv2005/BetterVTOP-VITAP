@@ -1,7 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
-import { Modalize } from 'react-native-modalize'
 import { useRef } from 'react'
-import { ScrollView } from 'react-native-gesture-handler'
 import { Pressable, Text, View, Modal } from 'react-native'
 import { FlatList } from 'react-native'
 import { StyleSheet } from 'react-native'
@@ -36,6 +34,7 @@ export function Attendance() {
 	const openSheet = async (item) => {
 		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
 		const userUpdatedDataStr = await AsyncStorage.getItem(`${item.courseID}-${item.classType}`)
+		if (!target || !item) return
 		console.log(`${item.courseID}-${item.classType} >> `, userUpdatedDataStr)
 		const userUpdatedData = JSON.parse(userUpdatedDataStr)
 		setUserUpdated(userUpdatedData)
