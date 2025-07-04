@@ -1,15 +1,24 @@
 import 'dotenv/config'
+import withInstallPermission from './plugins/withInstallPermission'
+
 const variant = process.env.APP_VARIANT || 'prod'
+
 export default {
 	expo: {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
+		plugins: [withInstallPermission],
 		slug: 'BetterVTOP',
-		version: '0.2.1',
-		android: {
-			versionCode: 1,
-		},
+		version: '0.3.0',
 		ios: {
+			supportsTablet: true,
+			bundleIdentifier: 'com.anonymous.BetterVTOP',
 			buildNumber: '1',
+		},
+
+		android: {
+			icon: './assets/icon.png',
+			package: variant === 'dev' ? 'com.anonymous.BetterVTOP.dev' : 'com.anonymous.BetterVTOP',
+			versionCode: 1,
 		},
 		orientation: 'portrait',
 		icon: './assets/icon.png',
@@ -20,14 +29,6 @@ export default {
 			image: './assets/splash-icon.png',
 			resizeMode: 'contain',
 			backgroundColor: '#000000',
-		},
-		ios: {
-			supportsTablet: true,
-			bundleIdentifier: 'com.anonymous.BetterVTOP',
-		},
-		android: {
-			icon: './assets/icon.png',
-			package: variant === 'dev' ? 'com.anonymous.BetterVTOP.dev' : 'com.anonymous.BetterVTOP',
 		},
 		web: {
 			favicon: './assets/favicon.png',
