@@ -1,9 +1,8 @@
 import Constants from 'expo-constants'
 import * as IntentLauncher from 'expo-intent-launcher'
 import * as FileSystem from 'expo-file-system'
-import * as MediaLibrary from 'expo-media-library'
 import * as mime from 'react-native-mime-types'
-import { requestStoragePermission } from './requestStoragePermission'
+import { ToastAndroid } from 'react-native'
 import { Alert } from 'react-native'
 
 const version = Constants.expoConfig.version
@@ -29,11 +28,11 @@ export async function getGitHubRelease() {
 }
 
 export async function downloadAndInstallAPK(downloadUrl, latestVer, setProgress) {
-	const { status } = await MediaLibrary.requestPermissionsAsync()
-	if (status !== 'granted') {
-		setProgress(null)
-		return Alert.alert('Permission Required', 'Please allow storage access.')
-	}
+	// const { status } = await MediaLibrary.requestPermissionsAsync()
+	// if (status !== 'granted') {
+	// 	setProgress(null)
+	// 	return Alert.alert('Permission Required', 'Please allow storage access.')
+	// }
 
 	if (!downloadUrl || !latestVer) {
 		const latest = await getGitHubRelease()
@@ -45,7 +44,7 @@ export async function downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
 		latestVer = latest.latestVer
 	}
 
-	const filePath = `${FileSystem.documentDirectory}BetterVTOP-${latestVer}.apk`
+	const filePath = `${FileSystem.documentDirectory}BetterVTOP.apk`
 
 	try {
 		const downloadResumable = FileSystem.createDownloadResumable(
@@ -71,6 +70,14 @@ export async function downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
 			flags: 1,
 			type: mime.lookup(res.uri) || 'application/vnd.android.package-archive',
 		})
+		setTimeout(async () => {
+			try {
+				await FileSystem.deleteAsync(res.uri, { idempotent: true })
+				ToastAndroid.show('Update file cleaned up successfully.', ToastAndroid.SHORT)
+			} catch (err) {
+				console.warn('Failed to delete APK:', err)
+			}
+		}, 5000)
 		setProgress(null)
 	} catch (err) {
 		console.error('Install error:', err)
