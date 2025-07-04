@@ -420,7 +420,12 @@ const AttendanceDetails = forwardRef(
 												<Text style={[styles.logCell, styles.headerText]}>Action</Text>
 												<Text style={[styles.logCell, styles.headerText]}>Reason</Text>
 											</View>
-											<ScrollView style={{ maxHeight: height * 0.45 }}>
+											<ScrollView
+												style={{
+													maxHeight: userUpdated ? height * 0.42 : height * 0.45,
+													backgroundColor: colorTheme.main.primary,
+												}}
+											>
 												{courseItem.attendance.log.map((entry, index) => {
 													const usrUpdated = userUpdated?.find(
 														(x) => x.id === `${entry.date}#${entry.time}`
