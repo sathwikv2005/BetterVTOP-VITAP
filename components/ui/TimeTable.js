@@ -7,6 +7,7 @@ import TimeTableDisplay from '../TimeTableDisplay'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getTime } from '../../util/getTime'
 import { ForceUpdateContext } from '../../context/ForceUpdateContext'
+import Loading from '../Loading'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -46,11 +47,7 @@ export function Timetable() {
 	const initialRouteName = weekdayMap[todayIndex]
 
 	return loading ? (
-		<Text
-			style={{ color: colorTheme.main.text, fontSize: 20, textAlign: 'center', marginTop: '50%' }}
-		>
-			Loading...
-		</Text>
+		<Loading />
 	) : (
 		<Tab.Navigator
 			initialRouteName={initialRouteName}

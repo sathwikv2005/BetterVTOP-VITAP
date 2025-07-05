@@ -1,15 +1,16 @@
 import { useContext, useEffect, useState } from 'react'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text } from 'react-native'
+import { View, Text, ToastAndroid } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { TextInput } from 'react-native'
-import { Image } from 'react-native'
 import { Pressable } from 'react-native'
-import { getCaptcha, vtopLogin } from '../util/VTOP/login'
+import { vtopLogin } from '../util/VTOP/login'
 import { Alert } from 'react-native'
 import { fetchVtopData } from '../util/VTOP/getAllData'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
+import Loading from '../components/Loading'
+import { goToDrawerTab } from '../util/goToDrawerTab'
 
 export default function Login() {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -55,7 +56,8 @@ export default function Login() {
 		forceUpdate()
 		console.log(trigger)
 		setLoading(false)
-		return Alert.alert('Login successful', 'Data fetched')
+		ToastAndroid.show('Data fetched successfully! ✅', ToastAndroid.LONG)
+		return goToDrawerTab('home')
 	}
 
 	const styles = StyleSheet.create({
@@ -151,11 +153,7 @@ export default function Login() {
 	})
 
 	return loading ? (
-		<Text
-			style={{ color: colorTheme.main.text, fontSize: 20, textAlign: 'center', marginTop: '50%' }}
-		>
-			Loading...
-		</Text>
+		<Loading />
 	) : (
 		<View style={styles.container}>
 			<Text style={styles.login}>Login to VTOP:</Text>
