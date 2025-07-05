@@ -1,13 +1,23 @@
-import { Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import Fontisto from '@expo/vector-icons/Fontisto'
 import Entypo from '@expo/vector-icons/Entypo'
-import { useContext } from 'react'
+
+import { useContext, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { formatCourseTitle } from '../util/formatCourseTitle'
+import Foundation from '@expo/vector-icons/Foundation'
 
-export default function AttendanceItem({ data, minPercent, ...props }) {
+export default function AttendanceItem({
+	data,
+	minPercent,
+	setTooltipText,
+	setTooltipVisible,
+	attendanceData,
+	...props
+}) {
 	const { colorTheme } = useContext(ColorThemeContext)
+	// console.log(attendanceData)
 	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
 	const btwExamsGreen = parseInt(data.cat2FatPercentage) >= parseInt(minPercent)
 	const splitData = data.courseDetails.split('-')
@@ -107,97 +117,141 @@ export default function AttendanceItem({ data, minPercent, ...props }) {
 			fontSize: 18,
 			marginTop: 0,
 		},
+		userStatus: {
+			flexDirection: 'row',
+			justifyContent: 'center',
+			alignItems: 'center',
+			gap: 4,
+		},
+		userDataInfo: {
+			marginTop: 3,
+			fontSize: 15,
+		},
 	})
 
 	return (
-		<View style={style.container}>
-			<View style={attendanceGreen ? style.greenBorder : style.redBorder}>
-				<View style={[style.box, style.header]}>
-					<View style={style.course}>
-						{data.classType.includes('T') ? (
-							<Entypo name="open-book" style={style.icon} size={18} color={colorTheme.main.text} />
-						) : (
-							<Fontisto
-								name="laboratory"
-								style={style.icon}
-								size={18}
-								color={colorTheme.main.text}
-							/>
-						)}
-						<Text style={[style.mainText, style.headerText]}>
-							{formatCourseTitle(courseTitle, 35)}
+		<>
+			<View style={style.container}>
+				<View style={attendanceGreen ? style.greenBorder : style.redBorder}>
+					<View style={[style.box, style.header]}>
+						<View style={style.course}>
+							{data.classType.includes('T') ? (
+								<Entypo
+									name="open-book"
+									style={style.icon}
+									size={18}
+									color={colorTheme.main.text}
+								/>
+							) : (
+								<Fontisto
+									name="laboratory"
+									style={style.icon}
+									size={18}
+									color={colorTheme.main.text}
+								/>
+							)}
+							<Text style={[style.mainText, style.headerText]}>
+								{formatCourseTitle(courseTitle, 35)}
+							</Text>
+						</View>
+						<Text style={[style.percentage, attendanceGreen ? style.green : style.red]}>
+							{data.percentage}%
 						</Text>
 					</View>
-					<Text style={[style.percentage, attendanceGreen ? style.green : style.red]}>
-						{data.percentage}%
-					</Text>
-				</View>
 
-				<View style={[style.box, style.details]}>
-					<View style={[style.attended, style.detailsBox]}>
-						<View style={[style.backGround]}>
-							<Text style={[style.mainText]}>Attended</Text>
-							<Text style={[style.mainText]}>
-								{data.attended}/{data.totalClasses}
-							</Text>
+					<View style={[style.box, style.details]}>
+						<View style={[style.attended, style.detailsBox]}>
+							<View style={[style.backGround]}>
+								<Text style={[style.mainText]}>Attended</Text>
+								<Text style={[style.mainText]}>
+									{data.classType.includes('T')
+										? `${data.attended}/${data.totalClasses}`
+										: `${parseInt(data.attended) / 2}/${parseInt(data.totalClasses) / 2}`}
+								</Text>
+							</View>
 						</View>
-					</View>
-					<View style={[style.betweenExams, style.detailsBox]}>
-						<View style={[style.backGround]}>
-							<Text
-								style={[
-									style.mainText,
-									{ textAlign: 'center' },
-									btwExamsGreen ? style.green : style.red,
-								]}
-							>
-								Btw Exams
-							</Text>
-							<Text
-								style={[
-									style.mainText,
-									{ textAlign: 'center' },
-									btwExamsGreen ? style.green : style.red,
-								]}
-							>
-								{data.cat2FatPercentage}%
-							</Text>
-						</View>
-					</View>
-					<View style={[style.buffer, style.detailsBox]}>
-						<View style={[style.backGround]}>
-							<View style={[style.bufferBox]}>
+						<View style={[style.betweenExams, style.detailsBox]}>
+							<View style={[style.backGround]}>
 								<Text
 									style={[
 										style.mainText,
 										{ textAlign: 'center' },
-										attendanceGreen ? style.green : style.red,
+										btwExamsGreen ? style.green : style.red,
 									]}
 								>
-									{attendanceGreen ? 'Can Skip' : 'Must Attend'}
+									Btw Exams
 								</Text>
 								<Text
 									style={[
 										style.mainText,
 										{ textAlign: 'center' },
-										attendanceGreen ? style.green : style.red,
+										btwExamsGreen ? style.green : style.red,
 									]}
 								>
-									{calcBufferClasses(minPercent, data.attended, data.totalClasses)}
+									{data.cat2FatPercentage}%
 								</Text>
+							</View>
+						</View>
+						<View style={[style.buffer, style.detailsBox]}>
+							<View style={[style.backGround]}>
+								<View style={[style.bufferBox]}>
+									<Text
+										style={[
+											style.mainText,
+											{ textAlign: 'center' },
+											attendanceGreen ? style.green : style.red,
+										]}
+									>
+										{attendanceGreen ? 'Can Skip' : 'Must Attend'}
+									</Text>
+
+									<Pressable
+										onPress={() => {
+											setTooltipText(
+												`This calculation excludes classes marked as "Not Posted" on VTOP.`
+											)
+
+											setTooltipVisible(true)
+										}}
+										style={[style.userStatus]}
+									>
+										<Text
+											style={[
+												style.mainText,
+												{ textAlign: 'center' },
+												attendanceGreen ? style.green : style.red,
+											]}
+										>
+											{calcBufferClasses(
+												minPercent,
+												data.classType.includes('T')
+													? attendanceData.attendance.attended
+													: parseInt(attendanceData.attendance.attended) / 2,
+												data.classType.includes('T')
+													? attendanceData.attendance.absent
+													: parseInt(attendanceData.attendance.absent) / 2
+											)}
+										</Text>
+										<Foundation
+											name="info"
+											style={style.userDataInfo}
+											color={colorTheme.accent.primary}
+										/>
+									</Pressable>
+								</View>
 							</View>
 						</View>
 					</View>
 				</View>
 			</View>
-		</View>
+		</>
 	)
 }
 
-function calcBufferClasses(minPercent, attended, totalClasses) {
+function calcBufferClasses(minPercent, attended, absent) {
 	const p = parseInt(minPercent)
 	const a = parseInt(attended)
-	const t = parseInt(totalClasses)
+	const t = a + parseInt(absent)
 	const percentage = (a * 100) / t
 	if (percentage < p) return classesNeeded(a, t, p)
 	return classesCanSkip(a, t, p)

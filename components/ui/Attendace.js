@@ -14,6 +14,10 @@ import FooterItem from '../FooterItem.js'
 import { ForceUpdateContext } from '../../context/ForceUpdateContext.js'
 import AttendanceDetails from '../AttendanceDetails.js'
 
+import { Dimensions } from 'react-native'
+import Loading from '../Loading.js'
+const { height } = Dimensions.get('window')
+
 export function Attendance() {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const { trigger } = useContext(ForceUpdateContext)
@@ -25,6 +29,8 @@ export function Attendance() {
 	const [savedSem, setSavedSem] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [minPercentage, setMinPercentage] = useState(75)
+	const [tooltipVisible, setTooltipVisible] = useState(false)
+	const [tooltipText, setTooltipText] = useState('')
 
 	const [selectedItem, setSelectedItem] = useState(null)
 	const [courseItem, setCourseItem] = useState(null)
@@ -140,11 +146,7 @@ export function Attendance() {
 	}
 
 	return loading ? (
-		<Text
-			style={{ color: colorTheme.main.text, fontSize: 20, textAlign: 'center', marginTop: '50%' }}
-		>
-			Loading...
-		</Text>
+		<Loading />
 	) : (
 		<View>
 			<View style={[styles.minPercent]}>
@@ -162,7 +164,13 @@ export function Attendance() {
 				keyExtractor={(item) => item.classDetails}
 				renderItem={({ item }) => (
 					<Pressable onPress={() => openSheet(item)}>
-						<AttendanceItem data={item} minPercent={minPercentage} />
+						<AttendanceItem
+							data={item}
+							attendanceData={attendanceData.find((x) => x.classDetails === item.classDetails)}
+							minPercent={minPercentage}
+							setTooltipText={setTooltipText}
+							setTooltipVisible={setTooltipVisible}
+						/>
 					</Pressable>
 				)}
 				refreshing={refreshing}
@@ -184,6 +192,32 @@ export function Attendance() {
 				userUpdated={userUpdated && userUpdated.length > 0 ? userUpdated : null}
 				setUserUpdated={setUserUpdated}
 			/>
+			{tooltipVisible && (
+				<View
+					style={{
+						position: 'absolute',
+						top: height * 0.4,
+						left: '5%',
+						width: '90%',
+						padding: 10,
+						backgroundColor: colorTheme.main.primary,
+						borderRadius: 8,
+						borderColor: colorTheme.accent.primary,
+						borderWidth: 1,
+						zIndex: 999,
+					}}
+				>
+					<Text style={{ color: colorTheme.main.text, textAlign: 'center', marginBottom: 10 }}>
+						{tooltipText}
+					</Text>
+					<Pressable
+						onPress={() => setTooltipVisible(false)}
+						style={{ alignSelf: 'center', paddingVertical: 4, paddingHorizontal: 10 }}
+					>
+						<Text style={{ color: colorTheme.accent.primary, fontWeight: '500' }}>Close</Text>
+					</Pressable>
+				</View>
+			)}
 		</View>
 	)
 }
