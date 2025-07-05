@@ -7,6 +7,7 @@ import { useContext, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { formatCourseTitle } from '../util/formatCourseTitle'
 import Foundation from '@expo/vector-icons/Foundation'
+import calcBufferClasses from '../util/calcBufferClasses'
 
 export default function AttendanceItem({
 	data,
@@ -246,25 +247,4 @@ export default function AttendanceItem({
 			</View>
 		</>
 	)
-}
-
-function calcBufferClasses(minPercent, attended, absent) {
-	const p = parseInt(minPercent)
-	const a = parseInt(attended)
-	const t = a + parseInt(absent)
-	const percentage = (a * 100) / t
-	if (percentage < p) return classesNeeded(a, t, p)
-	return classesCanSkip(a, t, p)
-}
-
-function classesNeeded(a, t, p) {
-	if (p <= (a / t) * 100) return 0 // already at or above target
-
-	const x = (p * t - 100 * a) / (100 - p)
-	return Math.ceil(x) // round up since you can't attend a fraction of a class
-}
-
-function classesCanSkip(a, t, p) {
-	const x = (a * 100) / p - t
-	return Math.floor(x >= 0 ? x : 0)
 }

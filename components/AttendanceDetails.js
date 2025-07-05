@@ -9,6 +9,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import Foundation from '@expo/vector-icons/Foundation'
 import { formatCourseTitle } from '../util/formatCourseTitle'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import calcBufferClasses from '../util/calcBufferClasses'
 
 const { height } = Dimensions.get('window')
 
@@ -29,6 +30,7 @@ const AttendanceDetails = forwardRef(
 		const [tooltipVisible, setTooltipVisible] = useState(false)
 		const [tooltipText, setTooltipText] = useState('')
 		const [userPercent, setUserPercent] = useState(0)
+		const [userModified, setUserModified] = useState(null)
 
 		useEffect(() => {
 			async function getUserUpdatedData() {
@@ -73,8 +75,11 @@ const AttendanceDetails = forwardRef(
 				const userData = userUpdated.filter((x) => x.isPresent === true)?.length
 
 				attended += userData
+				setUserModified({
+					attended,
+					total,
+				})
 			}
-
 			return Math.ceil((attended * 100) / total)
 		}
 
@@ -391,25 +396,55 @@ const AttendanceDetails = forwardRef(
 								</View>
 								<View style={{ marginTop: 20, width: '100%' }}>
 									{userUpdated && (
-										<View style={[styles.userPercentBox]}>
-											<Text style={[styles.userPercentText]}>User calculated percentage: </Text>
-											<Pressable
-												onPress={() => {
-													setTooltipText(
-														`This percentage is based on the attendance data you manually modified below.`
-													)
+										<View>
+											<View style={[styles.userPercentBox]}>
+												<Text style={[styles.userPercentText]}>User calculated percentage: </Text>
+												<Pressable
+													onPress={() => {
+														setTooltipText(
+															`This percentage is based on the attendance data you manually modified below.`
+														)
 
-													setTooltipVisible(true)
-												}}
-												style={[styles.userStatus]}
-											>
-												<Text style={[styles.userPercent]}>{userPercent}%</Text>
-												<Foundation
-													name="info"
-													style={styles.userDataInfo}
-													color={colorTheme.accent.primary}
-												/>
-											</Pressable>
+														setTooltipVisible(true)
+													}}
+													style={[styles.userStatus]}
+												>
+													<Text style={[styles.userPercent]}>{userPercent}%</Text>
+													<Foundation
+														name="info"
+														style={styles.userDataInfo}
+														color={colorTheme.accent.primary}
+													/>
+												</Pressable>
+											</View>
+											<View style={[styles.userPercentBox]}>
+												<Text style={[styles.userPercentText]}>
+													{userPercent >= minPercent ? 'Can Skip:' : 'Must Attend:'}
+												</Text>
+												<Pressable
+													onPress={() => {
+														setTooltipText(
+															`This calculation is based on the attendance data you manually modified below.`
+														)
+
+														setTooltipVisible(true)
+													}}
+													style={[styles.userStatus]}
+												>
+													<Text style={[styles.userPercent]}>
+														{calcBufferClasses(
+															minPercent,
+															userModified.attended,
+															userModified.total - userModified.attended
+														)}
+													</Text>
+													<Foundation
+														name="info"
+														style={styles.userDataInfo}
+														color={colorTheme.accent.primary}
+													/>
+												</Pressable>
+											</View>
 										</View>
 									)}
 									<ScrollView horizontal>
@@ -422,7 +457,7 @@ const AttendanceDetails = forwardRef(
 											</View>
 											<ScrollView
 												style={{
-													maxHeight: userUpdated ? height * 0.42 : height * 0.45,
+													maxHeight: userUpdated ? height * 0.39 : height * 0.45,
 													backgroundColor: colorTheme.main.primary,
 												}}
 											>
