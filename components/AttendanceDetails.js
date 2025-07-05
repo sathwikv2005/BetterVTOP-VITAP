@@ -417,34 +417,35 @@ const AttendanceDetails = forwardRef(
 													/>
 												</Pressable>
 											</View>
-											<View style={[styles.userPercentBox]}>
-												<Text style={[styles.userPercentText]}>
-													{userPercent >= minPercent ? 'Can Skip:' : 'Must Attend:'}
-												</Text>
-												<Pressable
-													onPress={() => {
-														setTooltipText(
-															`This calculation is based on the attendance data you manually modified below.`
-														)
-
-														setTooltipVisible(true)
-													}}
-													style={[styles.userStatus]}
-												>
-													<Text style={[styles.userPercent]}>
-														{calcBufferClasses(
-															minPercent,
-															userModified.attended,
-															userModified.total - userModified.attended
-														)}
+											{userModified && (
+												<View style={[styles.userPercentBox]}>
+													<Text style={[styles.userPercentText]}>
+														{userPercent >= minPercent ? 'Can Skip:' : 'Must Attend:'}
 													</Text>
-													<Foundation
-														name="info"
-														style={styles.userDataInfo}
-														color={colorTheme.accent.primary}
-													/>
-												</Pressable>
-											</View>
+													<Pressable
+														onPress={() => {
+															setTooltipText(
+																`This calculation is based on the attendance data you manually modified below.`
+															)
+															setTooltipVisible(true)
+														}}
+														style={[styles.userStatus]}
+													>
+														<Text style={[styles.userPercent]}>
+															{calcBufferClasses(
+																minPercent,
+																userModified.attended,
+																userModified.total - userModified.attended
+															)}
+														</Text>
+														<Foundation
+															name="info"
+															style={styles.userDataInfo}
+															color={colorTheme.accent.primary}
+														/>
+													</Pressable>
+												</View>
+											)}
 										</View>
 									)}
 									<ScrollView horizontal>
