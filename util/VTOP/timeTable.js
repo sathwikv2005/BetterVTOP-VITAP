@@ -5,10 +5,10 @@ import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
 import { parseTimeTable } from '../parse/parseTimeTable'
 import { vtopLogin } from './login'
-import { Alert } from 'react-native'
+import { Alert, ToastAndroid } from 'react-native'
 import { getTime } from '../getTime'
 
-export async function getTimeTable(overrideSemID) {
+export async function getTimeTable(setLoading, overrideSemID) {
 	try {
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -21,6 +21,8 @@ export async function getTimeTable(overrideSemID) {
 		const semID = overrideSemID || sem?.semID
 		if (!csrf || !jsessionId || !username || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 
@@ -42,6 +44,8 @@ export async function getTimeTable(overrideSemID) {
 		if (response.status === 404) {
 			console.log(await response.text())
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 		if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }

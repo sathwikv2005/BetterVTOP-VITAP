@@ -52,7 +52,7 @@ export default function Login() {
 				`Failed to login! Please try again later. \n error: ${data.error}`
 			)
 		}
-		const vtopData = await fetchVtopData()
+		const vtopData = await fetchVtopData(setLoading)
 		forceUpdate()
 		console.log(trigger)
 		setLoading(false)

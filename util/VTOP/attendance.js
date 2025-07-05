@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { parseDocument } from 'htmlparser2'
+import { Alert, ToastAndroid } from 'react-native'
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
@@ -7,7 +8,7 @@ import { parseAttendance } from '../parse/parseAttendance'
 import { getTime } from '../getTime'
 import { parseAttendanceByID } from '../parse/parseAttendanceDetails'
 
-export async function getAttendance(overrideSemID) {
+export async function getAttendance(setLoading, overrideSemID) {
 	try {
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -19,6 +20,8 @@ export async function getAttendance(overrideSemID) {
 		const semID = overrideSemID || sem?.semID
 		if (!csrf || !jsessionId || !username || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 
@@ -40,6 +43,8 @@ export async function getAttendance(overrideSemID) {
 		if (response.status === 404) {
 			console.log(await response.text())
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 		if (!response.ok)
@@ -71,18 +76,22 @@ export async function getAttendance(overrideSemID) {
 	}
 }
 
-export async function getAttendanceDetails() {
+export async function getAttendanceDetails(setLoading) {
 	try {
 		const cached = await AsyncStorage.getItem('attendance')
 		const attendanceArray = cached ? JSON.parse(cached).attendance : null
 
 		if (!attendanceArray || attendanceArray.length === 0) {
 			console.log('No cached attendance')
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 
 		const attendanceData = await Promise.all(
-			attendanceArray.map(({ courseID, classType }) => fetchAttendanceDetails(courseID, classType))
+			attendanceArray.map(({ courseID, classType }) =>
+				fetchAttendanceDetails(setLoading, courseID, classType)
+			)
 		)
 
 		// const attendanceData = [await fetchAttendanceDetails('AM_CSE1005_00100', 'ETH')]
@@ -102,7 +111,7 @@ export async function getAttendanceDetails() {
 	}
 }
 
-export async function fetchAttendanceDetails(ID, type) {
+export async function fetchAttendanceDetails(setLoading, ID, type) {
 	try {
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -114,6 +123,8 @@ export async function fetchAttendanceDetails(ID, type) {
 		const semID = sem?.semID
 		if (!csrf || !jsessionId || !username || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 
@@ -138,6 +149,8 @@ export async function fetchAttendanceDetails(ID, type) {
 		if (response.status === 404) {
 			console.log(await response.text())
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 		if (!response.ok)

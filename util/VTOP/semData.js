@@ -3,11 +3,11 @@ import { parseDocument } from 'htmlparser2'
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
-import { Alert } from 'react-native'
+import { Alert, ToastAndroid } from 'react-native'
 import { getTime } from '../getTime'
 import { parseSemesterOptions } from '../parse/parseSemData'
 
-export async function getSemData() {
+export async function getSemData(setLoading) {
 	try {
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -19,6 +19,8 @@ export async function getSemData() {
 		if (!csrf || !jsessionId || !username) {
 			console.log(csrf, jsessionId, username)
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 
@@ -43,6 +45,8 @@ export async function getSemData() {
 		if (response.status === 404) {
 			console.log(await response.text())
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
 		if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }

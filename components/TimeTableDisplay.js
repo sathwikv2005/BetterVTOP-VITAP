@@ -24,7 +24,7 @@ export default function TimeTableDisplay({ route }) {
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true)
 
-		const data = await getAllData()
+		const data = await getAllData(setRefreshing)
 		if (data.error) {
 			console.log(data.error)
 			setRefreshing(false)
