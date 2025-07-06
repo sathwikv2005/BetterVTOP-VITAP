@@ -9,6 +9,8 @@ import { Attendance } from '../components/ui/Attendace'
 import { Timetable } from '../components/ui/TimeTable'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import { getGitHubRelease, downloadAndInstallAPK } from '../util/getGitHubRelease'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { goToDrawerTab } from '../util/goToDrawerTab'
 
 const Tab = createBottomTabNavigator()
 
@@ -17,6 +19,7 @@ export function Home() {
 	const [updateChecked, setUpdateChecked] = useState(false)
 	const [progress, setProgress] = useState(null)
 	const [progressVisible, setProgressVisible] = useState(false)
+	const [userName, setUserName] = useState(null)
 
 	const navigation = useNavigation()
 	const { trigger } = useContext(ForceUpdateContext)
@@ -62,6 +65,27 @@ export function Home() {
 			}
 		}
 
+		async function checkUserName() {
+			const userName = await AsyncStorage.getItem('username')
+			if (!userName)
+				Alert.alert(
+					'Login Required',
+					'We couldn’t find your saved VTOP credentials.\n\nPlease log in to fetch your latest data from VTOP.',
+					[
+						{
+							text: 'Remind Me Later',
+							style: 'cancel',
+						},
+						{
+							text: 'Log In Now',
+							onPress: () => {
+								goToDrawerTab('login')
+							},
+						},
+					]
+				)
+		}
+		checkUserName()
 		checkForUpdate()
 	}, [tabRouteName, trigger])
 
