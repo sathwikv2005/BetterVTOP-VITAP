@@ -17,6 +17,7 @@ export default function AttendanceItem({
 	attendanceData,
 	...props
 }) {
+	if (!data || !attendanceData) return null
 	const { colorTheme } = useContext(ColorThemeContext)
 	// console.log(attendanceData)
 	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
