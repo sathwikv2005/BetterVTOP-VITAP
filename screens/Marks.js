@@ -1,5 +1,5 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { Alert, FlatList, Pressable, StyleSheet, Text, ToastAndroid, View } from 'react-native'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import SemDropDown from '../components/SemDropDown'
@@ -16,6 +16,7 @@ export default function Marks() {
 	const { trigger } = useContext(ForceUpdateContext)
 	const [sem, setSem] = useState(null)
 	const [semData, setSemData] = useState(null)
+	const [refreshing, setRefreshing] = useState(false)
 	const [marks, setMarks] = useState(null)
 
 	useEffect(() => {
@@ -35,6 +36,21 @@ export default function Marks() {
 		}
 		getSemData()
 	}, [trigger])
+
+	const onRefresh = useCallback(async () => {
+		setRefreshing(true)
+
+		const data = await getMarks(setRefreshing, sem)
+		if (data.error) {
+			console.log(data.error)
+			setRefreshing(false)
+			return Alert.alert('Failed to login, please try again.')
+		}
+
+		setMarks(data.marksData)
+		setRefreshing(false)
+		ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
+	}, [])
 
 	async function handleSemChange(prevSem, newSem) {
 		setSem(newSem)
@@ -63,12 +79,17 @@ export default function Marks() {
 	) : (
 		<View style={[{ flex: 1, marginTop: 20 }]}>
 			<SemDropDown semData={semData} defaultSem={sem} handleSemChange={handleSemChange} />
-			<MarksTable marks={marks} colorTheme={colorTheme} />
+			<MarksTable
+				marks={marks}
+				colorTheme={colorTheme}
+				onRefresh={onRefresh}
+				refreshing={refreshing}
+			/>
 		</View>
 	)
 }
 
-function MarksTable({ marks, colorTheme, ...props }) {
+function MarksTable({ marks, colorTheme, refreshing, onRefresh, ...props }) {
 	const insets = useSafeAreaInsets()
 
 	const [selected, setSelected] = useState(null)
@@ -124,6 +145,8 @@ function MarksTable({ marks, colorTheme, ...props }) {
 						</Pressable>
 					)
 				}}
+				refreshing={refreshing}
+				onRefresh={onRefresh}
 				ListEmptyComponent={
 					<Text style={styles.emptyText}>No data available. Please select a semester.</Text>
 				}
