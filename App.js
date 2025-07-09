@@ -188,7 +188,6 @@ function CustomDrawerContent(props) {
 					}}
 					style={{
 						backgroundColor: isSettingsFocused ? colorTheme.accent.secondary : 'transparent',
-						borderRadius: 50,
 					}}
 					activeTintColor={colorTheme.main.primary}
 					inactiveTintColor={colorTheme.main.text}
