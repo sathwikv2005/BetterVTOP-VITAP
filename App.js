@@ -9,6 +9,7 @@ import {
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { Text, View, ActivityIndicator } from 'react-native'
+import { DrawerItem } from '@react-navigation/drawer'
 import { Home } from './screens/Home'
 import Feather from '@expo/vector-icons/Feather'
 import Entypo from '@expo/vector-icons/Entypo'
@@ -155,6 +156,10 @@ function DrawerLabel({ icon, text, focused }) {
 
 function CustomDrawerContent(props) {
 	const { colorTheme } = useContext(ColorThemeContext)
+	const focusedRoute = props.state.routeNames[props.state.index]
+
+	const isSettingsFocused = focusedRoute === 'settings'
+
 	return (
 		<DrawerContentScrollView
 			{...props}
@@ -172,27 +177,22 @@ function CustomDrawerContent(props) {
 					justifyContent: 'center',
 				}}
 			>
-				<View
-					style={{
-						paddingVertical: 10,
-						paddingHorizontal: 20,
-						flexDirection: 'row',
-						alignItems: 'center',
+				<DrawerItem
+					label="Settings"
+					icon={({ color, size }) => <Feather name="settings" color={color} size={size} />}
+					onPress={() => props.navigation.navigate('settings')}
+					labelStyle={{
+						fontWeight: isSettingsFocused ? '800' : '500',
+						fontSize: 16,
+						color: isSettingsFocused ? colorTheme.main.primary : colorTheme.main.text,
 					}}
-				>
-					<Feather name="settings" size={22} color={colorTheme.main.text} />
-					<Text
-						onPress={() => props.navigation.navigate('settings')}
-						style={{
-							marginLeft: 10,
-							color: colorTheme.main.text,
-							fontSize: 16,
-							fontWeight: '500',
-						}}
-					>
-						Settings
-					</Text>
-				</View>
+					style={{
+						backgroundColor: isSettingsFocused ? colorTheme.accent.secondary : 'transparent',
+						borderRadius: 50,
+					}}
+					activeTintColor={colorTheme.main.primary}
+					inactiveTintColor={colorTheme.main.text}
+				/>
 			</View>
 		</DrawerContentScrollView>
 	)
