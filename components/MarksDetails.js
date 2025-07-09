@@ -40,6 +40,7 @@ const MarksDetails = forwardRef(({ data, colorTheme }, ref) => {
 			flexDirection: 'column',
 			borderWidth: 1,
 			borderColor: colorTheme.accent.primary,
+			borderRadius: 5,
 			minWidth: 700,
 			// maxHeight: height * 0.8,
 		},
