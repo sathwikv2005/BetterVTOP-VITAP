@@ -102,7 +102,7 @@ export default function ClassItem({ item, day, ...props }) {
 		},
 		icon: {
 			fontSize: 17,
-			marginTop: 4,
+			marginTop: 3,
 		},
 		timings: {
 			flexDirection: 'row',

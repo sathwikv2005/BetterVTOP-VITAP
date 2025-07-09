@@ -12,8 +12,8 @@ import Constants from 'expo-constants'
 import { Linking } from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import Feather from '@expo/vector-icons/Feather'
-import { ColorThemeContext } from '../context/ColorThemeContext'
-import { downloadAndInstallAPK, getGitHubRelease } from '../util/getGitHubRelease'
+import { ColorThemeContext } from '../../context/ColorThemeContext'
+import { downloadAndInstallAPK, getGitHubRelease } from '../../util/getGitHubRelease'
 
 const version = Constants.expoConfig.version
 

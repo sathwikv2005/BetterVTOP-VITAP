@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Text, View, StyleSheet, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DropDownPicker from 'react-native-dropdown-picker'
-import { ColorThemeContext } from '../context/ColorThemeContext'
-import { getColorTheme, getNewColorTheme } from '../constants/colorTheme/colorThemeMap'
+import { ColorThemeContext } from '../../context/ColorThemeContext'
+import { getColorTheme, getNewColorTheme } from '../../constants/colorTheme/colorThemeMap'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
 export default function ColorTheme() {

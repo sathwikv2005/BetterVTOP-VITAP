@@ -171,26 +171,33 @@ const AttendanceDetails = forwardRef(
 			},
 			logRow: {
 				flexDirection: 'row',
-				paddingVertical: 6,
-				paddingHorizontal: 4,
 				borderBottomWidth: 1,
-				borderBottomColor: colorTheme.main.tertiary,
-			},
-			logHeader: {
+				borderBottomColor: colorTheme.accent.tertiary,
 				backgroundColor: colorTheme.main.primary,
 			},
+
+			logHeader: {
+				backgroundColor: colorTheme.main.primary,
+				borderBottomWidth: 2,
+				borderBottomColor: colorTheme.accent.tertiary,
+			},
+
 			logCell: {
 				width: 130,
+				paddingVertical: 8,
 				paddingHorizontal: 6,
-				alignContent: 'center',
 				color: colorTheme.main.text,
-				borderRightWidth: 1,
-				borderRightColor: colorTheme.main.tertiary,
-				borderLeftWidth: 1,
-				borderLeftColor: colorTheme.main.tertiary,
 				fontSize: 12,
 				textAlign: 'center',
+				borderRightWidth: 1,
+				borderRightColor: colorTheme.accent.tertiary,
+				justifyContent: 'center',
 			},
+
+			lastLogCell: {
+				borderRightWidth: 0, // Removes extra border at end
+			},
+
 			headerText: {
 				fontWeight: '600',
 				color: colorTheme.accent.primary,
@@ -454,7 +461,9 @@ const AttendanceDetails = forwardRef(
 												<Text style={[styles.logCell, styles.headerText]}>Date/Time</Text>
 												<Text style={[styles.logCell, styles.headerText]}>Status</Text>
 												<Text style={[styles.logCell, styles.headerText]}>Action</Text>
-												<Text style={[styles.logCell, styles.headerText]}>Reason</Text>
+												<Text style={[styles.logCell, styles.headerText, styles.lastLogCell]}>
+													Reason
+												</Text>
 											</View>
 											<ScrollView
 												style={{
@@ -474,13 +483,13 @@ const AttendanceDetails = forwardRef(
 																{'\n'}
 																{entry.time}, {entry.slot}
 															</Text>
+
 															{usrUpdated ? (
 																<Pressable
 																	onPress={() => {
 																		setTooltipText(
 																			`This class was marked as '${usrUpdated.status}' by you.\nOriginal VTOP status: '${entry.status}'.\n\nThis change will be automatically removed once the official VTOP data matches your input.`
 																		)
-
 																		setTooltipVisible(true)
 																	}}
 																	style={[styles.logCell, styles.userStatus]}
@@ -504,16 +513,17 @@ const AttendanceDetails = forwardRef(
 																	style={[
 																		styles.logCell,
 																		entry.isPresent ? styles.green : styles.red,
-																		usrUpdated ? { color: colorTheme.accent.primary } : '',
 																	]}
 																>
 																	{entry.status}
 																</Text>
 															)}
+
 															<Text style={styles.logCell}>
 																{renderAction(entry, entry.isPresent, usrUpdated)}
 															</Text>
-															<Text style={styles.logCell}>
+
+															<Text style={[styles.logCell, styles.lastLogCell]}>
 																{entry.reason ? entry.reason : '-'}
 															</Text>
 														</View>

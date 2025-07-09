@@ -12,6 +12,7 @@
 		"studentTimeTable": "/vtop/academics/common/StudentTimeTable",
 		"viewTimeTable": "/vtop/processViewTimeTable",
 		"ViewStudentAttendance": "/vtop/processViewStudentAttendance",
-		"ViewAttendanceDetail": "/vtop/processViewAttendanceDetail"
+		"ViewAttendanceDetail": "/vtop/processViewAttendanceDetail",
+		"StudentMarkView": "/vtop/examinations/doStudentMarkView"
 	}
 }

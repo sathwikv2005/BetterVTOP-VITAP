@@ -1,13 +1,13 @@
 import { useContext, useState, useEffect } from 'react'
-import { goToDrawerTab } from '../util/goToDrawerTab'
+import { goToDrawerTab } from '../../util/goToDrawerTab'
 import { Text, View, StyleSheet, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DropDownPicker from 'react-native-dropdown-picker'
-import { ColorThemeContext } from '../context/ColorThemeContext'
+import { ColorThemeContext } from '../../context/ColorThemeContext'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import { ForceUpdateContext } from '../context/ForceUpdateContext'
+import { ForceUpdateContext } from '../../context/ForceUpdateContext'
 
-export default function SemSelection() {
+export default function SemSelection({ title, ...props }) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const { trigger } = useContext(ForceUpdateContext)
 	const [dropDown, setDropDown] = useState(false)
@@ -79,7 +79,7 @@ export default function SemSelection() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.heading}>Default Semester</Text>
+			<Text style={styles.heading}>{title}</Text>
 			<View style={styles.setting}>
 				<DropDownPicker
 					dropDownDirection="AUTO"

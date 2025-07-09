@@ -1,6 +1,7 @@
 import { goToDrawerTab } from '../goToDrawerTab'
 import { getAttendance } from './attendance'
 import { vtopLogin } from './login'
+import { getMarks } from './marks'
 import { getSemData } from './semData'
 import { getTimeTable } from './timeTable'
 import { Alert, ToastAndroid } from 'react-native'
@@ -28,6 +29,7 @@ export async function fetchVtopData(setLoading) {
 	if (timetable.error) return timetable
 	const attendance = await getAttendance(setLoading)
 	if (attendance.error) return attendance
+
 	return {
 		semData,
 		timetable,
