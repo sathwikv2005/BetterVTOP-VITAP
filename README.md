@@ -4,14 +4,25 @@
 
 ## 👉 You can download and try the APK from the [Releases page](https://github.com/sathwikv2005/BetterVTOP-VITAP/releases).
 
-## 📱 Features
+---
 
-- 📊 View detailed **attendance summaries**
-- 🧑‍🏫 See **faculty and course details**
-- 🗓️ Check your **class timetable**
-- 🔄 **Pull to refresh** and get real-time updates from VTOP
-- 🔐 Login with your official VTOP credentials (securely stored)
-- 🧠 Works even in offline mode using cached data
+## 📱 App Screenshots
+
+<p float="left">
+  <img src="./screenshots/Screenshot_1.png" width="45%" />
+  <img src="./screenshots/Screenshot_2.png" width="45%" />
+</p>
+
+<p float="left">
+  <img src="./screenshots/Screenshot_3.png" width="45%" />
+  <img src="./screenshots/Screenshot_4.png" width="45%" />
+</p>
+
+<p float="left">
+  <img src="./screenshots/Screenshot_5.png" width="30%" />
+  <img src="./screenshots/Screenshot_6.png" width="30%" />
+  <img src="./screenshots/Screenshot_7.png" width="30%" />
+</p>
 
 ---
 
