@@ -15,7 +15,6 @@ export default function SemDropDown({ semData, handleSemChange, defaultSem, ...p
 
 	useEffect(() => {
 		async function getSemData() {
-			console.log(sem)
 			filterSemData(semData)
 		}
 		getSemData()
@@ -33,7 +32,7 @@ export default function SemDropDown({ semData, handleSemChange, defaultSem, ...p
 			label: item.sem,
 			value: item.semID,
 		}))
-		console.log(arr)
+
 		setFilteredSemData(arr)
 		if (!sem && defaultSem) {
 			setSem(defaultSem)

@@ -20,6 +20,7 @@ import Settings from './screens/Settings'
 import Login from './screens/Login'
 import { ForceUpdateProvider } from './context/ForceUpdateContext'
 import Marks from './screens/Marks'
+import ExamSchedule from './screens/ExamSchedule'
 
 const Drawer = createDrawerNavigator()
 
@@ -126,6 +127,20 @@ function MainApp() {
 					}}
 				/>
 				<Drawer.Screen
+					name="examSchedule"
+					component={ExamSchedule}
+					options={{
+						drawerLabel: ({ focused }) => (
+							<DrawerLabel
+								icon={<Entypo name="book" size={24} />}
+								text="Exam Schedule"
+								focused={focused}
+							/>
+						),
+						headerTitle: 'Exam Schedule',
+					}}
+				/>
+				<Drawer.Screen
 					name="settings"
 					component={Settings}
 					options={{ drawerLabel: () => null, title: 'Settings', drawerItemStyle: { height: 0 } }}
@@ -139,7 +154,9 @@ function DrawerLabel({ icon, text, focused }) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	return (
 		<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-			{React.cloneElement(icon, { color: colorTheme.main.text })}
+			{React.cloneElement(icon, {
+				color: focused ? colorTheme.main.primary : colorTheme.main.text,
+			})}
 			<Text
 				style={{
 					marginLeft: 10,
@@ -179,7 +196,13 @@ function CustomDrawerContent(props) {
 			>
 				<DrawerItem
 					label="Settings"
-					icon={({ color, size }) => <Feather name="settings" color={color} size={size} />}
+					icon={({ color, size }) => (
+						<Feather
+							name="settings"
+							color={isSettingsFocused ? colorTheme.main.primary : colorTheme.main.text}
+							size={size}
+						/>
+					)}
 					onPress={() => props.navigation.navigate('settings')}
 					labelStyle={{
 						fontWeight: isSettingsFocused ? '800' : '500',

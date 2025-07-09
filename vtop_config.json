@@ -13,6 +13,7 @@
 		"viewTimeTable": "/vtop/processViewTimeTable",
 		"ViewStudentAttendance": "/vtop/processViewStudentAttendance",
 		"ViewAttendanceDetail": "/vtop/processViewAttendanceDetail",
-		"StudentMarkView": "/vtop/examinations/doStudentMarkView"
+		"StudentMarkView": "/vtop/examinations/doStudentMarkView",
+		"SearchExamScheduleForStudent": "/vtop/examinations/doSearchExamScheduleForStudent"
 	}
 }

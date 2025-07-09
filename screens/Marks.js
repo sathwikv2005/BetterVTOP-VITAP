@@ -29,8 +29,6 @@ export default function Marks() {
 			}
 			const savedSem = JSON.parse(semStr)
 			const savedSemData = JSON.parse(semDataStr)
-			console.log(savedSem.semID)
-			// setSem(savedSem.semID)
 			setSemData(savedSemData.semData)
 			setLoading(false)
 		}

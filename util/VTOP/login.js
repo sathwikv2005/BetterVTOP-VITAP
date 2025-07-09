@@ -60,10 +60,8 @@ export async function vtopLogin(username, password) {
 
 		const newJsessId = data.cookies.find((c) => c.key === 'JSESSIONID')?.value
 
-		console.log('Cookies:', data.cookies)
-
 		// Save csrf and session ID in AsyncStorage
-		console.log('new:', newJsessId, newCsrf)
+
 		await AsyncStorage.multiSet([
 			['csrfToken', newCsrf],
 			['sessionId', newJsessId],

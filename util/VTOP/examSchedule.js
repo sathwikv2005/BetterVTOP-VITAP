@@ -5,9 +5,11 @@ import Headers from '../../headers.json'
 import { goToDrawerTab } from '../goToDrawerTab'
 import { Alert, ToastAndroid } from 'react-native'
 import { getTime } from '../getTime'
-import { parseSemesterOptions } from '../parse/parseSemData'
+import { parseMarks } from '../parse/parseExamSchedule'
+import { vtopLogin } from './login'
+import { parseExamSchedule } from '../parse/parseExamSchedule'
 
-export async function getSemData(setLoading) {
+export async function getExamSchedule(setLoading, overrideSemID) {
 	try {
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
@@ -15,21 +17,23 @@ export async function getSemData(setLoading) {
 			'username',
 			'sem',
 		])
+		const sem = await JSON.parse(savedSem)
 
-		if (!csrf || !jsessionId || !username) {
+		const semID = overrideSemID || sem?.semID
+		if (!csrf || !jsessionId || !username || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
 			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
-
+		await vtopLogin()
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
-		params.append('verifyMenu', 'true')
+		params.append('semesterSubId', semID)
 		params.append('authorizedID', username.toUpperCase())
-		params.append('x', `@(new Date().toUTCString())`)
+
 		const response = await fetch(
-			VtopConfig.domain + VtopConfig.backEndApi.commonStudentAttendance,
+			VtopConfig.domain + VtopConfig.backEndApi.SearchExamScheduleForStudent,
 			{
 				method: 'POST',
 				headers: {
@@ -53,25 +57,22 @@ export async function getSemData(setLoading) {
 		const html = await response.text()
 		const document = parseDocument(html)
 
-		const semData = parseSemesterOptions(document)
+		const examScheduleData = parseExamSchedule(document)
 
 		await AsyncStorage.setItem(
-			'semData',
+			`examSchedule-${semID}`,
 			JSON.stringify({
-				semData,
+				examScheduleData,
 				createdAt: getTime(),
 			})
 		)
-		if (!savedSem || savedSem === null) {
-			await AsyncStorage.setItem('sem', JSON.stringify(semData[0]))
-		}
-		// console.log(semData[0])
+		// console.log('schedule ', JSON.stringify(examScheduleData))
 		return {
-			semData,
+			examScheduleData,
 			createdAt: getTime(),
 		}
 	} catch (err) {
-		console.error('Error fetching sem data:', err)
+		console.error('Error fetching exam schedule:', err)
 		return { error: err }
 	}
 }
