@@ -41,7 +41,7 @@ export function Attendance() {
 		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
 		const userUpdatedDataStr = await AsyncStorage.getItem(`${item.courseID}-${item.classType}`)
 		if (!target || !item) return
-		console.log(`${item.courseID}-${item.classType} >> `, userUpdatedDataStr)
+
 		const userUpdatedData = JSON.parse(userUpdatedDataStr)
 		setUserUpdated(userUpdatedData)
 		setSelectedItem(item)
@@ -67,7 +67,7 @@ export function Attendance() {
 			setMinPercentage(cachedMinPercentage)
 
 			if (!data) data = { attendance: [], createdAt: getTime() }
-
+			// console.log(savedAttendanceData.attendanceData)
 			setAttendance(data.attendance)
 			setLastUpdated(data.createdAt)
 			setLoading(false)

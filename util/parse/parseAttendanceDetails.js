@@ -15,6 +15,10 @@ export function parseAttendanceByID(dom) {
 
 	// Get summary table and find first <tr> with <td> (not <th>)
 	const summaryTable = getElementById('StudentCourseDetailDataTable', dom.children)
+	if (!summaryTable) {
+		console.warn('summaryTable not found')
+		return { attendance }
+	}
 	const summaryRows = getElementsByTagName('tr', summaryTable, true)
 	const dataRow = summaryRows.find((row) => {
 		const cells = getElementsByTagName('td', row.children || [], true)
@@ -56,6 +60,15 @@ export function parseAttendanceByID(dom) {
 
 	// Attendance detail rows
 	const detailTable = getElementById('StudentAttendanceDetailDataTable', dom.children)
+	if (!detailTable) {
+		console.warn('detailTable not found')
+		return {
+			courseDetails,
+			classDetails,
+			faculty,
+			attendance,
+		}
+	}
 	const rows = getElementsByTagName('tr', detailTable, true)
 
 	for (const row of rows) {

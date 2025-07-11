@@ -471,64 +471,83 @@ const AttendanceDetails = forwardRef(
 													backgroundColor: colorTheme.main.primary,
 												}}
 											>
-												{courseItem.attendance.log.map((entry, index) => {
-													const usrUpdated = userUpdated?.find(
-														(x) => x.id === `${entry.date}#${entry.time}`
-													)
+												{!courseItem.attendance ||
+												!courseItem.attendance?.log ||
+												!(courseItem.attendance.log.length > 0) ? (
+													<Text
+														style={[
+															styles.logRow,
+															{
+																color: colorTheme.main.text,
+																padding: 10,
+																textAlign: 'center',
+																justifyContent: 'center',
+																height: 40,
+															},
+														]}
+													>
+														No data available
+													</Text>
+												) : (
+													courseItem.attendance.log.map((entry, index) => {
+														const usrUpdated = userUpdated?.find(
+															(x) => x.id === `${entry.date}#${entry.time}`
+														)
 
-													return (
-														<View key={index} style={styles.logRow}>
-															<Text style={styles.logCell}>
-																{entry.date}, {entry.day}
-																{'\n'}
-																{entry.time}, {entry.slot}
-															</Text>
+														return (
+															<View key={index} style={styles.logRow}>
+																<Text style={styles.logCell}>
+																	{entry.date}, {entry.day}
+																	{'\n'}
+																	{entry.time}, {entry.slot}
+																</Text>
 
-															{usrUpdated ? (
-																<Pressable
-																	onPress={() => {
-																		setTooltipText(
-																			`This class was marked as '${usrUpdated.status}' by you.\nOriginal VTOP status: '${entry.status}'.\n\nThis change will be automatically removed once the official VTOP data matches your input.`
-																		)
-																		setTooltipVisible(true)
-																	}}
-																	style={[styles.logCell, styles.userStatus]}
-																>
+																{usrUpdated ? (
+																	<Pressable
+																		onPress={() => {
+																			setTooltipText(
+																				`This class was marked as '${usrUpdated.status}' by you.\nOriginal VTOP status: '${entry.status}'.\n\nThis change will be automatically removed once the official VTOP data matches your input.`
+																			)
+																			setTooltipVisible(true)
+																		}}
+																		style={[styles.logCell, styles.userStatus]}
+																	>
+																		<Text
+																			style={[
+																				styles.userDataCell,
+																				{ color: colorTheme.accent.primary },
+																			]}
+																		>
+																			{usrUpdated.status}
+																		</Text>
+																		<Foundation
+																			name="info"
+																			style={styles.userDataInfo}
+																			color={colorTheme.accent.primary}
+																		/>
+																	</Pressable>
+																) : (
 																	<Text
 																		style={[
-																			styles.userDataCell,
-																			{ color: colorTheme.accent.primary },
+																			styles.logCell,
+																			entry.isPresent ? styles.green : styles.red,
 																		]}
 																	>
-																		{usrUpdated.status}
+																		{entry.status}
 																	</Text>
-																	<Foundation
-																		name="info"
-																		style={styles.userDataInfo}
-																		color={colorTheme.accent.primary}
-																	/>
-																</Pressable>
-															) : (
-																<Text
-																	style={[
-																		styles.logCell,
-																		entry.isPresent ? styles.green : styles.red,
-																	]}
-																>
-																	{entry.status}
+																)}
+
+																<Text style={styles.logCell}>
+																	{renderAction(entry, entry.isPresent, usrUpdated)}
 																</Text>
-															)}
 
-															<Text style={styles.logCell}>
-																{renderAction(entry, entry.isPresent, usrUpdated)}
-															</Text>
-
-															<Text style={[styles.logCell, styles.lastLogCell]}>
-																{entry.reason ? entry.reason : '-'}
-															</Text>
-														</View>
-													)
-												})}
+																<Text style={[styles.logCell, styles.lastLogCell]}>
+																	{entry.reason ? entry.reason : '-'}
+																</Text>
+															</View>
+														)
+													})
+												)}
 											</ScrollView>
 										</View>
 									</ScrollView>

@@ -155,11 +155,11 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 		}
 		if (!response.ok)
 			if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
-
 		const html = await response.text()
 		const document = parseDocument(html)
 
 		const attendanceData = parseAttendanceByID(document)
+
 		// console.log('attendance data:')
 		// console.log(attendanceData)
 		// console.log('attendance data log:')
@@ -193,7 +193,7 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 
 		return attendanceData
 	} catch (err) {
-		console.error('Error getting attendance details:', err)
+		console.error('Error fetching attendance details:', err)
 		return { error: err }
 	}
 }
