@@ -1,14 +1,15 @@
 import 'dotenv/config'
 import withInstallPermission from './plugins/withInstallPermission'
+import withCustomGradleFix from './plugins/custom-gradle-fix'
 
 const variant = process.env.APP_VARIANT || 'prod'
 
 export default {
 	expo: {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
-		plugins: [withInstallPermission],
+		plugins: [withInstallPermission, withCustomGradleFix],
 		slug: 'BetterVTOP',
-		version: '0.5.0',
+		version: '0.5.1',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
