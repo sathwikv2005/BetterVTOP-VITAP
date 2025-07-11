@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
 import VtopConfig from '../../vtop_config.json'
+import Headers from '../../headers.json'
 
 // Fetch captcha + pre-login setup
 export async function getCaptcha() {
@@ -30,8 +31,44 @@ export async function getCaptcha() {
 export async function vtopLogin(username, password) {
 	if (!username || !password) {
 		const isLoggedIn = await checkLogin()
+		if (isLoggedIn) return { message: 'Already Logged In.', ...isLoggedIn }
+	}
+	return await forceVtopLogin(username, password)
+}
 
-		if (isLoggedIn) return { message: 'Already Logged In.' }
+export async function checkLogin() {
+	try {
+		const [[, csrf], [, jsessionId], [, username]] = await AsyncStorage.multiGet([
+			'csrfToken',
+			'sessionId',
+			'username',
+		])
+		if (!csrf || !jsessionId || !username) return false
+		const response = await fetch(
+			VtopConfig.domain + VtopConfig.vtopUrls.homepage + `?_csrf=${csrf}`,
+			{
+				method: 'GET',
+				headers: {
+					...Headers,
+					Cookie: `JSESSIONID=${jsessionId}`,
+				},
+				credentials: 'omit',
+			}
+		)
+		if (!response.ok) return false
+		console.log('Already loggedIn')
+		return {
+			csrf,
+			jsessionId,
+		}
+	} catch (err) {
+		console.log(err)
+		return false
+	}
+}
+
+export async function forceVtopLogin(username, password) {
+	if (!username || !password) {
 		const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
 			'username',
 			'password',
@@ -42,7 +79,6 @@ export async function vtopLogin(username, password) {
 	if (!username || !password) {
 		return { error: 'Missing required parameters.' }
 	}
-
 	try {
 		// POST login request
 		const response = await fetch(
@@ -71,38 +107,10 @@ export async function vtopLogin(username, password) {
 			['password', password],
 		])
 
-		return { message: 'Login successful' }
+		return { message: 'Login successful', csrf: newCsrf, jsessionId: newJsessId }
 	} catch (error) {
 		await AsyncStorage.multiRemove(['csrfToken', 'sessionId', 'username'])
 		console.error('Error in vtopLogin:', error)
 		return { error: 'Failed to login' }
-	}
-}
-
-export async function checkLogin() {
-	try {
-		const [[, csrf], [, jsessionId], [, username]] = await AsyncStorage.multiGet([
-			'csrfToken',
-			'sessionId',
-			'username',
-		])
-		if (!csrf || !jsessionId || !username) return false
-		const response = await fetch(
-			VtopConfig.domain + VtopConfig.vtopUrls.homepage + `?_csrf=${csrf}`,
-			{
-				method: 'GET',
-				headers: {
-					...Headers,
-					Cookie: `JSESSIONID=${jsessionId}`,
-				},
-				credentials: 'omit',
-			}
-		)
-		if (!response.ok) return false
-		console.log('Already loggedIn')
-		return true
-	} catch (err) {
-		console.log(err)
-		return false
 	}
 }

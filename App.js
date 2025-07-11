@@ -8,12 +8,13 @@ import {
 } from '@react-navigation/drawer'
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
-import { Text, View, ActivityIndicator } from 'react-native'
+import { Text, View, ActivityIndicator, Pressable } from 'react-native'
 import { DrawerItem } from '@react-navigation/drawer'
 import { Home } from './screens/Home'
 import Feather from '@expo/vector-icons/Feather'
 import Entypo from '@expo/vector-icons/Entypo'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
@@ -21,6 +22,7 @@ import Login from './screens/Login'
 import { ForceUpdateProvider } from './context/ForceUpdateContext'
 import Marks from './screens/Marks'
 import ExamSchedule from './screens/ExamSchedule'
+import openVTOP from './screens/OpenVTOP'
 
 const Drawer = createDrawerNavigator()
 
@@ -138,6 +140,20 @@ function MainApp() {
 							/>
 						),
 						headerTitle: 'Exam Schedule',
+					}}
+				/>
+				<Drawer.Screen
+					name="openVTOP"
+					component={openVTOP}
+					options={{
+						drawerLabel: ({ focused }) => (
+							<DrawerLabel
+								icon={<FontAwesome name="globe" size={24} />}
+								text="Open VTOP"
+								focused={focused}
+							/>
+						),
+						headerTitle: 'VTOP',
 					}}
 				/>
 				<Drawer.Screen
