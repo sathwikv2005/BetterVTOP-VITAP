@@ -8,8 +8,10 @@ import { getTimeTable } from '../util/VTOP/timeTable'
 import { Alert } from 'react-native'
 import { getAllData } from '../util/VTOP/getAllData'
 import FooterItem from './FooterItem.js'
+import { ForceUpdateContext } from '../context/ForceUpdateContext'
 
 export default function TimeTableDisplay({ route }) {
+	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [refreshing, setRefreshing] = useState(false)
 
@@ -34,6 +36,7 @@ export default function TimeTableDisplay({ route }) {
 		setTimetable(data.timetable.timetable)
 		setLastUpdated(data.timetable.createdAt)
 		setRefreshing(false)
+		forceUpdate()
 		Alert.alert('Timetable & Attendance refreshed!')
 	}, [])
 

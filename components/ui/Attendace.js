@@ -20,7 +20,7 @@ const { height } = Dimensions.get('window')
 
 export function Attendance() {
 	const { colorTheme } = useContext(ColorThemeContext)
-	const { trigger } = useContext(ForceUpdateContext)
+	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 	const [refreshing, setRefreshing] = useState(false)
 	const [lastUpdated, setLastUpdated] = useState(getTime())
 	const [attendance, setAttendance] = useState([])
@@ -88,6 +88,7 @@ export function Attendance() {
 		setAttendance(data.attendance.attendance)
 		setLastUpdated(data.attendance.createdAt)
 		setRefreshing(false)
+		forceUpdate()
 		Alert.alert('Timetable & Attendance refreshed!')
 	}, [])
 
