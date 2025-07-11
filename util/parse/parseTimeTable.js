@@ -11,7 +11,7 @@ export function parseTimeTable(document) {
 		start: cell.children[0]?.data?.trim().split(' - ')[0],
 		end: thEndTimeCells[i]?.children[0]?.data?.trim().split(' - ')[0],
 	}))
-	console.log(thTimeSlots)
+
 	const labTimeCells = selectAll('td', rows[2]).slice(2)
 	const labEndTimeCells = selectAll('td', rows[3]).slice(1)
 	const labTimeSlots = labTimeCells.map((cell, i) => ({
