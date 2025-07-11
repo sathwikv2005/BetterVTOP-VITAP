@@ -28,15 +28,17 @@ export async function getCaptcha() {
 
 // Login to VTOP
 export async function vtopLogin(username, password) {
-	const isLoggedIn = await checkLogin()
+	if (!username || !password) {
+		const isLoggedIn = await checkLogin()
 
-	if (isLoggedIn) return { message: 'Already Logged In.' }
-	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
-		'username',
-		'password',
-	])
-	if (!username) username = savedUsername
-	if (!password) password = savedPassword
+		if (isLoggedIn) return { message: 'Already Logged In.' }
+		const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
+			'username',
+			'password',
+		])
+		if (!username) username = savedUsername
+		if (!password) password = savedPassword
+	}
 	if (!username || !password) {
 		return { error: 'Missing required parameters.' }
 	}
