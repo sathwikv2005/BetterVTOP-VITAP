@@ -9,7 +9,7 @@ export default {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
 		plugins: [withInstallPermission, withCustomGradleFix],
 		slug: 'BetterVTOP',
-		version: '0.5.1',
+		version: '0.6.0',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
