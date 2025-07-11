@@ -62,7 +62,7 @@ export async function getTimeTable(setLoading, overrideSemID) {
 				createdAt: getTime(),
 			})
 		)
-		// console.log(timetable[0])
+
 		return {
 			timetable,
 			createdAt: getTime(),

@@ -84,7 +84,7 @@ function sortClasses(data) {
 		return []
 	}
 	const sorted = data.classes.slice().sort((a, b) => a.timings.start.localeCompare(b.timings.start))
-
+	// console.log(JSON.stringify(data))
 	const merged = []
 	let i = 0
 

@@ -6,12 +6,12 @@ export function parseTimeTable(document) {
 	const courseMap = getCourseTitleMap(document)
 	// Extract time slots
 	const thTimeCells = selectAll('td', rows[0]).slice(2)
-	const thEndTimeCells = selectAll('td', rows[1]).slice(2)
+	const thEndTimeCells = selectAll('td', rows[1]).slice(1)
 	const thTimeSlots = thTimeCells.map((cell, i) => ({
 		start: cell.children[0]?.data?.trim().split(' - ')[0],
 		end: thEndTimeCells[i]?.children[0]?.data?.trim().split(' - ')[0],
 	}))
-
+	console.log(thTimeSlots)
 	const labTimeCells = selectAll('td', rows[2]).slice(2)
 	const labEndTimeCells = selectAll('td', rows[3]).slice(1)
 	const labTimeSlots = labTimeCells.map((cell, i) => ({
