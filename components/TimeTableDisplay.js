@@ -1,16 +1,17 @@
-import React, { useState, useCallback, useContext, useMemo } from 'react'
+import React, { useState, useCallback, useContext, useMemo, useEffect } from 'react'
 import { ScrollView, RefreshControl, Text, View } from 'react-native'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { StyleSheet } from 'react-native'
 import { FlatList } from 'react-native'
 import ClassItem from './ClassItem'
 import { getTimeTable } from '../util/VTOP/timeTable'
-import { Alert } from 'react-native'
 import { getAllData } from '../util/VTOP/getAllData'
 import FooterItem from './FooterItem.js'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
+import { useAlert } from 'custom-react-native-alert'
 
 export default function TimeTableDisplay({ route }) {
+	const { showAlert, hideAlert } = useAlert()
 	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [refreshing, setRefreshing] = useState(false)
@@ -30,14 +31,90 @@ export default function TimeTableDisplay({ route }) {
 		if (data.error) {
 			console.log(data.error)
 			setRefreshing(false)
-			return Alert.alert('Failed to login, please try again.')
+			return showAlert({
+				title: '❌ Login Failed',
+				message: 'Failed to login. Please try again.',
+				styles: {
+					overlay: {
+						backgroundColor: '#000000B0',
+					},
+					container: {
+						backgroundColor: colorTheme.main.secondary,
+						width: '85%',
+						padding: 16,
+						borderRadius: 12,
+						borderColor: colorTheme.main.primary,
+					},
+					title: {
+						color: '#FF5A5F',
+						fontSize: 18,
+						fontWeight: '600',
+						textAlign: 'center',
+						marginBottom: 6,
+					},
+					message: {
+						color: colorTheme.main.text,
+						fontSize: 15,
+						textAlign: 'center',
+						marginBottom: 12,
+					},
+					okButton: {
+						backgroundColor: colorTheme.accent.primary,
+						paddingVertical: 10,
+						borderRadius: 8,
+					},
+					okText: {
+						color: colorTheme.main.primary,
+						fontWeight: 'bold',
+						textAlign: 'center',
+					},
+				},
+			})
 		}
 		console.log(data)
 		setTimetable(data.timetable.timetable)
 		setLastUpdated(data.timetable.createdAt)
 		setRefreshing(false)
 		forceUpdate()
-		Alert.alert('Timetable & Attendance refreshed!')
+		showAlert({
+			title: 'All Set!',
+			message: 'Your timetable and attendance are now up to date.',
+			styles: {
+				overlay: {
+					backgroundColor: '#000000B0',
+				},
+				container: {
+					backgroundColor: colorTheme.main.secondary,
+					width: '85%',
+					padding: 16,
+					borderRadius: 12,
+					borderColor: colorTheme.main.primary,
+				},
+				title: {
+					color: colorTheme.accent.primary,
+					fontSize: 18,
+					fontWeight: '600',
+					marginBottom: 4,
+					textAlign: 'center',
+				},
+				message: {
+					marginTop: 10,
+					color: colorTheme.main.text,
+					fontSize: 15,
+					marginBottom: 12,
+				},
+				okButton: {
+					backgroundColor: colorTheme.accent.primary,
+					paddingVertical: 10,
+					borderRadius: 8,
+				},
+				okText: {
+					color: colorTheme.main.primary,
+					fontWeight: 'bold',
+					textAlign: 'center',
+				},
+			},
+		})
 	}, [])
 
 	const styles = StyleSheet.create({

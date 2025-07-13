@@ -44,15 +44,21 @@ export async function checkLogin() {
 			'username',
 		])
 		if (!csrf || !jsessionId || !username) return false
+		const params = new URLSearchParams()
+		params.append('_csrf', csrf)
+		params.append('verifyMenu', 'true')
+		params.append('authorizedID', username.toUpperCase())
+		params.append('x', `@(new Date().toUTCString())`)
 		const response = await fetch(
-			VtopConfig.domain + VtopConfig.vtopUrls.homepage + `?_csrf=${csrf}`,
+			VtopConfig.domain + VtopConfig.backEndApi.commonStudentAttendance,
 			{
-				method: 'GET',
+				method: 'POST',
 				headers: {
 					...Headers,
 					Cookie: `JSESSIONID=${jsessionId}`,
 				},
 				credentials: 'omit',
+				body: params.toString(),
 			}
 		)
 		if (!response.ok) return false

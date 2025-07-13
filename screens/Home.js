@@ -11,10 +11,12 @@ import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import { getGitHubRelease, downloadAndInstallAPK } from '../util/getGitHubRelease'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { goToDrawerTab } from '../util/goToDrawerTab'
+import { useAlert } from 'custom-react-native-alert'
 
 const Tab = createBottomTabNavigator()
 
 export function Home() {
+	const { showAlert } = useAlert()
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [updateChecked, setUpdateChecked] = useState(false)
 	const [progress, setProgress] = useState(null)
@@ -42,11 +44,20 @@ export function Home() {
 
 				const { latestVer, downloadUrl } = latest
 
-				Alert.alert(
-					'Update Available',
-					`Version ${latestVer} is available. Would you like to update now?`,
-					[
-						{ text: 'Later', style: 'cancel', onPress: () => setProgress(null) },
+				showAlert({
+					title: '🚀 Update Available',
+					message: `Version ${latestVer} is available. Would you like to update now?`,
+					buttons: [
+						{
+							text: 'Later',
+							onPress: () => setProgress(null),
+							style: {
+								backgroundColor: colorTheme.main.tertiary,
+							},
+							textStyle: {
+								color: colorTheme.main.text,
+							},
+						},
 						{
 							text: 'Update Now',
 							onPress: () => {
@@ -57,9 +68,46 @@ export function Home() {
 									if (p === 1) setProgressVisible(false)
 								})
 							},
+							style: {
+								backgroundColor: colorTheme.accent.primary,
+							},
+							textStyle: {
+								color: colorTheme.main.primary,
+								fontWeight: 'bold',
+							},
 						},
-					]
-				)
+					],
+					styles: {
+						overlay: {
+							backgroundColor: '#000000B0',
+						},
+						container: {
+							backgroundColor: colorTheme.main.secondary,
+							width: '85%',
+							padding: 16,
+							borderRadius: 12,
+							borderColor: colorTheme.main.primary,
+						},
+						title: {
+							color: colorTheme.accent.primary,
+							fontSize: 18,
+							fontWeight: '600',
+							marginBottom: 4,
+							textAlign: 'center',
+						},
+						message: {
+							marginTop: 10,
+							color: colorTheme.main.text,
+							fontSize: 15,
+							marginBottom: 12,
+						},
+						buttons: {
+							justifyContent: 'flex-end',
+							flexDirection: 'row',
+							flexWrap: 'wrap',
+						},
+					},
+				})
 			} catch (err) {
 				console.error('Update check failed:', err)
 			}

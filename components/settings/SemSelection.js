@@ -6,8 +6,10 @@ import DropDownPicker from 'react-native-dropdown-picker'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { ForceUpdateContext } from '../../context/ForceUpdateContext'
+import { useAlert } from 'custom-react-native-alert'
 
 export default function SemSelection({ title, ...props }) {
+	const { showAlert } = useAlert()
 	const { colorTheme } = useContext(ColorThemeContext)
 	const { trigger } = useContext(ForceUpdateContext)
 	const [dropDown, setDropDown] = useState(false)
@@ -37,10 +39,46 @@ export default function SemSelection({ title, ...props }) {
 		const target = semData.find((x) => x.semID === newSemID)
 		await AsyncStorage.setItem('sem', JSON.stringify(target))
 		setSem(newSemID)
-		Alert.alert(
-			'Semester Updated',
-			'Your default semester has been changed. Please refresh the home page to fetch the latest data from VTOP.'
-		)
+		showAlert({
+			title: '✅ Semester Updated',
+			message:
+				'Your default semester has been changed.\nPlease refresh the home page to fetch the latest data from VTOP.',
+			styles: {
+				overlay: {
+					backgroundColor: '#000000B0',
+				},
+				container: {
+					backgroundColor: colorTheme.main.secondary,
+					width: '85%',
+					padding: 16,
+					borderRadius: 12,
+					borderColor: colorTheme.main.primary,
+				},
+				title: {
+					color: colorTheme.accent.primary,
+					fontSize: 18,
+					fontWeight: '600',
+					textAlign: 'center',
+					marginBottom: 6,
+				},
+				message: {
+					color: colorTheme.main.text,
+					fontSize: 15,
+					textAlign: 'center',
+					marginBottom: 12,
+				},
+				okButton: {
+					backgroundColor: colorTheme.accent.primary,
+					paddingVertical: 10,
+					borderRadius: 8,
+				},
+				okText: {
+					color: colorTheme.main.primary,
+					fontWeight: 'bold',
+					textAlign: 'center',
+				},
+			},
+		})
 	}
 
 	function filterSemData(data) {

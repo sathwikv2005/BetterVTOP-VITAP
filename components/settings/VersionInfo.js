@@ -14,10 +14,12 @@ import AntDesign from '@expo/vector-icons/AntDesign'
 import Feather from '@expo/vector-icons/Feather'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import { downloadAndInstallAPK, getGitHubRelease } from '../../util/getGitHubRelease'
+import { useAlert } from 'custom-react-native-alert'
 
 const version = Constants.expoConfig.version
 
 export default function VersionInfo() {
+	const { showAlert } = useAlert()
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [progress, setProgress] = useState(null)
 
@@ -31,24 +33,121 @@ export default function VersionInfo() {
 
 	const handleUpdatePress = async () => {
 		const github = await getGitHubRelease()
-		if (!github) return Alert.alert('No updates available.')
+
+		if (!github)
+			return showAlert({
+				title: '✅ Boom! You’re All Caught Up',
+				message: 'You’re already on the latest version. No updates are available right now.',
+				styles: {
+					overlay: {
+						backgroundColor: '#000000B0',
+					},
+					container: {
+						backgroundColor: colorTheme.main.secondary,
+						width: '85%',
+						padding: 16,
+						borderRadius: 12,
+						borderColor: colorTheme.main.primary,
+						// elevation: 6,
+						// shadowColor: colorTheme.accent.primary,
+						// shadowOffset: { width: 0, height: 4 },
+						// shadowOpacity: 0.3,
+						// shadowRadius: 6,
+					},
+					title: {
+						color: colorTheme.accent.primary,
+						fontSize: 18,
+						fontWeight: '600',
+						marginBottom: 4,
+						textAlign: 'center',
+					},
+					message: {
+						marginTop: 10,
+						color: colorTheme.main.text,
+						fontSize: 15,
+						// textAlign: 'center',
+						marginBottom: 12,
+					},
+					okButton: {
+						backgroundColor: colorTheme.accent.primary,
+						paddingVertical: 10,
+						borderRadius: 8,
+					},
+					okText: {
+						color: colorTheme.main.primary,
+						fontWeight: 'bold',
+						textAlign: 'center',
+					},
+				},
+			})
 
 		const { downloadUrl, latestVer } = github
 
-		Alert.alert(
-			'Update Available',
-			`Version ${latestVer} is available. Would you like to update now?`,
-			[
-				{ text: 'Cancel', style: 'cancel', onPress: () => setProgress(null) },
+		showAlert({
+			title: '🚀 Update Available',
+			message: `Version ${latestVer} is available. Would you like to update now?`,
+			buttons: [
+				{
+					text: 'Cancel',
+					onPress: () => setProgress(null),
+					style: {
+						backgroundColor: colorTheme.main.tertiary,
+					},
+					textStyle: {
+						color: colorTheme.main.text,
+					},
+				},
 				{
 					text: 'Update Now',
 					onPress: () => {
-						setProgress(0) // show progress bar
+						setProgress(0)
 						downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
 					},
+					style: {
+						backgroundColor: colorTheme.accent.primary,
+					},
+					textStyle: {
+						color: colorTheme.main.primary,
+						fontWeight: 'bold',
+					},
 				},
-			]
-		)
+			],
+			styles: {
+				overlay: {
+					backgroundColor: '#000000B0',
+				},
+				container: {
+					backgroundColor: colorTheme.main.secondary,
+					width: '85%',
+					padding: 16,
+					borderRadius: 12,
+					borderColor: colorTheme.main.primary,
+				},
+				title: {
+					color: colorTheme.accent.primary,
+					fontSize: 18,
+					fontWeight: '600',
+					marginBottom: 4,
+					textAlign: 'center',
+				},
+				message: {
+					marginTop: 10,
+					color: colorTheme.main.text,
+					fontSize: 15,
+					marginBottom: 12,
+				},
+				okButton: {
+					backgroundColor: colorTheme.accent.primary,
+					paddingVertical: 10,
+					borderRadius: 8,
+				},
+				okText: {
+					color: colorTheme.main.primary,
+					fontWeight: 'bold',
+					textAlign: 'center',
+				},
+			},
+		})
 	}
 
 	const styles = StyleSheet.create({

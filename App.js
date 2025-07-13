@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { AlertProvider, useAlert } from 'custom-react-native-alert'
 import 'react-native-gesture-handler'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import {
@@ -31,7 +32,9 @@ export default function App() {
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<ForceUpdateProvider>
 				<ColorThemeProvider>
-					<MainApp />
+					<AlertProvider>
+						<MainApp />
+					</AlertProvider>
 				</ColorThemeProvider>
 			</ForceUpdateProvider>
 		</GestureHandlerRootView>
