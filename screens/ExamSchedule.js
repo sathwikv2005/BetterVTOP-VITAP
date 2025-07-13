@@ -111,7 +111,19 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 		{ key: 'seatNo', label: 'Seat No.' },
 	]
 
-	if (!schedule || schedule.length === 0) return null
+	if (!schedule || schedule.length === 0)
+		return (
+			<Text
+				style={{
+					color: 'white',
+					textAlign: 'center',
+					marginTop: 50,
+					fontSize: 18,
+				}}
+			>
+				No data available. Please select a semester.
+			</Text>
+		)
 
 	const styles = StyleSheet.create({
 		wrapper: {
