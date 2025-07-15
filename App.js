@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AlertProvider, useAlert } from 'custom-react-native-alert'
 import 'react-native-gesture-handler'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -10,6 +10,7 @@ import {
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { Text, View, ActivityIndicator, Pressable } from 'react-native'
+import * as Notifications from 'expo-notifications'
 import { DrawerItem } from '@react-navigation/drawer'
 import { Home } from './screens/Home'
 import Feather from '@expo/vector-icons/Feather'
@@ -24,8 +25,23 @@ import { ForceUpdateProvider } from './context/ForceUpdateContext'
 import Marks from './screens/Marks'
 import ExamSchedule from './screens/ExamSchedule'
 import openVTOP from './screens/OpenVTOP'
+import {
+	requestNotificationPermission,
+	scheduleClassReminders,
+	startAutoReschedule,
+} from './util/upcomingClassNotifications'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Drawer = createDrawerNavigator()
+
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowBanner: true,
+		shouldShowList: true,
+		shouldPlaySound: true,
+		shouldSetBadge: false,
+	}),
+})
 
 export default function App() {
 	return (
@@ -43,6 +59,23 @@ export default function App() {
 
 function MainApp() {
 	const { colorTheme } = useContext(ColorThemeContext)
+
+	useEffect(() => {
+		async function setupNotifications() {
+			const notiEnabled = await AsyncStorage.getItem('upcomingClassNotiEnabled')
+			if (notiEnabled === 'false') return
+
+			const granted = await requestNotificationPermission()
+			if (granted) {
+				const timetable = await AsyncStorage.getItem('timetable')
+				if (timetable) {
+					await scheduleClassReminders(JSON.parse(timetable))
+					await startAutoReschedule()
+				}
+			}
+		}
+		setupNotifications()
+	}, [])
 
 	if (!colorTheme) {
 		return (

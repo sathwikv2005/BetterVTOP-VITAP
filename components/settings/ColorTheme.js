@@ -74,13 +74,17 @@ export default function ColorTheme() {
 			: accentItems
 
 	const styles = StyleSheet.create({
-		container: { padding: 20, paddingVertical: 0, width: '100%' },
 		heading: { color: colorTheme.main.text, fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-		setting: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-		label: { color: colorTheme.main.text, fontSize: 18, width: '70%' },
+		setting: {
+			flexDirection: 'row',
+			width: '95%',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			alignSelf: 'center',
+		},
+		label: { color: colorTheme.main.text, fontSize: 15 },
 		picker: {
-			width: '30%',
-			zIndex: 100,
+			width: '100%',
 			backgroundColor: colorTheme.main.primary,
 			borderColor: colorTheme.accent.tertiary,
 			zIndex: 100,
@@ -88,42 +92,22 @@ export default function ColorTheme() {
 		dropDownBox: {
 			backgroundColor: colorTheme.main.secondary,
 			borderColor: colorTheme.accent.tertiary,
-			width: '30%',
+			width: '100%',
+			zIndex: 100,
 		},
 	})
 	return (
-		<View style={styles.container}>
-			<Text style={styles.heading}>Color Theme</Text>
-
-			{/* <View style={styles.setting}>
-				<Text style={styles.label}>Main Color:</Text>
-				<DropDownPicker
-					dropDownDirection="AUTO"
-					dropDownContainerStyle={styles.dropDownBox}
-					style={styles.picker}
-					textStyle={{ color: colorTheme.main.text }}
-					labelStyle={{
-						color: colorTheme.main.text,
-					}}
-					open={mainOpen}
-					containerStyle={{ color: colorTheme.main.text }}
-					ArrowDownIconComponent={({ style }) => (
-						<Icon name="arrow-drop-down" size={24} color={colorTheme.main.text} style={style} />
-					)}
-					ArrowUpIconComponent={({ style }) => (
-						<Icon name="arrow-drop-up" size={24} color={colorTheme.main.text} style={style} />
-					)}
-					showTickIcon={false}
-					value={mainValue}
-					items={mainItems}
-					setOpen={setMainOpen}
-					setValue={setMainValue}
-					onChangeValue={handleMainThemeChange}
-				/>
-			</View> */}
-
-			<View style={styles.setting}>
-				<Text style={styles.label}>Accent Color:</Text>
+		<View style={styles.setting}>
+			<Text style={styles.label}>Accent Color:</Text>
+			<View
+				style={{
+					width: '30%',
+					backgroundColor: colorTheme.main.secondary,
+					borderColor: colorTheme.accent.tertiary,
+					zIndex: accentOpen ? 1000 : 0,
+					position: 'relative',
+				}}
+			>
 				<DropDownPicker
 					dropDownDirection="AUTO"
 					dropDownContainerStyle={styles.dropDownBox}
@@ -142,6 +126,7 @@ export default function ColorTheme() {
 					setOpen={setAccentOpen}
 					setValue={setAccentValue}
 					onChangeValue={handleAccentThemeChange}
+					zIndex={accentOpen ? 1000 : 0}
 				/>
 			</View>
 		</View>
