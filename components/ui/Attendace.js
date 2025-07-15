@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import { Pressable, Text, View, Modal } from 'react-native'
 import { FlatList } from 'react-native'
 import { StyleSheet } from 'react-native'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { TextInput } from 'react-native-gesture-handler'
@@ -13,11 +14,12 @@ import { getTime } from '../../util/getTime.js'
 import FooterItem from '../FooterItem.js'
 import { ForceUpdateContext } from '../../context/ForceUpdateContext.js'
 import AttendanceDetails from '../AttendanceDetails.js'
-
 import { Dimensions } from 'react-native'
 import Loading from '../Loading.js'
 import { useAlert } from 'custom-react-native-alert'
 const { height } = Dimensions.get('window')
+
+const Tab = createMaterialTopTabNavigator()
 
 export function Attendance() {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -228,41 +230,80 @@ export function Attendance() {
 	return loading ? (
 		<Loading />
 	) : (
-		<View>
-			<View style={[styles.minPercent]}>
-				<Text style={[styles.mainText]}>Minimum Percentage:</Text>
-				<TextInput
-					value={minPercentage.toString()}
-					style={styles.input}
-					onChangeText={onChangeMinPercent}
-				/>
-			</View>
-			<FlatList
-				style={{ backgroundColor: colorTheme.main.primary }}
-				contentContainerStyle={styles.list}
-				data={attendance}
-				keyExtractor={(item) => item.classDetails}
-				renderItem={({ item }) => (
-					<Pressable onPress={() => openSheet(item)}>
-						<AttendanceItem
-							data={item}
-							attendanceData={attendanceData.find((x) => x.classDetails === item.classDetails)}
-							minPercent={minPercentage}
-							setTooltipText={setTooltipText}
+		<>
+			<Tab.Navigator
+				screenOptions={({ route }) => ({
+					tabBarStyle: {
+						backgroundColor: colorTheme.main.secondary,
+						elevation: 8, // Android shadow depth
+						shadowColor: colorTheme.accent.primary, // Android & iOS shadow color
+						shadowOffset: { width: 0, height: 4 }, // iOS only
+						shadowOpacity: 0.3, // iOS only
+						shadowRadius: 5, // iOS only
+					},
+					tabBarIndicatorStyle: {
+						backgroundColor: colorTheme.accent.primary,
+						oppacity: '50%',
+					},
+
+					tabBarActiveTintColor: colorTheme.accent.primary,
+					tabBarInactiveTintColor: colorTheme.main.tertiary,
+					tabBarBounces: true,
+				})}
+			>
+				<Tab.Screen
+					name="Theory"
+					children={() => (
+						<RenderAttendance
+							attendance={attendance.filter((x) => x.classType.includes('T'))}
+							attendanceData={attendanceData}
+							colorTheme={colorTheme}
+							styles={styles}
+							minPercentage={minPercentage}
+							tooltipVisible={tooltipVisible}
 							setTooltipVisible={setTooltipVisible}
+							setTooltipText={setTooltipText}
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+							lastUpdated={lastUpdated}
+							savedSem={savedSem}
+							sheetRef={sheetRef}
+							selectedItem={selectedItem}
+							courseItem={courseItem}
+							userUpdated={userUpdated}
+							setUserUpdated={setUserUpdated}
+							onChangeMinPercent={onChangeMinPercent}
+							openSheet={openSheet}
 						/>
-					</Pressable>
-				)}
-				refreshing={refreshing}
-				onRefresh={onRefresh}
-				ListEmptyComponent={
-					<Text style={styles.emptyText}>No data available. Please try refreshing.</Text>
-				}
-				ListFooterComponent={
-					<FooterItem style={styles.lastUpdated} lastUpdated={lastUpdated} savedSem={savedSem} />
-				}
-				ListFooterComponentStyle={{ flexGrow: 1 }}
-			/>
+					)}
+				/>
+				<Tab.Screen
+					name="Lab"
+					children={() => (
+						<RenderAttendance
+							attendance={attendance.filter((x) => !x.classType.includes('T'))}
+							attendanceData={attendanceData}
+							colorTheme={colorTheme}
+							styles={styles}
+							minPercentage={minPercentage}
+							tooltipVisible={tooltipVisible}
+							setTooltipVisible={setTooltipVisible}
+							setTooltipText={setTooltipText}
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+							lastUpdated={lastUpdated}
+							savedSem={savedSem}
+							sheetRef={sheetRef}
+							selectedItem={selectedItem}
+							courseItem={courseItem}
+							userUpdated={userUpdated}
+							setUserUpdated={setUserUpdated}
+							onChangeMinPercent={onChangeMinPercent}
+							openSheet={openSheet}
+						/>
+					)}
+				/>
+			</Tab.Navigator>
 			<AttendanceDetails
 				ref={sheetRef}
 				selectedItem={selectedItem}
@@ -298,6 +339,68 @@ export function Attendance() {
 					</Pressable>
 				</View>
 			)}
+		</>
+	)
+}
+
+function RenderAttendance({
+	styles,
+	colorTheme,
+	attendance,
+	attendanceData,
+	minPercentage,
+	tooltipVisible,
+	setTooltipText,
+	setTooltipVisible,
+	refreshing,
+	onRefresh,
+	lastUpdated,
+	savedSem,
+	sheetRef,
+	selectedItem,
+	courseItem,
+	userUpdated,
+	setUserUpdated,
+	onChangeMinPercent,
+	openSheet,
+	...props
+}) {
+	return (
+		<View>
+			<View style={[styles.minPercent]}>
+				<Text style={[styles.mainText]}>Minimum Percentage:</Text>
+				<TextInput
+					value={minPercentage.toString()}
+					style={styles.input}
+					onChangeText={onChangeMinPercent}
+				/>
+			</View>
+			<FlatList
+				style={{ backgroundColor: colorTheme.main.primary }}
+				contentContainerStyle={styles.list}
+				data={attendance}
+				keyExtractor={(item) => item.classDetails}
+				renderItem={({ item }) => (
+					<Pressable onPress={() => openSheet(item)}>
+						<AttendanceItem
+							data={item}
+							attendanceData={attendanceData.find((x) => x.classDetails === item.classDetails)}
+							minPercent={minPercentage}
+							setTooltipText={setTooltipText}
+							setTooltipVisible={setTooltipVisible}
+						/>
+					</Pressable>
+				)}
+				refreshing={refreshing}
+				onRefresh={onRefresh}
+				ListEmptyComponent={
+					<Text style={styles.emptyText}>No data available. Please try refreshing.</Text>
+				}
+				ListFooterComponent={
+					<FooterItem style={styles.lastUpdated} lastUpdated={lastUpdated} savedSem={savedSem} />
+				}
+				ListFooterComponentStyle={{ flexGrow: 1 }}
+			/>
 		</View>
 	)
 }
