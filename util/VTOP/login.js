@@ -115,7 +115,7 @@ export async function forceVtopLogin(username, password) {
 
 		return { message: 'Login successful', csrf: newCsrf, jsessionId: newJsessId }
 	} catch (error) {
-		await AsyncStorage.multiRemove(['csrfToken', 'sessionId', 'username'])
+		await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 		console.error('Error in vtopLogin:', error)
 		return { error: 'Failed to login' }
 	}
