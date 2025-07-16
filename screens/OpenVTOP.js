@@ -13,6 +13,7 @@ import * as IntentLauncher from 'expo-intent-launcher'
 import * as FileSystem from 'expo-file-system'
 import * as Mime from 'react-native-mime-types'
 import { useAlert } from 'custom-react-native-alert'
+import mimeToExtension from '../util/mimeToExtension'
 
 export default function OpenVTOP({ navigation }) {
 	const { showAlert } = useAlert()
@@ -201,19 +202,6 @@ export default function OpenVTOP({ navigation }) {
 	)
 }
 
-const mimeToExtension = {
-	'application/pdf': 'pdf',
-	'application/msword': 'doc',
-	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
-	'application/vnd.ms-excel': 'xls',
-	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
-	'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx', // ← ADD THIS
-	'application/zip': 'zip',
-	'image/png': 'png',
-	'image/jpeg': 'jpg',
-	'text/plain': 'txt',
-}
-
 async function requestStoragePermission() {
 	if (Platform.OS !== 'android') return true
 
@@ -385,6 +373,7 @@ export async function handleFileDownload(url, sessionID, showAlert, colorTheme, 
 			},
 		})
 	} catch (err) {
+		setWebLoading(false)
 		console.error('Download error:', err)
 		Alert.alert('Download failed', err.message || 'Unknown error')
 	}
