@@ -42,11 +42,11 @@ export default function VersionInfo() {
 			})
 		}
 
-		const { downloadUrl, latestVer } = github
+		const { downloadUrl, latestVer, body } = github
 
 		showAlert({
 			title: '🚀 New Version Available',
-			message: `Version ${latestVer} is ready. Want to update now?`,
+			message: `Version ${latestVer} is ready. Want to update now?\n\n${body}`,
 			buttons: [
 				{
 					text: 'Cancel',
@@ -75,7 +75,7 @@ export default function VersionInfo() {
 		overlay: { backgroundColor: '#000000B0' },
 		container: {
 			backgroundColor: colorTheme.main.secondary,
-			width: '85%',
+			width: '95%',
 			padding: 16,
 			borderRadius: 12,
 			borderColor: colorTheme.main.primary,
@@ -90,7 +90,7 @@ export default function VersionInfo() {
 		message: {
 			marginTop: 10,
 			color: colorTheme.main.text,
-			fontSize: 15,
+			fontSize: 12,
 			marginBottom: 12,
 		},
 		okButton: {
