@@ -17,13 +17,13 @@ export async function getGitHubRelease() {
 
 	if ('v' + version === latestVer) return false
 
-	const assetsReq = await fetch(latest.assets_url)
-	const assets = (await assetsReq.json())[0]
+	const downloadUrl = latest.assets.browser_download_url
+	const body = cleanMarkdown(latest.body)
 
-	const downloadUrl = assets.browser_download_url
 	return {
 		latestVer,
 		downloadUrl,
+		body,
 	}
 }
 
@@ -83,4 +83,20 @@ export async function downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
 		console.error('Install error:', err)
 		Alert.alert('Error', 'Failed to install update.')
 	}
+}
+
+function cleanMarkdown(body) {
+	return (
+		body
+			// Remove leading ###, ##, # headers
+			.replace(/^#+\s*/gm, '')
+			// Remove markdown bold and italic (**text**, *text*, _text_)
+			.replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, '$1')
+			// Convert list markers to bullet points
+			.replace(/^[-*+]\s+/gm, '➜ ')
+			// Remove backticks for inline code
+			.replace(/`([^`]+)`/g, '$1')
+			// Do not collapse multiple newlines
+			.trim()
+	)
 }
