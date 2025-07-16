@@ -9,7 +9,7 @@ import {
 } from '@react-navigation/drawer'
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
-import { Text, View, ActivityIndicator, Pressable } from 'react-native'
+import { Text, View, ActivityIndicator, Pressable, Image } from 'react-native'
 import * as Notifications from 'expo-notifications'
 import { DrawerItem } from '@react-navigation/drawer'
 import { Home } from './screens/Home'
@@ -232,9 +232,32 @@ function CustomDrawerContent(props) {
 	return (
 		<DrawerContentScrollView
 			{...props}
-			contentContainerStyle={{ flex: 1, justifyContent: 'space-between' }}
+			contentContainerStyle={{ flex: 1, justifyContent: 'space-between', paddingTop: 0 }}
 		>
 			<View>
+				<View
+					style={{
+						backgroundColor: '#0f1012',
+						width: '100%',
+						alignItems: 'center',
+						justifyContent: 'center',
+						marginBottom: 10,
+						padding: 0,
+					}}
+				>
+					<Image
+						source={require('./assets/banner.png')}
+						style={{
+							backgroundColor: '#0f1012',
+							width: '111%',
+							height: 150,
+							padding: 0,
+						}}
+						resizeMode="cover"
+					/>
+				</View>
+
+				{/* Drawer Items */}
 				<DrawerItemList {...props} />
 			</View>
 
