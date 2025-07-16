@@ -48,7 +48,6 @@ export async function scheduleClassReminders(timetableObj) {
 		const classKey = `${cls.courseCode}-${timing.start}`
 
 		if (scheduledClasses.includes(classKey)) {
-			console.log('Already scheduled:', classKey)
 			continue
 		}
 
@@ -63,7 +62,6 @@ export async function scheduleClassReminders(timetableObj) {
 			channelId: Platform.OS === 'android' ? ANDROID_CHANNEL_ID : undefined,
 		})
 
-		console.log('Scheduled:', classKey)
 		newScheduledClasses.push(classKey)
 	}
 
@@ -102,7 +100,7 @@ TaskManager.defineTask(BACKGROUND_TASK, async () => {
 	}
 })
 
-// 📌 Start the background rescheduling
+// Start the background rescheduling
 export async function startAutoReschedule() {
 	const status = await BackgroundFetch.getStatusAsync()
 	if (status === BackgroundFetch.Status.Available) {
