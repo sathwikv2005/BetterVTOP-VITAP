@@ -90,7 +90,7 @@ export default function VersionInfo() {
 		message: {
 			marginTop: 10,
 			color: colorTheme.main.text,
-			fontSize: 12,
+			fontSize: 14,
 			marginBottom: 12,
 		},
 		okButton: {
