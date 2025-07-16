@@ -1,3 +1,8 @@
+
+<p align="center">
+  <img src="./assets/icon-foreground.png" width="120" alt="App Icon" />
+</p>
+
 # BetterVTOP
 
 **BetterVTOP** is an unofficial, student-made companion app for VIT AP’s VTOP portal. Designed with a clean UI and student-focused experience, it provides fast access to your attendance, timetable, and academic data — all in one place.
