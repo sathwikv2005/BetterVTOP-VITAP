@@ -42,11 +42,11 @@ export function Home() {
 				const latest = await getGitHubRelease()
 				if (!latest) return
 
-				const { latestVer, downloadUrl } = latest
+				const { latestVer, downloadUrl, body } = latest
 
 				showAlert({
 					title: '🚀 Update Available',
-					message: `Version ${latestVer} is available. Would you like to update now?`,
+					message: `Version ${latestVer} is available. Would you like to update now?\n\n${body}`,
 					buttons: [
 						{
 							text: 'Later',
@@ -83,7 +83,7 @@ export function Home() {
 						},
 						container: {
 							backgroundColor: colorTheme.main.secondary,
-							width: '85%',
+							width: '95%',
 							padding: 16,
 							borderRadius: 12,
 							borderColor: colorTheme.main.primary,
@@ -98,7 +98,7 @@ export function Home() {
 						message: {
 							marginTop: 10,
 							color: colorTheme.main.text,
-							fontSize: 15,
+							fontSize: 12,
 							marginBottom: 12,
 						},
 						buttons: {
