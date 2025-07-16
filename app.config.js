@@ -9,7 +9,7 @@ export default {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
 		plugins: [withInstallPermission, withCustomGradleFix],
 		slug: 'BetterVTOP',
-		version: '0.6.1',
+		version: '0.7.0',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
@@ -21,8 +21,13 @@ export default {
 				foregroundImage: './assets/icon-foreground.png',
 				backgroundColor: variant === 'dev' ? '#9C27B0' : '#000000',
 			},
+
 			package: variant === 'dev' ? 'com.anonymous.BetterVTOP.dev' : 'com.anonymous.BetterVTOP',
 			versionCode: 1,
+		},
+		notification: {
+			icon: './assets/notification-icon.png',
+			color: '#0b82d4',
 		},
 		orientation: 'portrait',
 		icon: './assets/icon.png',
