@@ -31,6 +31,7 @@ import {
 	startAutoReschedule,
 } from './util/upcomingClassNotifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import FacultyView from './screens/FacultyView'
 
 const Drawer = createDrawerNavigator()
 
@@ -176,6 +177,20 @@ function MainApp() {
 							/>
 						),
 						headerTitle: 'Exam Schedule',
+					}}
+				/>
+				<Drawer.Screen
+					name="facultyView"
+					component={FacultyView}
+					options={{
+						drawerLabel: ({ focused }) => (
+							<DrawerLabel
+								icon={<Entypo name="graduation-cap" size={24} />}
+								text="Faculty Info"
+								focused={focused}
+							/>
+						),
+						headerTitle: 'Faculty Info',
 					}}
 				/>
 				<Drawer.Screen

@@ -9,6 +9,7 @@ import { getMarks } from '../util/VTOP/marks'
 import MarksDetails from '../components/MarksDetails'
 import MarksItem from '../components/MarksItem'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 export default function Marks() {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -111,11 +112,17 @@ function MarksTable({ marks, colorTheme, refreshing, onRefresh, ...props }) {
 			alignContent: 'center',
 			alignSelf: 'center',
 		},
-		emptyText: {
-			color: 'white',
-			textAlign: 'center',
-			marginTop: 50,
+		emptyTitle: {
+			color: colorTheme.main.text,
 			fontSize: 18,
+			fontWeight: '600',
+			textAlign: 'center',
+			marginBottom: 6,
+		},
+		emptySub: {
+			color: colorTheme.main.tertiary,
+			fontSize: 15,
+			textAlign: 'center',
 		},
 		lastUpdated: {
 			color: colorTheme.main.tertiary,
@@ -146,7 +153,16 @@ function MarksTable({ marks, colorTheme, refreshing, onRefresh, ...props }) {
 				refreshing={refreshing}
 				onRefresh={onRefresh}
 				ListEmptyComponent={
-					<Text style={styles.emptyText}>No data available. Please select a semester.</Text>
+					<View style={{ alignItems: 'center', marginTop: 50, paddingHorizontal: 20 }}>
+						<FontAwesome
+							name="info-circle"
+							size={40}
+							color={colorTheme.accent.primary}
+							style={{ marginBottom: 10 }}
+						/>
+						<Text style={[styles.emptyTitle]}>No Data Available</Text>
+						<Text style={[styles.emptySub]}>Please select a semester to view marks.</Text>
+					</View>
 				}
 			/>
 			<MarksDetails ref={sheetRef} data={selected} colorTheme={colorTheme} />
