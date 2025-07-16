@@ -14,6 +14,7 @@ import { getExamSchedule } from '../util/VTOP/examSchedule'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import SemDropDown from '../components/SemDropDown'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 const { width } = Dimensions.get('window')
 
@@ -113,16 +114,34 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 
 	if (!schedule || schedule.length === 0)
 		return (
-			<Text
-				style={{
-					color: 'white',
-					textAlign: 'center',
-					marginTop: 50,
-					fontSize: 18,
-				}}
-			>
-				No data available. Please select a semester.
-			</Text>
+			<View style={{ alignItems: 'center', marginTop: 50, paddingHorizontal: 20 }}>
+				<FontAwesome
+					name="info-circle"
+					size={40}
+					color={colorTheme.accent.primary}
+					style={{ marginBottom: 10 }}
+				/>
+				<Text
+					style={{
+						color: colorTheme.main.text,
+						fontSize: 18,
+						fontWeight: '600',
+						textAlign: 'center',
+						marginBottom: 6,
+					}}
+				>
+					No Data Available
+				</Text>
+				<Text
+					style={{
+						color: colorTheme.main.tertiary,
+						fontSize: 15,
+						textAlign: 'center',
+					}}
+				>
+					Please select a semester to view schedule.
+				</Text>
+			</View>
 		)
 
 	const styles = StyleSheet.create({
