@@ -14,8 +14,8 @@
 		"prebuild:dev:clean": "APP_VARIANT=dev npx expo prebuild --clean",
 		"prebuild:android:dev": "APP_VARIANT=dev npx expo prebuild --platform android",
 		"prebuild:android": "npx expo prebuild --platform android",
-		"buildapk": "./android/gradlew assembleRelease",
-		"buildapk:dev": "./android/gradlew assembleDebug"
+		"buildapk": "cd ./android && ./gradlew assembleRelease",
+		"buildapk:dev": "cd ./android && ./gradlew assembleDebug"
 	},
 	"dependencies": {
 		"@react-native-async-storage/async-storage": "2.1.2",
