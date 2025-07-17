@@ -89,8 +89,6 @@ function MainApp() {
 			try {
 				await setUserProperty(analytics, 'app_version', version)
 				await setUserProperty(analytics, 'app_variant', variant)
-
-				console.log('[Analytics] Set user properties:', { version, variant })
 			} catch (error) {
 				console.error('[Analytics] Failed to set user properties', error)
 			}
@@ -134,7 +132,6 @@ function MainApp() {
 						screen_name: currentRoute.name,
 						screen_class: currentRoute.name,
 					})
-					console.log('[Analytics] Screen opened:', currentRoute.name)
 				}
 			}}
 			onStateChange={async () => {
@@ -147,7 +144,6 @@ function MainApp() {
 						screen_name: currentRoute.name,
 						screen_class: currentRoute.name,
 					})
-					console.log('[Analytics] Screen changed to:', currentRoute.name)
 				}
 			}}
 		>

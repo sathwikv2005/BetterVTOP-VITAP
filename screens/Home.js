@@ -150,7 +150,6 @@ export function Home() {
 				screen_name: tabRouteName,
 				screen_class: tabRouteName === 'attendance' ? tabRouteName : 'timetable',
 			})
-			console.log('[Analytics] Tab screen changed to:', tabRouteName)
 		}
 		logTabScreen()
 
