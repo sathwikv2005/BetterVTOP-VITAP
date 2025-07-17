@@ -58,7 +58,10 @@ export async function scheduleClassReminders(timetableObj) {
 				sound: true,
 				priority: Notifications.AndroidNotificationPriority.MAX,
 			},
-			trigger: triggerTime,
+			trigger: {
+				type: 'date',
+				date: triggerTime,
+			},
 			channelId: Platform.OS === 'android' ? ANDROID_CHANNEL_ID : undefined,
 		})
 
