@@ -12,6 +12,11 @@ import { getGitHubRelease, downloadAndInstallAPK } from '../util/getGitHubReleas
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { goToDrawerTab } from '../util/goToDrawerTab'
 import { useAlert } from 'custom-react-native-alert'
+import { getApp } from '@react-native-firebase/app'
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics'
+
+const app = getApp()
+const analytics = getAnalytics(app)
 
 const Tab = createBottomTabNavigator()
 
@@ -133,6 +138,22 @@ export function Home() {
 					]
 				)
 		}
+
+		const logTabScreen = async () => {
+			if (
+				tabRouteName.toLocaleLowerCase() === 'theory' ||
+				tabRouteName.toLocaleLowerCase() === 'lab'
+			)
+				return
+
+			await logEvent(analytics, 'screen_view', {
+				screen_name: tabRouteName,
+				screen_class: tabRouteName === 'attendance' ? tabRouteName : 'timetable',
+			})
+			console.log('[Analytics] Tab screen changed to:', tabRouteName)
+		}
+		logTabScreen()
+
 		checkUserName()
 		checkForUpdate()
 	}, [tabRouteName, trigger])

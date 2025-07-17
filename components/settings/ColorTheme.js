@@ -5,6 +5,11 @@ import DropDownPicker from 'react-native-dropdown-picker'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import { getColorTheme, getNewColorTheme } from '../../constants/colorTheme/colorThemeMap'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import { getApp } from '@react-native-firebase/app'
+import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
+
+const app = getApp()
+const analytics = getAnalytics(app)
 
 export default function ColorTheme() {
 	const { colorTheme, setColorTheme } = useContext(ColorThemeContext)
@@ -44,7 +49,7 @@ export default function ColorTheme() {
 		})
 	}, [])
 
-	const handleMainThemeChange = (newMain) => {
+	const handleMainThemeChange = async (newMain) => {
 		if (newMain === prevMainValue) return // no change
 		setMainValue(newMain)
 		setPrevMainValue(newMain)
@@ -52,10 +57,15 @@ export default function ColorTheme() {
 		const newColorTheme = getNewColorTheme(updated)
 		AsyncStorage.setItem('colorTheme', JSON.stringify(updated))
 		setColorTheme(newColorTheme)
+		await logEvent(analytics, 'theme_changed_main', {
+			type: 'main',
+			main_theme: newMain,
+			accent_theme: accentValue,
+		})
 		// Alert.alert('Restart required', 'Please restart the app to see the changes')
 	}
 
-	const handleAccentThemeChange = (newAccent) => {
+	const handleAccentThemeChange = async (newAccent) => {
 		if (newAccent === prevAccentValue) return // no change
 		setAccentValue(newAccent)
 		setPrevAccentValue(newAccent)
@@ -63,6 +73,11 @@ export default function ColorTheme() {
 		const newColorTheme = getNewColorTheme(updated)
 		AsyncStorage.setItem('colorTheme', JSON.stringify(updated))
 		setColorTheme(newColorTheme)
+		await logEvent(analytics, 'theme_changed_accent', {
+			type: 'accent',
+			main_theme: mainValue,
+			accent_theme: newAccent,
+		})
 		// Alert.alert('Restart required', 'Please restart the app to see the changes')
 	}
 

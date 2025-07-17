@@ -3,14 +3,25 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "expo start",
+		"start": "npx expo start",
+		"start:clear": "npx expo start --clear",
 		"android": "expo run:android",
 		"ios": "expo run:ios",
-		"web": "expo start --web"
+		"web": "expo start --web",
+		"prebuild": "npx expo prebuild",
+		"prebuild:clean": "npx expo prebuild --clean",
+		"prebuild:dev": "APP_VARIANT=dev npx expo prebuild",
+		"prebuild:dev:clean": "APP_VARIANT=dev npx expo prebuild --clean",
+		"prebuild:android:dev": "APP_VARIANT=dev npx expo prebuild --platform android",
+		"prebuild:android": "npx expo prebuild --platform android",
+		"buildapk": "./android/gradlew assembleRelease",
+		"buildapk:dev": "./android/gradlew assembleDebug"
 	},
 	"dependencies": {
 		"@react-native-async-storage/async-storage": "2.1.2",
 		"@react-native-cookies/cookies": "^6.2.1",
+		"@react-native-firebase/analytics": "^22.4.0",
+		"@react-native-firebase/app": "^22.4.0",
 		"@react-navigation/bottom-tabs": "^7.3.10",
 		"@react-navigation/drawer": "^7.3.9",
 		"@react-navigation/material-top-tabs": "^7.2.10",
