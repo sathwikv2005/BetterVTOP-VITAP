@@ -1,6 +1,5 @@
-
 <p align="center">
-  <img src="./assets/icon-foreground.png" width="120" alt="App Icon" />
+  <img src="./assets/banner.png" alt="App Icon" />
 </p>
 
 # BetterVTOP
