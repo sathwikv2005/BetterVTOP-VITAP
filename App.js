@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import { AlertProvider, useAlert } from 'custom-react-native-alert'
 import 'react-native-gesture-handler'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -31,7 +31,16 @@ import {
 	startAutoReschedule,
 } from './util/upcomingClassNotifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { getApp } from '@react-native-firebase/app'
+import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
+import Constants from 'expo-constants'
 import FacultyView from './screens/FacultyView'
+
+const version = Constants.expoConfig.version
+const variant = Constants.expoConfig.name?.toLowerCase().includes('dev') ? 'dev' : 'prod'
+
+const app = getApp()
+const analytics = getAnalytics(app)
 
 const Drawer = createDrawerNavigator()
 
@@ -76,6 +85,16 @@ function MainApp() {
 			}
 		}
 		setupNotifications()
+		async function setUserProperties() {
+			try {
+				await setUserProperty(analytics, 'app_version', version)
+				await setUserProperty(analytics, 'app_variant', variant)
+			} catch (error) {
+				console.error('[Analytics] Failed to set user properties', error)
+			}
+		}
+
+		setUserProperties()
 	}, [])
 
 	if (!colorTheme) {
@@ -99,8 +118,35 @@ function MainApp() {
 		},
 	}
 
+	const routeNameRef = useRef()
+
 	return (
-		<NavigationContainer ref={navigationRef} theme={MyTheme}>
+		<NavigationContainer
+			ref={navigationRef}
+			theme={MyTheme}
+			onReady={async () => {
+				const currentRoute = navigationRef.getCurrentRoute()
+				if (currentRoute) {
+					routeNameRef.current = currentRoute.name
+					await logEvent(analytics, 'screen_view', {
+						screen_name: currentRoute.name,
+						screen_class: currentRoute.name,
+					})
+				}
+			}}
+			onStateChange={async () => {
+				const prevRouteName = routeNameRef.current
+				const currentRoute = navigationRef.getCurrentRoute()
+
+				if (currentRoute && prevRouteName !== currentRoute.name) {
+					routeNameRef.current = currentRoute.name
+					await logEvent(analytics, 'screen_view', {
+						screen_name: currentRoute.name,
+						screen_class: currentRoute.name,
+					})
+				}
+			}}
+		>
 			<StatusBar style="light" />
 			<Drawer.Navigator
 				id="RootDrawer"

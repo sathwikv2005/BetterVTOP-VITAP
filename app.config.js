@@ -1,27 +1,34 @@
 import 'dotenv/config'
 import withInstallPermission from './plugins/withInstallPermission'
 import withCustomGradleFix from './plugins/custom-gradle-fix'
+const withFirebaseGoogleServicesFileSwap = require('./plugins/withFirebaseGoogleServicesFileSwap')
 
 const variant = process.env.APP_VARIANT || 'prod'
 
 export default {
 	expo: {
 		name: variant === 'dev' ? 'BetterVTOP Dev' : 'BetterVTOP',
-		plugins: [withInstallPermission, withCustomGradleFix],
+		plugins: [
+			withInstallPermission,
+			withCustomGradleFix,
+			'@react-native-firebase/app',
+			withFirebaseGoogleServicesFileSwap,
+		],
 		slug: 'BetterVTOP',
-		version: '0.8.0',
+		version: 'b0.8.0',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
+			googleServicesFile: './firebase/GoogleService-Info.plist',
 			buildNumber: '1',
 		},
 
 		android: {
 			adaptiveIcon: {
 				foregroundImage: './assets/icon-foreground.png',
-				backgroundColor: variant === 'dev' ? '#9C27B0' : '#000000',
+				backgroundColor: variant === 'dev' ? '#A73D00' : '#000000',
 			},
-
+			googleServicesFile: './firebase/google-services.json',
 			package: variant === 'dev' ? 'com.anonymous.BetterVTOP.dev' : 'com.anonymous.BetterVTOP',
 			versionCode: 1,
 		},
