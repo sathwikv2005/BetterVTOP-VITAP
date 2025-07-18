@@ -1,9 +1,14 @@
 import { useContext, useEffect, useState } from 'react'
 import { View, Text, Switch, StyleSheet } from 'react-native'
 import * as Notifications from 'expo-notifications'
+import { getApp } from '@react-native-firebase/app'
+import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import ColorTheme from './ColorTheme'
+
+const app = getApp()
+const analytics = getAnalytics(app)
 
 export default function General() {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -17,10 +22,24 @@ export default function General() {
 
 	async function handleUpComingClassNotiChange() {
 		const newState = !upcomingClassNoti
+
 		if (!newState) {
 			await Notifications.cancelAllScheduledNotificationsAsync()
 			await AsyncStorage.removeItem('scheduledClassNotifications')
+
+			// Log disabling notifications
+			await logEvent(analytics, 'notification_toggle', {
+				enabled: false,
+				screen: 'GeneralSettings',
+			})
+		} else {
+			// Log enabling notifications
+			await logEvent(analytics, 'notification_toggle', {
+				enabled: true,
+				screen: 'GeneralSettings',
+			})
 		}
+
 		setUpcomingClassNoti(newState)
 		await AsyncStorage.setItem('upcomingClassNotiEnabled', JSON.stringify(newState))
 	}

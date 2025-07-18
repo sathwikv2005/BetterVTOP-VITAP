@@ -1,7 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import Constants from 'expo-constants'
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Constants from 'expo-constants'
+import { getApp } from '@react-native-firebase/app'
+import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
+
+const app = getApp()
+const analytics = getAnalytics(app)
 
 // Fetch captcha + pre-login setup
 export async function getCaptcha() {
@@ -74,19 +79,21 @@ export async function checkLogin() {
 }
 
 export async function forceVtopLogin(username, password) {
-	if (!username || !password) {
-		const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
-			'username',
-			'password',
-		])
-		if (!username) username = savedUsername
-		if (!password) password = savedPassword
-	}
+	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
+		'username',
+		'password',
+	])
+
+	username = username || savedUsername
+	password = password || savedPassword
+
 	if (!username || !password) {
 		return { error: 'Missing required parameters.' }
 	}
 	try {
 		// POST login request
+		const groupYear = username.slice(0, 5).toUpperCase()
+
 		const response = await fetch(
 			Constants.expoConfig.extra.apiUrl +
 				`/api/login/autocaptcha?username=${username}&pwd=${password}`,
@@ -97,6 +104,11 @@ export async function forceVtopLogin(username, password) {
 		const data = await response.json()
 		if (response.status === 401) {
 			console.log('api error:', data.error)
+			if (data.error.toLowerCase().includes('csrf')) {
+				await logEvent(analytics, 'login_failed_invalid_csrf', {
+					groupYear: groupYear,
+				})
+			}
 			return { error: data.error }
 		}
 
@@ -113,9 +125,14 @@ export async function forceVtopLogin(username, password) {
 			['password', password],
 		])
 
+		await setUserProperty(analytics, 'group_year', groupYear)
+		await logEvent(analytics, 'user_group_year', { value: groupYear })
+		await logEvent(analytics, 'login_success', { groupYear })
+
 		return { message: 'Login successful', csrf: newCsrf, jsessionId: newJsessId }
 	} catch (error) {
 		await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+		await logEvent(analytics, 'login_failed', { groupYear })
 		console.error('Error in vtopLogin:', error)
 		return { error: 'Failed to login' }
 	}
