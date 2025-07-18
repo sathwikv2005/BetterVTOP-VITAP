@@ -92,7 +92,7 @@ export async function forceVtopLogin(username, password) {
 	}
 	try {
 		// POST login request
-		const groupYear = username.slice(0, 5)
+		const groupYear = username.slice(0, 5).toUpperCase()
 
 		const response = await fetch(
 			Constants.expoConfig.extra.apiUrl +

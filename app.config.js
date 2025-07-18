@@ -15,7 +15,7 @@ export default {
 			withFirebaseGoogleServicesFileSwap,
 		],
 		slug: 'BetterVTOP',
-		version: '0.8.0',
+		version: 'b0.8.0',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
@@ -26,7 +26,7 @@ export default {
 		android: {
 			adaptiveIcon: {
 				foregroundImage: './assets/icon-foreground.png',
-				backgroundColor: variant === 'dev' ? '#FF5E00' : '#000000',
+				backgroundColor: variant === 'dev' ? '#A73D00' : '#000000',
 			},
 			googleServicesFile: './firebase/google-services.json',
 			package: variant === 'dev' ? 'com.anonymous.BetterVTOP.dev' : 'com.anonymous.BetterVTOP',
