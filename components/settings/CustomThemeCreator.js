@@ -38,6 +38,8 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 		setCurrentSetter(() => setter)
 	}
 
+	function doNothing(param) {}
+
 	const handleColorChange = (color) => {
 		setCurrentColor(color)
 		currentSetter(color)
@@ -96,14 +98,46 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 
 		setColorTheme(resetTheme)
 
-		// Reset currentColor to match currently selected color field
-		if (currentSetter === setMainPrimary) setCurrentColor(resetTheme.main.primary)
-		else if (currentSetter === setMainSecondary) setCurrentColor(resetTheme.main.secondary)
-		else if (currentSetter === setMainTertiary) setCurrentColor(resetTheme.main.tertiary)
-		else if (currentSetter === setMainText) setCurrentColor(resetTheme.main.text)
-		else if (currentSetter === setAccentPrimary) setCurrentColor(resetTheme.accent.primary)
-		else if (currentSetter === setAccentSecondary) setCurrentColor(resetTheme.accent.secondary)
-		else if (currentSetter === setAccentTertiary) setCurrentColor(resetTheme.accent.tertiary)
+		// Determine the correct color + setter to reapply to picker
+		const fallbackSetter = setMainPrimary
+		const fallbackColor = resetTheme.main.primary
+
+		let matchedColor = fallbackColor
+		let matchedSetter = fallbackSetter
+
+		switch (currentSetter) {
+			case setMainPrimary:
+				matchedColor = resetTheme.main.primary
+
+				break
+			case setMainSecondary:
+				matchedColor = resetTheme.main.secondary
+
+				break
+			case setMainTertiary:
+				matchedColor = resetTheme.main.tertiary
+
+				break
+			case setMainText:
+				matchedColor = resetTheme.main.text
+
+				break
+			case setAccentPrimary:
+				matchedColor = resetTheme.accent.primary
+
+				break
+			case setAccentSecondary:
+				matchedColor = resetTheme.accent.secondary
+
+				break
+			case setAccentTertiary:
+				matchedColor = resetTheme.accent.tertiary
+
+				break
+		}
+
+		setCurrentColor(matchedColor)
+		setCurrentSetter(() => doNothing)
 	}
 
 	const handleSave = async () => {
@@ -141,7 +175,7 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 		container: {
 			paddingVertical: 30,
 			paddingHorizontal: 20,
-			paddingBottom: 100,
+			// paddingBottom: 100,
 			backgroundColor: colorTheme.main.secondary,
 		},
 		heading: {
@@ -287,11 +321,11 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 				<View style={{ height: 250, marginBottom: 20 }}>
 					<ColorPicker
 						color={currentColor}
-						onColorChangeComplete={handleColorChange}
+						onColorChange={handleColorChange}
 						thumbSize={30}
 						sliderSize={30}
 						noSnap={true}
-						row={false}
+						row={true}
 					/>
 				</View>
 
