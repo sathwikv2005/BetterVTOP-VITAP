@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AlertProvider, useAlert } from 'custom-react-native-alert'
 import 'react-native-gesture-handler'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -35,6 +35,8 @@ import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
 import Constants from 'expo-constants'
 import FacultyView from './screens/FacultyView'
+import WhatsNew from './components/whats_new/WhatsNew'
+import displayWhatsNew from './constants/displayWhatsNew'
 
 const version = Constants.expoConfig.version
 const variant = Constants.expoConfig.name?.toLowerCase().includes('dev') ? 'dev' : 'prod'
@@ -54,12 +56,24 @@ Notifications.setNotificationHandler({
 })
 
 export default function App() {
+	const [showWhatsNew, setShowWhatsNew] = useState(false)
+
+	useEffect(() => {
+		async function checkFirstOpenAfterUpdate() {
+			const checkVersion = await AsyncStorage.getItem('last-seen-version')
+			// const checkVersion = true
+			setShowWhatsNew(displayWhatsNew && checkVersion !== version)
+		}
+		checkFirstOpenAfterUpdate()
+	}, [])
+
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<ForceUpdateProvider>
 				<ColorThemeProvider>
 					<AlertProvider>
 						<MainApp />
+						{showWhatsNew && <WhatsNew setShowWhatsNew={setShowWhatsNew} version={version} />}
 					</AlertProvider>
 				</ColorThemeProvider>
 			</ForceUpdateProvider>
