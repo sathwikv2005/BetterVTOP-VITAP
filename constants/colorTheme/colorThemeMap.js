@@ -28,6 +28,8 @@ export const colorThemeMap = {
 }
 
 export async function getColorTheme() {
+	let customTheme = await AsyncStorage.getItem('custom-theme')
+	if (customTheme) return JSON.parse(customTheme)
 	let colorTheme = await AsyncStorage.getItem('colorTheme')
 	if (!colorTheme) {
 		colorTheme = {

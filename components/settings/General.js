@@ -10,7 +10,7 @@ import ColorTheme from './ColorTheme'
 const app = getApp()
 const analytics = getAnalytics(app)
 
-export default function General() {
+export default function General({ openSheet }) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const [upcomingClassNoti, setUpcomingClassNoti] = useState(true)
 
@@ -84,7 +84,7 @@ export default function General() {
 		<View style={styles.container}>
 			<Text style={styles.heading}>General</Text>
 			<View style={styles.card}>
-				<ColorTheme />
+				<ColorTheme openSheet={openSheet} />
 				<View style={styles.row}>
 					<Text style={styles.label}>Class Reminders {upcomingClassNoti ? '🔔' : '🔕'}</Text>
 					<Switch
