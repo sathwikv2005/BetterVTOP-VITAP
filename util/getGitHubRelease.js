@@ -19,7 +19,7 @@ export async function getGitHubRelease() {
 
 	const downloadUrl = latest.assets[0].browser_download_url
 	const body = cleanMarkdown(latest.body)
-	console.log(latest.assets)
+
 	return {
 		latestVer,
 		downloadUrl,
@@ -33,7 +33,7 @@ export async function downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
 	// 	setProgress(null)
 	// 	return Alert.alert('Permission Required', 'Please allow storage access.')
 	// }
-	console.log(downloadUrl)
+
 	if (!downloadUrl || !latestVer) {
 		const latest = await getGitHubRelease()
 		if (!latest) {
