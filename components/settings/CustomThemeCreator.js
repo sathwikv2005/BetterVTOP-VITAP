@@ -255,16 +255,16 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 	})
 
 	const mainPickers = [
-		{ label: 'Main Primary', color: mainPrimary, setter: setMainPrimary },
-		{ label: 'Main Secondary', color: mainSecondary, setter: setMainSecondary },
-		{ label: 'Main Tertiary', color: mainTertiary, setter: setMainTertiary },
-		{ label: 'Main Text', color: mainText, setter: setMainText },
+		{ label: 'Primary', color: mainPrimary, setter: setMainPrimary },
+		{ label: 'Secondary', color: mainSecondary, setter: setMainSecondary },
+		{ label: 'Tertiary', color: mainTertiary, setter: setMainTertiary },
+		{ label: 'Text', color: mainText, setter: setMainText },
 	]
 
 	const accentPickers = [
-		{ label: 'Accent Primary', color: accentPrimary, setter: setAccentPrimary },
-		{ label: 'Accent Secondary', color: accentSecondary, setter: setAccentSecondary },
-		{ label: 'Accent Tertiary', color: accentTertiary, setter: setAccentTertiary },
+		{ label: 'Primary', color: accentPrimary, setter: setAccentPrimary },
+		{ label: 'Secondary', color: accentSecondary, setter: setAccentSecondary },
+		{ label: 'Tertiary', color: accentTertiary, setter: setAccentTertiary },
 	]
 
 	return (
@@ -303,7 +303,7 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 					))}
 				</View>
 
-				<Text style={[styles.sectionHeader, { marginTop: 35 }]}>Accent Colors</Text>
+				<Text style={[styles.sectionHeader, { marginTop: 25 }]}>Accent Colors</Text>
 				<View style={styles.previewRow}>
 					{accentPickers.map(({ label, color, setter }) => (
 						<Pressable key={label} onPress={() => handleColorEdit(color, setter)}>
@@ -317,7 +317,7 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 					))}
 				</View>
 
-				<Text style={[styles.sectionHeader, { marginTop: 50 }]}>Color Picker</Text>
+				<Text style={[styles.sectionHeader, { marginTop: 30 }]}>Color Picker</Text>
 				<View style={{ height: 250, marginBottom: 20 }}>
 					<ColorPicker
 						color={currentColor}
