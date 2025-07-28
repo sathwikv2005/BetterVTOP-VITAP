@@ -1,9 +1,13 @@
 import { Linking } from 'react-native'
-import { logEvent } from '@react-native-firebase/analytics'
+import { getApp } from '@react-native-firebase/app'
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics'
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { extractMagicValue } from '../parse/parseVITAPWifi'
+
+const app = getApp()
+const analytics = getAnalytics(app)
 
 export default async function wifiLoginVITAP(username, password) {
 	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([

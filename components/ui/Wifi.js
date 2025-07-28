@@ -31,6 +31,7 @@ export default function Wifi() {
 	async function handleLogin() {
 		setLoading(true)
 		let login = await wifiLoginVITAP(userName, pwd)
+		console.log(login)
 		if (login && login.error && login.code === 3) {
 			await wifiLogoutVITAPnoLinking()
 			login = await wifiLoginVITAP(userName, pwd)
@@ -85,6 +86,48 @@ export default function Wifi() {
 				title: '⚠️ Login Failed',
 				message:
 					'Authentication with the Wi-Fi portal was unsuccessful. Please verify your username and password, then try again.',
+				styles: {
+					overlay: {
+						backgroundColor: '#000000B0',
+					},
+					container: {
+						backgroundColor: colorTheme.main.secondary,
+						width: '85%',
+						padding: 16,
+						borderRadius: 12,
+						borderColor: colorTheme.main.primary,
+					},
+					title: {
+						color: '#FF5A5F',
+						fontSize: 18,
+						fontWeight: '600',
+						textAlign: 'center',
+						marginBottom: 6,
+					},
+					message: {
+						color: colorTheme.main.text,
+						fontSize: 15,
+						textAlign: 'center',
+						marginBottom: 12,
+					},
+					okButton: {
+						backgroundColor: colorTheme.accent.primary,
+						paddingVertical: 10,
+						borderRadius: 8,
+					},
+					okText: {
+						color: colorTheme.main.primary,
+						fontWeight: 'bold',
+						textAlign: 'center',
+					},
+				},
+			})
+		}
+		if (login && login.error) {
+			setLoading(false)
+			return showAlert({
+				title: '⚠️ Login Failed',
+				message: login.error,
 				styles: {
 					overlay: {
 						backgroundColor: '#000000B0',
