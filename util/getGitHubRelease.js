@@ -15,7 +15,7 @@ export async function getGitHubRelease() {
 
 	const latestVer = latest.tag_name
 
-	// if ('v' + version === latestVer) return false
+	if ('v' + version === latestVer) return false
 
 	const downloadUrl = latest.assets[0].browser_download_url
 	const body = cleanMarkdown(latest.body)
