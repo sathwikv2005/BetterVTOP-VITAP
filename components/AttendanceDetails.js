@@ -362,7 +362,7 @@ const AttendanceDetails = forwardRef(
 													{courseItem.faculty}
 												</Text>
 												<Text style={[styles.text, styles.courseDetailsText]}>
-													{courseItem.classDetails.split('-')[1]}
+													{courseItem.classDetails.split('- ')[1]}
 												</Text>
 											</View>
 
