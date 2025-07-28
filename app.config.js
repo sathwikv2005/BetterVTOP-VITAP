@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import withInstallPermission from './plugins/withInstallPermission'
 import withCustomGradleFix from './plugins/custom-gradle-fix'
+import withNetworkSecurityConfig from './plugins/withNetworkSecurityConfig'
 const withFirebaseGoogleServicesFileSwap = require('./plugins/withFirebaseGoogleServicesFileSwap')
 
 const variant = process.env.APP_VARIANT || 'prod'
@@ -13,9 +14,10 @@ export default {
 			withCustomGradleFix,
 			'@react-native-firebase/app',
 			withFirebaseGoogleServicesFileSwap,
+			withNetworkSecurityConfig,
 		],
 		slug: 'BetterVTOP',
-		version: 'b0.8.0',
+		version: '0.9.0',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
