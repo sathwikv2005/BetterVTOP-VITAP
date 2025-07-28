@@ -4,9 +4,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { useNavigation, useNavigationState } from '@react-navigation/native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import Feather from '@expo/vector-icons/Feather'
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { Attendance } from '../components/ui/Attendace'
 import { Timetable } from '../components/ui/TimeTable'
+import Wifi from '../components/ui/Wifi'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import { getGitHubRelease, downloadAndInstallAPK } from '../util/getGitHubRelease'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -36,7 +38,7 @@ export function Home() {
 		state.routes.find((r) => r.name === 'home')?.state?.routeNames?.[tabIndex] || 'Timetable'
 
 	useEffect(() => {
-		let title = tabRouteName === 'attendance' ? 'Attendance' : 'Timetable'
+		let title = tabRouteName.charAt(0).toUpperCase() + tabRouteName.slice(1)
 		navigation.setOptions({ headerTitle: title })
 
 		if (updateChecked) return
@@ -190,9 +192,11 @@ export function Home() {
 	return (
 		<>
 			<Tab.Navigator
+				initialRouteName="timetable"
 				screenOptions={{
 					headerShown: false,
-					tabBarActiveBackgroundColor: colorTheme.accent.tertiary,
+					// tabBarActiveBackgroundColor: colorTheme.accent.tertiary,
+					tabBarActiveBackgroundColor: colorTheme.main.secondary,
 					tabBarInactiveBackgroundColor: colorTheme.main.secondary,
 					tabBarShowLabel: false,
 					tabBarIconStyle: { height: '100%' },
@@ -200,6 +204,25 @@ export function Home() {
 					tabBarStyle: { borderWidth: 0, borderColor: colorTheme.main.primary },
 				}}
 			>
+				<Tab.Screen
+					name="WiFi"
+					component={Wifi}
+					options={{
+						tabBarIcon: ({ focused }) => (
+							<FontAwesome5
+								name="wifi"
+								size={18}
+								color={focused ? colorTheme.accent.primary : colorTheme.main.text}
+								style={{
+									borderTopWidth: focused ? 2 : 0,
+									borderRadius: focused ? 0 : 40,
+									borderTopColor: colorTheme.accent.primary,
+									paddingTop: 4,
+								}}
+							/>
+						),
+					}}
+				/>
 				<Tab.Screen
 					name="timetable"
 					component={Timetable}
