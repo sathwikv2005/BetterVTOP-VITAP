@@ -72,7 +72,7 @@ export default async function wifiLoginVITAP(username, password) {
 	} catch (error) {
 		await logEvent(analytics, 'wifi_login_failed', { groupYear })
 		console.error('Error in wifiLoginVITAP:', error)
-		return { error: 'Failed to login', code: 2 }
+		return { error: error.message, code: 2 }
 	}
 }
 
