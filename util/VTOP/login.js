@@ -126,7 +126,11 @@ export async function forceVtopLogin(username, password) {
 		])
 
 		await setUserProperty(analytics, 'group_year', groupYear)
-		await logEvent(analytics, 'user_group_year', { value: groupYear })
+		await logEvent(analytics, 'user_group_year', {
+			groupYear,
+			group: groupYear.slice(2),
+			year: groupYear.slice(0, 2),
+		})
 		await logEvent(analytics, 'login_success', { groupYear })
 
 		return { message: 'Login successful', csrf: newCsrf, jsessionId: newJsessId }

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Text, View, StyleSheet, Alert } from 'react-native'
+import { Text, View, StyleSheet, Pressable } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DropDownPicker from 'react-native-dropdown-picker'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
@@ -11,7 +11,7 @@ import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/
 const app = getApp()
 const analytics = getAnalytics(app)
 
-export default function ColorTheme() {
+export default function ColorTheme({ openSheet }) {
 	const { colorTheme, setColorTheme } = useContext(ColorThemeContext)
 
 	const [mainOpen, setMainOpen] = useState(false)
@@ -55,8 +55,9 @@ export default function ColorTheme() {
 		setPrevMainValue(newMain)
 		const updated = { main: mainValue, accent: accentValue }
 		const newColorTheme = getNewColorTheme(updated)
-		AsyncStorage.setItem('colorTheme', JSON.stringify(updated))
+		await AsyncStorage.setItem('colorTheme', JSON.stringify(updated))
 		setColorTheme(newColorTheme)
+		await AsyncStorage.removeItem('custom-theme')
 		await logEvent(analytics, 'theme_changed_main', {
 			type: 'main',
 			main_theme: newMain,
@@ -71,8 +72,9 @@ export default function ColorTheme() {
 		setPrevAccentValue(newAccent)
 		const updated = { main: mainValue, accent: accentValue }
 		const newColorTheme = getNewColorTheme(updated)
-		AsyncStorage.setItem('colorTheme', JSON.stringify(updated))
+		await AsyncStorage.setItem('colorTheme', JSON.stringify(updated))
 		setColorTheme(newColorTheme)
+		await AsyncStorage.removeItem('custom-theme')
 		await logEvent(analytics, 'theme_changed_accent', {
 			type: 'accent',
 			main_theme: mainValue,
@@ -89,10 +91,17 @@ export default function ColorTheme() {
 			: accentItems
 
 	const styles = StyleSheet.create({
+		container: {
+			width: '100%',
+			borderBottomColor: colorTheme.main.tertiary,
+			borderBottomWidth: 1,
+		},
 		heading: { color: colorTheme.main.text, fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
 		setting: {
 			flexDirection: 'row',
-			width: '95%',
+			width: '100%',
+			// paddingVertical: 8,
+			paddingHorizontal: 4,
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			alignSelf: 'center',
@@ -112,37 +121,45 @@ export default function ColorTheme() {
 		},
 	})
 	return (
-		<View style={styles.setting}>
-			<Text style={styles.label}>Accent Color:</Text>
-			<View
-				style={{
-					width: '30%',
-					backgroundColor: colorTheme.main.secondary,
-					borderColor: colorTheme.accent.tertiary,
-					zIndex: accentOpen ? 1000 : 0,
-					position: 'relative',
-				}}
-			>
-				<DropDownPicker
-					dropDownDirection="AUTO"
-					dropDownContainerStyle={styles.dropDownBox}
-					style={styles.picker}
-					textStyle={{ color: colorTheme.main.text }}
-					labelStyle={{ color: colorTheme.main.text }}
-					open={accentOpen}
-					value={accentValue}
-					ArrowDownIconComponent={({ style }) => (
-						<Icon name="arrow-drop-down" size={24} color={colorTheme.main.text} style={style} />
-					)}
-					ArrowUpIconComponent={({ style }) => (
-						<Icon name="arrow-drop-up" size={24} color={colorTheme.main.text} style={style} />
-					)}
-					items={filteredAccent}
-					setOpen={setAccentOpen}
-					setValue={setAccentValue}
-					onChangeValue={handleAccentThemeChange}
-					zIndex={accentOpen ? 1000 : 0}
-				/>
+		<View style={[styles.container]}>
+			<View style={styles.setting}>
+				<Text style={styles.label}>Accent Color:</Text>
+				<View
+					style={{
+						width: '30%',
+						backgroundColor: colorTheme.main.secondary,
+						borderColor: colorTheme.accent.tertiary,
+						zIndex: accentOpen ? 1000 : 0,
+						position: 'relative',
+					}}
+				>
+					<DropDownPicker
+						dropDownDirection="AUTO"
+						dropDownContainerStyle={styles.dropDownBox}
+						style={styles.picker}
+						textStyle={{ color: colorTheme.main.text }}
+						labelStyle={{ color: colorTheme.main.text }}
+						open={accentOpen}
+						value={accentValue}
+						ArrowDownIconComponent={({ style }) => (
+							<Icon name="arrow-drop-down" size={24} color={colorTheme.main.text} style={style} />
+						)}
+						ArrowUpIconComponent={({ style }) => (
+							<Icon name="arrow-drop-up" size={24} color={colorTheme.main.text} style={style} />
+						)}
+						items={filteredAccent}
+						setOpen={setAccentOpen}
+						setValue={setAccentValue}
+						onChangeValue={handleAccentThemeChange}
+						zIndex={accentOpen ? 1000 : 0}
+					/>
+				</View>
+			</View>
+
+			<View style={[styles.setting, { marginTop: 20, marginBottom: 20 }]}>
+				<Pressable onPress={() => openSheet()}>
+					<Text style={styles.label}>Create a new theme!</Text>
+				</Pressable>
 			</View>
 		</View>
 	)
