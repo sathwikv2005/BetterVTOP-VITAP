@@ -69,6 +69,7 @@ export default function FacultyView() {
 		facultyList: {
 			width: '100%',
 			justifyContent: 'center',
+			paddingBottom: 100,
 		},
 		card: {
 			width: '92%',
@@ -117,7 +118,7 @@ export default function FacultyView() {
 			padding: 10,
 		},
 		titleBox: {
-			width: '90%',
+			width: '100%',
 			flexDirection: 'column',
 			justifyContent: 'center',
 			alignItems: 'center',
@@ -128,6 +129,8 @@ export default function FacultyView() {
 			marginBottom: 25,
 			marginTop: 10,
 			// flexWrap: 'wrap',
+			borderBottomColor: colorTheme.accent.secondary,
+			borderWidth: 1,
 		},
 
 		personIcon2: {
@@ -141,6 +144,7 @@ export default function FacultyView() {
 			fontWeight: 'bold',
 			color: colorTheme.accent.primary,
 			textAlign: 'center',
+			paddingBottom: 10,
 			// flexWrap: 'wrap',
 			// marginBottom: 20,
 		},
