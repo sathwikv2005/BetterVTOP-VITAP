@@ -78,7 +78,8 @@ export async function checkLogin() {
 	}
 }
 
-export async function forceVtopLogin(username, password) {
+export async function forceVtopLogin(username, password, tries) {
+	if (!tries) tries = 0
 	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
 		'username',
 		'password',
@@ -105,6 +106,7 @@ export async function forceVtopLogin(username, password) {
 		if (response.status === 401) {
 			console.log('api error:', data.error)
 			if (data.error.toLowerCase().includes('csrf')) {
+				if (tries < 5) return await forceVtopLogin(username, password, tries + 1)
 				await logEvent(analytics, 'login_failed_invalid_csrf', {
 					groupYear: groupYear,
 				})
