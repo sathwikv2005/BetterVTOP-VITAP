@@ -9,7 +9,7 @@ import {
 } from '@react-navigation/drawer'
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
-import { Text, View, ActivityIndicator, Pressable, Image } from 'react-native'
+import { Text, View, ActivityIndicator, Pressable, Image, ToastAndroid } from 'react-native'
 import * as Notifications from 'expo-notifications'
 import { DrawerItem } from '@react-navigation/drawer'
 import { Home } from './screens/Home'
@@ -21,7 +21,7 @@ import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
 import Login from './screens/Login'
-import { ForceUpdateProvider } from './context/ForceUpdateContext'
+import { ForceUpdateContext, ForceUpdateProvider } from './context/ForceUpdateContext'
 import Marks from './screens/Marks'
 import ExamSchedule from './screens/ExamSchedule'
 import openVTOP from './screens/OpenVTOP'
@@ -37,6 +37,9 @@ import Constants from 'expo-constants'
 import FacultyView from './screens/FacultyView'
 import WhatsNew from './components/whats_new/WhatsNew'
 import displayWhatsNew from './constants/displayWhatsNew'
+import { getAllData } from './util/VTOP/getAllData'
+import Loading from './components/Loading'
+import { goToDrawerTab } from './util/goToDrawerTab'
 
 const version = Constants.expoConfig.version
 const variant = Constants.expoConfig.name?.toLowerCase().includes('dev') ? 'dev' : 'prod'
@@ -82,9 +85,107 @@ export default function App() {
 }
 
 function MainApp() {
+	const { showAlert } = useAlert()
 	const { colorTheme } = useContext(ColorThemeContext)
+	const [username, setUserName] = useState(null)
+	const [loading, setLoading] = useState(false)
+	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 
 	useEffect(() => {
+		async function checkUserName() {
+			const userName = await AsyncStorage.getItem('username')
+
+			if (!userName) {
+				showAlert({
+					title: '🔐 Login Required',
+					message:
+						'We couldn’t find your saved VTOP credentials.\n\nPlease log in to fetch your latest data from VTOP.',
+					buttons: [
+						{
+							text: 'Remind Me Later',
+							style: {
+								backgroundColor: colorTheme.main.tertiary,
+							},
+							textStyle: {
+								color: colorTheme.main.text,
+							},
+						},
+						{
+							text: 'Log In Now',
+							onPress: () => goToDrawerTab('login'),
+							style: {
+								backgroundColor: colorTheme.accent.primary,
+							},
+							textStyle: {
+								color: colorTheme.main.primary,
+								fontWeight: 'bold',
+							},
+						},
+					],
+					styles: {
+						overlay: {
+							backgroundColor: '#000000B0',
+						},
+						container: {
+							backgroundColor: colorTheme.main.secondary,
+							width: '95%',
+							padding: 16,
+							borderRadius: 12,
+							borderColor: colorTheme.main.primary,
+						},
+						title: {
+							color: colorTheme.accent.primary,
+							fontSize: 18,
+							fontWeight: '600',
+							marginBottom: 4,
+							textAlign: 'center',
+						},
+						message: {
+							marginTop: 10,
+							color: colorTheme.main.text,
+							fontSize: 14,
+							marginBottom: 12,
+							textAlign: 'center',
+						},
+						buttons: {
+							justifyContent: 'flex-end',
+							flexDirection: 'row',
+							flexWrap: 'wrap',
+						},
+					},
+				})
+				setUserName(null)
+				return
+			}
+			setUserName(userName)
+		}
+		checkUserName()
+	}, [])
+
+	useEffect(() => {
+		async function runDailyTask() {
+			const today = new Date().toISOString().split('T')[0] // "YYYY-MM-DD"
+			const lastRun = await AsyncStorage.getItem('last-daily-run')
+			if (lastRun !== today) {
+				try {
+					await getAllData(setLoading)
+				} catch (err) {
+					setLoading(false)
+					console.log(err)
+					return ToastAndroid.show(
+						'⚠️ Unable to fetch the latest VTOP data.\nPlease check your internet connection and try again.',
+						ToastAndroid.LONG
+					)
+				}
+				ToastAndroid.show('✅ Your VTOP data has been updated automatically.', ToastAndroid.LONG)
+				await AsyncStorage.setItem('last-daily-run', today)
+				forceUpdate()
+			}
+			setLoading(false)
+		}
+
+		if (username) runDailyTask().catch((err) => console.log(err))
+
 		async function setupNotifications() {
 			const notiEnabled = await AsyncStorage.getItem('upcomingClassNotiEnabled')
 			if (notiEnabled === 'false') return
@@ -133,7 +234,7 @@ function MainApp() {
 	}
 
 	const routeNameRef = useRef()
-
+	if (loading) return <Loading />
 	return (
 		<NavigationContainer
 			ref={navigationRef}
