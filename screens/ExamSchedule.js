@@ -55,7 +55,7 @@ export default function ExamSchedule() {
 		setExamSchedule(data.examScheduleData)
 		setRefreshing(false)
 		ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
-	}, [])
+	}, [sem])
 
 	async function handleSemChange(prevSem, newSem) {
 		setSem(newSem)

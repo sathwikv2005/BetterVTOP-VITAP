@@ -48,8 +48,6 @@ export default function Marks() {
 
 		setMarks(data.marksData)
 
-		await AsyncStorage.setItem(`marks-${sem}`, JSON.stringify({ marksData: data.marksData }))
-
 		setRefreshing(false)
 		ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
 	}, [sem])
