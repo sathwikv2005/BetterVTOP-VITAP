@@ -10,10 +10,11 @@ const app = getApp()
 const analytics = getAnalytics(app)
 
 export default async function wifiLoginVITAP(username, password) {
-	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
-		'username',
-		'password',
-	])
+	const wifiCredsRaw = await AsyncStorage.getItem('wifi-creds')
+	const wifiCreds = wifiCredsRaw ? JSON.parse(wifiCredsRaw) : null
+
+	const savedUsername = wifiCreds?.username || null
+	const savedPassword = wifiCreds?.pwd || null
 
 	username = username || savedUsername
 	password = password || savedPassword
@@ -21,7 +22,7 @@ export default async function wifiLoginVITAP(username, password) {
 	if (!username || !password) {
 		return { error: 'Missing required parameters.' }
 	}
-	console.log(generateBypassUsername(username))
+
 	const groupYear = username.slice(0, 5).toUpperCase()
 
 	async function attemptLogin(uname) {
