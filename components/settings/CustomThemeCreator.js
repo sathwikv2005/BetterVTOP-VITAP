@@ -185,11 +185,17 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 		colorHex: { textAlign: 'center', color: colorTheme.main.text, marginBottom: 10 },
 		previewCard: {
 			backgroundColor: colorTheme.main.primary,
-			padding: 15,
-			borderRadius: 12,
+			padding: 20,
+			borderRadius: 14,
 			marginBottom: 20,
 			alignItems: 'center',
+			shadowColor: '#000',
+			shadowOpacity: 0.2,
+			shadowRadius: 4,
+			elevation: 4,
+			width: '100%',
 		},
+
 		previewButton: {
 			backgroundColor: colorTheme.accent.primary,
 			paddingVertical: 10,
@@ -240,20 +246,73 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 					)} */}
 
 					<Text style={styles.note}>
-						Changes update live across the app.{'\n'}
-						Use the{' '}
-						<Text style={{ fontWeight: 'bold', color: colorTheme.accent.secondary }}>
-							Reset
-						</Text>{' '}
-						button if needed.
+						Changes update live across the app, feel free to preview them on other pages.
+						{'\n'}Your draft will be preserved until the app restarts.
+						{'\n'} If you mess up, just use the{' '}
+						<Text style={{ fontWeight: 'bold', color: colorTheme.accent.secondary }}>Reset</Text>{' '}
+						button below.
 					</Text>
 
 					{/* Live Preview Card */}
 					<View style={styles.previewCard}>
-						<Text style={{ color: colorTheme.main.text, fontWeight: 'bold' }}>Live Preview</Text>
-						<Pressable style={styles.previewButton}>
-							<Text style={styles.previewButtonText}>Sample Button</Text>
-						</Pressable>
+						<Text
+							style={{
+								color: colorTheme.main.text,
+								fontWeight: 'bold',
+								fontSize: 18,
+								marginBottom: 8,
+							}}
+						>
+							Live Preview
+						</Text>
+
+						{/* Paragraph */}
+						<Text
+							style={{
+								color: colorTheme.main.tertiary,
+								fontSize: 14,
+								textAlign: 'center',
+								marginBottom: 12,
+								opacity: 0.85,
+							}}
+						>
+							This is a sample text to preview your colors. Customize your theme below!
+						</Text>
+
+						{/* Buttons Row */}
+						<View style={{ flexDirection: 'row', gap: 10 }}>
+							<Pressable
+								style={{
+									backgroundColor: colorTheme.accent.primary,
+									paddingVertical: 8,
+									paddingHorizontal: 16,
+									borderRadius: 8,
+									shadowColor: '#000',
+									shadowOpacity: 0.2,
+									shadowRadius: 4,
+									elevation: 3,
+								}}
+							>
+								<Text style={{ color: colorTheme.main.primary, fontWeight: 'bold' }}>Primary</Text>
+							</Pressable>
+
+							<Pressable
+								style={{
+									backgroundColor: colorTheme.accent.secondary,
+									paddingVertical: 8,
+									paddingHorizontal: 16,
+									borderRadius: 8,
+									shadowColor: '#000',
+									shadowOpacity: 0.2,
+									shadowRadius: 4,
+									elevation: 3,
+								}}
+							>
+								<Text style={{ color: colorTheme.main.primary, fontWeight: 'bold' }}>
+									Secondary
+								</Text>
+							</Pressable>
+						</View>
 					</View>
 
 					<Text style={styles.sectionHeader}>Main Colors</Text>
