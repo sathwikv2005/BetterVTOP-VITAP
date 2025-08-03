@@ -85,7 +85,6 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 			}
 			return newTheme
 		})
-
 		setUnsavedChanges(true)
 	}
 
@@ -236,9 +235,9 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 					keyboardShouldPersistTaps="handled"
 				>
 					<Text style={styles.heading}>🎨 Customize Your Theme</Text>
-					{unsavedChanges && (
+					{/* {unsavedChanges && (
 						<Text style={[styles.note, { color: 'orange' }]}>⚠ You have unsaved changes</Text>
-					)}
+					)} */}
 
 					<Text style={styles.note}>
 						Changes update live across the app.{'\n'}
