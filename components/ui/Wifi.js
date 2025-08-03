@@ -52,7 +52,7 @@ export default function Wifi() {
 						width: '85%',
 						padding: 16,
 						borderRadius: 12,
-						borderColor: colorTheme.main.primary,
+						// borderColor: colorTheme.main.primary,
 					},
 					title: {
 						color: '#FF5A5F',
@@ -201,7 +201,7 @@ export default function Wifi() {
 			// height: 425,
 			backgroundColor: colorTheme.main.primary,
 			// borderColor: colorTheme.accent.secondary,
-			borderWidth: 1,
+			// borderWidth: 1,
 			marginTop: 5,
 			alignSelf: 'center',
 			// justifyContent: 'center',
