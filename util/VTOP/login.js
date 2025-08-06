@@ -91,17 +91,19 @@ export async function forceVtopLogin(username, password, tries) {
 	if (!username || !password) {
 		return { error: 'Missing required parameters.' }
 	}
+	const groupYear = username.slice(0, 5).toUpperCase()
 	try {
 		// POST login request
-		const groupYear = username.slice(0, 5).toUpperCase()
 
-		const response = await fetch(
-			Constants.expoConfig.extra.apiUrl +
-				`/api/login/autocaptcha?username=${username}&pwd=${password}`,
-			{
-				method: 'GET',
-			}
-		)
+		const response = await fetch(Constants.expoConfig.extra.apiUrl + `/api/login/autocaptcha`, {
+			// const response = await fetch(`http://192.168.127.26:6700/api/login/autocaptcha`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ username, pwd: password }),
+		})
+
 		const data = await response.json()
 		if (response.status === 401) {
 			console.log('api error:', data.error)
