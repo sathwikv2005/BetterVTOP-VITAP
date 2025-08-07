@@ -69,7 +69,7 @@ export default async function wifiLoginVITAP(username, password) {
 				if (redirectMatch) {
 					await AsyncStorage.setItem(
 						'wifi-creds',
-						JSON.stringify({ username: bypassUsername, pwd: password })
+						JSON.stringify({ username: username, pwd: password })
 					)
 					await Linking.openURL(redirectMatch[1])
 					return true
