@@ -78,7 +78,7 @@ export default function Login() {
 			// height: 425,
 			backgroundColor: colorTheme.main.primary,
 			// borderColor: colorTheme.accent.secondary,
-			borderWidth: 1,
+			// borderWidth: 1,
 			marginTop: 5,
 			alignSelf: 'center',
 			// justifyContent: 'center',
@@ -110,7 +110,7 @@ export default function Login() {
 			justifyContent: 'space-between',
 			borderRadius: 6,
 
-			backgroundColor: colorTheme.main.secondary,
+			// backgroundColor: colorTheme.main.secondary,
 			// gap: 5,
 		},
 		iconBox: {

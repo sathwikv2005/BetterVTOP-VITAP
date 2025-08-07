@@ -120,27 +120,6 @@ export function Home() {
 			}
 		}
 
-		async function checkUserName() {
-			const userName = await AsyncStorage.getItem('username')
-			if (!userName)
-				Alert.alert(
-					'Login Required',
-					'We couldn’t find your saved VTOP credentials.\n\nPlease log in to fetch your latest data from VTOP.',
-					[
-						{
-							text: 'Remind Me Later',
-							style: 'cancel',
-						},
-						{
-							text: 'Log In Now',
-							onPress: () => {
-								goToDrawerTab('login')
-							},
-						},
-					]
-				)
-		}
-
 		const logTabScreen = async () => {
 			if (
 				tabRouteName.toLocaleLowerCase() === 'theory' ||
@@ -155,7 +134,6 @@ export function Home() {
 		}
 		logTabScreen()
 
-		checkUserName()
 		checkForUpdate()
 	}, [tabRouteName, trigger])
 

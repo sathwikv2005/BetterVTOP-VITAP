@@ -1,11 +1,23 @@
-import React, { forwardRef, useContext, useState, useRef, useEffect } from 'react'
-import { View, Text, Pressable, StyleSheet, ScrollView, Dimensions } from 'react-native'
+import React, { forwardRef, useContext, useState, useRef, useEffect, useMemo } from 'react'
+import {
+	View,
+	Text,
+	Pressable,
+	StyleSheet,
+	ScrollView,
+	Dimensions,
+	Modal,
+	Animated,
+	TextInput,
+	KeyboardAvoidingView,
+	Platform,
+} from 'react-native'
 import { Modalize } from 'react-native-modalize'
 import ColorPicker from 'react-native-wheel-color-picker'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getApp } from '@react-native-firebase/app'
-import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics'
 
 const app = getApp()
 const analytics = getAnalytics(app)
@@ -14,7 +26,6 @@ const screenHeight = Dimensions.get('window').height
 
 const CustomThemeCreator = forwardRef((props, ref) => {
 	const { colorTheme, setColorTheme } = useContext(ColorThemeContext)
-
 	const initialThemeRef = useRef(colorTheme)
 	const initialTheme = initialThemeRef.current
 
@@ -32,20 +43,23 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 	// Picker state
 	const [currentColor, setCurrentColor] = useState(mainPrimary)
 	const [currentSetter, setCurrentSetter] = useState(() => setMainPrimary)
+	const [hexInput, setHexInput] = useState(mainPrimary)
+
+	const [showResetModal, setShowResetModal] = useState(false)
+	const [unsavedChanges, setUnsavedChanges] = useState(false)
 
 	const handleColorEdit = (color, setter) => {
 		setCurrentColor(color)
 		setCurrentSetter(() => setter)
 	}
 
-	function doNothing(param) {}
-
 	const handleColorChange = (color) => {
 		setCurrentColor(color)
+		setHexInput(color.toUpperCase())
 		currentSetter(color)
 
 		setColorTheme((prev) => {
-			const newTheme = JSON.parse(JSON.stringify(prev)) // deep clone
+			const newTheme = JSON.parse(JSON.stringify(prev))
 			switch (currentSetter) {
 				case setMainPrimary:
 					newTheme.main.primary = color
@@ -71,22 +85,16 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 			}
 			return newTheme
 		})
+		setUnsavedChanges(true)
+	}
+
+	const handleResetConfirm = () => {
+		setShowResetModal(false)
+		handleReset()
 	}
 
 	const handleReset = () => {
-		const resetTheme = {
-			main: {
-				primary: initialTheme.main.primary,
-				secondary: initialTheme.main.secondary,
-				tertiary: initialTheme.main.tertiary,
-				text: initialTheme.main.text,
-			},
-			accent: {
-				primary: initialTheme.accent.primary,
-				secondary: initialTheme.accent.secondary,
-				tertiary: initialTheme.accent.tertiary,
-			},
-		}
+		const resetTheme = JSON.parse(JSON.stringify(initialTheme))
 
 		setMainPrimary(resetTheme.main.primary)
 		setMainSecondary(resetTheme.main.secondary)
@@ -97,47 +105,11 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 		setAccentTertiary(resetTheme.accent.tertiary)
 
 		setColorTheme(resetTheme)
-
-		// Determine the correct color + setter to reapply to picker
-		const fallbackSetter = setMainPrimary
-		const fallbackColor = resetTheme.main.primary
-
-		let matchedColor = fallbackColor
-		let matchedSetter = fallbackSetter
-
-		switch (currentSetter) {
-			case setMainPrimary:
-				matchedColor = resetTheme.main.primary
-
-				break
-			case setMainSecondary:
-				matchedColor = resetTheme.main.secondary
-
-				break
-			case setMainTertiary:
-				matchedColor = resetTheme.main.tertiary
-
-				break
-			case setMainText:
-				matchedColor = resetTheme.main.text
-
-				break
-			case setAccentPrimary:
-				matchedColor = resetTheme.accent.primary
-
-				break
-			case setAccentSecondary:
-				matchedColor = resetTheme.accent.secondary
-
-				break
-			case setAccentTertiary:
-				matchedColor = resetTheme.accent.tertiary
-
-				break
-		}
-
-		setCurrentColor(matchedColor)
-		setCurrentSetter(() => doNothing)
+		setCurrentColor(resetTheme.main.primary)
+		setCurrentSetter((prev) => {
+			return () => {}
+		})
+		setUnsavedChanges(false)
 	}
 
 	const handleSave = async () => {
@@ -158,16 +130,12 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 		setColorTheme(new_theme)
 		await AsyncStorage.setItem('custom-theme', JSON.stringify(new_theme))
 		ref?.current?.close()
+		setUnsavedChanges(false)
 
 		await logEvent(analytics, 'custom_theme_saved', {
 			type: 'custom',
-			main_primary: new_theme.main.primary,
-			main_secondary: new_theme.main.secondary,
-			main_tertiary: new_theme.main.tertiary,
-			main_text: new_theme.main.text,
-			accent_primary: new_theme.accent.primary,
-			accent_secondary: new_theme.accent.secondary,
-			accent_tertiary: new_theme.accent.tertiary,
+			...new_theme.main,
+			...new_theme.accent,
 		})
 	}
 
@@ -175,83 +143,67 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 		container: {
 			paddingVertical: 30,
 			paddingHorizontal: 20,
-			// paddingBottom: 100,
 			backgroundColor: colorTheme.main.secondary,
 		},
 		heading: {
 			color: colorTheme.accent.primary,
 			fontSize: 24,
 			fontWeight: 'bold',
-			marginBottom: 20,
-			textAlign: 'center',
-		},
-		sectionHeader: {
-			color: colorTheme.main.text,
-			fontSize: 18,
-			fontWeight: '700',
-			// marginTop: 25,
 			marginBottom: 10,
-		},
-		label: {
-			color: '#ccc',
-			marginTop: 15,
-			marginBottom: 5,
-			fontSize: 15,
-			fontWeight: '600',
-		},
-		previewRow: {
-			paddingVertical: 10,
-			flexDirection: 'row',
-			flexWrap: 'wrap',
-			gap: 12,
-			marginBottom: 16,
-		},
-
-		previewBox: {
-			width: 70,
-			height: 50,
-			borderRadius: 8,
-			borderWidth: 2,
-			borderColor: '#888888',
-			margin: 6,
-		},
-		buttonRow: {
-			flexDirection: 'row',
-			justifyContent: 'space-between',
-			marginTop: 40,
-			gap: 12,
-		},
-		button: {
-			flex: 1,
-			paddingVertical: 14,
-			borderRadius: 10,
-			alignItems: 'center',
-		},
-		saveButton: {
-			backgroundColor: colorTheme.accent.primary,
-		},
-		resetButton: {
-			backgroundColor: colorTheme.main.tertiary,
-		},
-		saveText: {
-			color: colorTheme.main.primary,
-			fontWeight: 'bold',
-			fontSize: 16,
-		},
-		resetText: {
-			color: colorTheme.main.text,
-			fontWeight: 'bold',
-			fontSize: 16,
+			textAlign: 'center',
 		},
 		note: {
 			color: colorTheme.main.text,
 			fontSize: 13,
 			fontStyle: 'italic',
-			marginBottom: 20,
+			marginBottom: 10,
 			textAlign: 'center',
-			lineHeight: 18,
 			opacity: 0.8,
 		},
+		sectionHeader: {
+			color: colorTheme.main.text,
+			fontSize: 18,
+			fontWeight: '700',
+			marginBottom: 10,
+		},
+		previewRow: {
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			gap: 12,
+			justifyContent: 'space-evenly',
+			marginBottom: 16,
+		},
+		previewWrapper: { width: '22%', alignItems: 'center' },
+		previewBox: { width: '100%', height: 50, borderRadius: 8, borderWidth: 2, margin: 6 },
+		previewLabel: { color: '#ccc', fontSize: 11, textAlign: 'center', marginTop: 5 },
+		buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, gap: 12 },
+		button: { flex: 1, paddingVertical: 14, borderRadius: 10, alignItems: 'center' },
+		saveButton: { backgroundColor: colorTheme.accent.primary },
+		resetButton: { backgroundColor: colorTheme.main.tertiary },
+		saveText: { color: colorTheme.main.primary, fontWeight: 'bold', fontSize: 16 },
+		resetText: { color: colorTheme.main.text, fontWeight: 'bold', fontSize: 16 },
+		colorHex: { textAlign: 'center', color: colorTheme.main.text, marginBottom: 10 },
+		previewCard: {
+			backgroundColor: colorTheme.main.primary,
+			padding: 20,
+			borderRadius: 14,
+			marginBottom: 20,
+			alignItems: 'center',
+			shadowColor: '#000',
+			shadowOpacity: 0.2,
+			shadowRadius: 4,
+			elevation: 4,
+			width: '100%',
+		},
+
+		previewButton: {
+			backgroundColor: colorTheme.accent.primary,
+			paddingVertical: 10,
+			paddingHorizontal: 20,
+			borderRadius: 8,
+			marginTop: 10,
+		},
+		previewButtonText: { color: colorTheme.main.primary, fontWeight: 'bold' },
 	})
 
 	const mainPickers = [
@@ -277,67 +229,240 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 				borderTopColor: colorTheme.accent.primary,
 				borderTopWidth: 3,
 			}}
+			keyboardAvoidingBehavior="padding"
 		>
-			<ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-				<Text style={styles.heading}>🎨 Customize Your Theme</Text>
+			<KeyboardAvoidingView
+				style={{ flex: 1 }}
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			>
+				<ScrollView
+					contentContainerStyle={styles.container}
+					showsVerticalScrollIndicator={false}
+					keyboardShouldPersistTaps="handled"
+				>
+					<Text style={styles.heading}>🎨 Customize Your Theme</Text>
+					{/* {unsavedChanges && (
+						<Text style={[styles.note, { color: 'orange' }]}>⚠ You have unsaved changes</Text>
+					)} */}
 
-				<Text style={styles.note}>
-					Color changes update live across the app — feel free to preview them on other pages and
-					come back to save. Your draft will be preserved until the app restarts.{'\n'} If you mess
-					up, just use the{' '}
-					<Text style={{ fontWeight: 'bold', color: colorTheme.accent.secondary }}>Reset</Text>{' '}
-					button below.
-				</Text>
+					<Text style={styles.note}>
+						Changes update live across the app, feel free to preview them on other pages.
+						{'\n'}Your draft will be preserved until the app restarts.
+						{'\n'} If you mess up, just use the{' '}
+						<Text style={{ fontWeight: 'bold', color: colorTheme.accent.secondary }}>Reset</Text>{' '}
+						button below.
+					</Text>
 
-				<Text style={styles.sectionHeader}>Main Colors</Text>
-				<View style={styles.previewRow}>
-					{mainPickers.map(({ label, color, setter }) => (
-						<Pressable key={label} onPress={() => handleColorEdit(color, setter)}>
-							<View style={styles.previewBox}>
-								<View style={[styles.previewBox, { backgroundColor: color }]} />
-								<Text style={{ color: '#ccc', fontSize: 12, textAlign: 'center', marginTop: 4 }}>
-									{label}
+					{/* Live Preview Card */}
+					<View style={styles.previewCard}>
+						<Text
+							style={{
+								color: colorTheme.main.text,
+								fontWeight: 'bold',
+								fontSize: 18,
+								marginBottom: 8,
+							}}
+						>
+							Live Preview
+						</Text>
+
+						{/* Paragraph */}
+						<Text
+							style={{
+								color: colorTheme.main.tertiary,
+								fontSize: 14,
+								textAlign: 'center',
+								marginBottom: 12,
+								opacity: 0.85,
+							}}
+						>
+							This is a sample text to preview your colors. Customize your theme below!
+						</Text>
+
+						{/* Buttons Row */}
+						<View style={{ flexDirection: 'row', gap: 10 }}>
+							<Pressable
+								style={{
+									backgroundColor: colorTheme.accent.primary,
+									paddingVertical: 8,
+									paddingHorizontal: 16,
+									borderRadius: 8,
+									shadowColor: '#000',
+									shadowOpacity: 0.2,
+									shadowRadius: 4,
+									elevation: 3,
+								}}
+							>
+								<Text style={{ color: colorTheme.main.primary, fontWeight: 'bold' }}>Primary</Text>
+							</Pressable>
+
+							<Pressable
+								style={{
+									backgroundColor: colorTheme.accent.secondary,
+									paddingVertical: 8,
+									paddingHorizontal: 16,
+									borderRadius: 8,
+									shadowColor: '#000',
+									shadowOpacity: 0.2,
+									shadowRadius: 4,
+									elevation: 3,
+								}}
+							>
+								<Text style={{ color: colorTheme.main.primary, fontWeight: 'bold' }}>
+									Secondary
 								</Text>
-							</View>
-						</Pressable>
-					))}
-				</View>
+							</Pressable>
+						</View>
+					</View>
 
-				<Text style={[styles.sectionHeader, { marginTop: 25 }]}>Accent Colors</Text>
-				<View style={styles.previewRow}>
-					{accentPickers.map(({ label, color, setter }) => (
-						<Pressable key={label} onPress={() => handleColorEdit(color, setter)}>
-							<View style={styles.previewBox}>
-								<View style={[styles.previewBox, { backgroundColor: color }]} />
-								<Text style={{ color: '#ccc', fontSize: 12, textAlign: 'center', marginTop: 4 }}>
-									{label}
+					<Text style={styles.sectionHeader}>Main Colors</Text>
+					<View style={styles.previewRow}>
+						{mainPickers.map(({ label, color, setter }) => (
+							<Pressable
+								key={label}
+								style={styles.previewWrapper}
+								onPress={() => handleColorEdit(color, setter)}
+							>
+								<View
+									style={[
+										styles.previewBox,
+										{
+											backgroundColor: color,
+											borderColor: color === currentColor ? '#fff' : '#888',
+										},
+									]}
+								/>
+								<Text style={styles.previewLabel}>{label}</Text>
+							</Pressable>
+						))}
+					</View>
+
+					<Text style={styles.sectionHeader}>Accent Colors</Text>
+					<View style={styles.previewRow}>
+						{accentPickers.map(({ label, color, setter }) => (
+							<Pressable
+								key={label}
+								style={styles.previewWrapper}
+								onPress={() => handleColorEdit(color, setter)}
+							>
+								<View
+									style={[
+										styles.previewBox,
+										{
+											backgroundColor: color,
+											borderColor: color === currentColor ? '#fff' : '#888',
+										},
+									]}
+								/>
+								<Text style={styles.previewLabel}>{label}</Text>
+							</Pressable>
+						))}
+					</View>
+
+					<Text style={styles.sectionHeader}>Color Picker</Text>
+
+					<View style={{ height: 250, marginBottom: 20 }}>
+						<ColorPicker
+							color={currentColor}
+							onColorChange={handleColorChange}
+							thumbSize={30}
+							sliderSize={30}
+							noSnap
+							row
+						/>
+					</View>
+					<View style={{ alignItems: 'center', marginBottom: 20 }}>
+						<TextInput
+							style={{
+								width: 150,
+								paddingVertical: 8,
+								borderWidth: 1,
+								borderColor: '#aaa',
+								borderRadius: 8,
+								textAlign: 'center',
+								color: colorTheme.main.text,
+								backgroundColor: colorTheme.main.primary,
+								fontWeight: 'bold',
+							}}
+							value={hexInput}
+							onChangeText={(text) => {
+								setHexInput(text)
+								const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/
+								if (hexRegex.test(text)) {
+									handleColorChange(text)
+								}
+							}}
+							placeholder="#000"
+							placeholderTextColor="#7E7E7EFF"
+							maxLength={7}
+							autoCapitalize="none"
+						/>
+						<Text style={{ fontSize: 12, color: colorTheme.main.text, marginTop: 5 }}>
+							Enter HEX (e.g. #FF5733)
+						</Text>
+					</View>
+					<View style={styles.buttonRow}>
+						<Pressable
+							style={[styles.button, styles.resetButton]}
+							onPress={() => setShowResetModal(true)}
+						>
+							<Text style={styles.resetText}>Reset</Text>
+						</Pressable>
+						<Pressable style={[styles.button, styles.saveButton]} onPress={handleSave}>
+							<Text style={styles.saveText}>Save</Text>
+						</Pressable>
+					</View>
+
+					{/* Reset Confirmation Modal */}
+					<Modal visible={showResetModal} transparent animationType="fade">
+						<View
+							style={{
+								flex: 1,
+								justifyContent: 'center',
+								alignItems: 'center',
+								backgroundColor: 'rgba(0,0,0,0.4)',
+							}}
+						>
+							<View
+								style={{
+									backgroundColor: colorTheme.main.secondary,
+									padding: 20,
+									borderRadius: 10,
+									width: '80%',
+								}}
+							>
+								<Text
+									style={{
+										color: colorTheme.main.text,
+										fontSize: 18,
+										fontWeight: 'bold',
+										marginBottom: 10,
+									}}
+								>
+									Reset Theme?
 								</Text>
+								<Text style={{ color: colorTheme.main.text, marginBottom: 20 }}>
+									Are you sure you want to reset to the default theme? This action cannot be undone.
+								</Text>
+								<View style={styles.buttonRow}>
+									<Pressable
+										style={[styles.button, styles.resetButton]}
+										onPress={() => setShowResetModal(false)}
+									>
+										<Text style={styles.resetText}>Cancel</Text>
+									</Pressable>
+									<Pressable
+										style={[styles.button, styles.saveButton]}
+										onPress={handleResetConfirm}
+									>
+										<Text style={styles.saveText}>Reset</Text>
+									</Pressable>
+								</View>
 							</View>
-						</Pressable>
-					))}
-				</View>
-
-				<Text style={[styles.sectionHeader, { marginTop: 30 }]}>Color Picker</Text>
-				<View style={{ height: 250, marginBottom: 20 }}>
-					<ColorPicker
-						color={currentColor}
-						onColorChange={handleColorChange}
-						thumbSize={30}
-						sliderSize={30}
-						noSnap={true}
-						row={true}
-					/>
-				</View>
-
-				<View style={styles.buttonRow}>
-					<Pressable style={[styles.button, styles.resetButton]} onPress={handleReset}>
-						<Text style={styles.resetText}>Reset</Text>
-					</Pressable>
-					<Pressable style={[styles.button, styles.saveButton]} onPress={handleSave}>
-						<Text style={styles.saveText}>Save</Text>
-					</Pressable>
-				</View>
-			</ScrollView>
+						</View>
+					</Modal>
+				</ScrollView>
+			</KeyboardAvoidingView>
 		</Modalize>
 	)
 })
