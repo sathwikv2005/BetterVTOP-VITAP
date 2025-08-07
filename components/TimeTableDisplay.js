@@ -31,6 +31,41 @@ export default function TimeTableDisplay({ route }) {
 			return showAlert({
 				title: '❌ Login Failed',
 				message: 'Failed to login. Please try again.',
+				styles: {
+					overlay: {
+						backgroundColor: '#000000B0',
+					},
+					container: {
+						backgroundColor: colorTheme.main.secondary,
+						width: '85%',
+						padding: 16,
+						borderRadius: 12,
+						borderColor: colorTheme.main.primary,
+					},
+					title: {
+						color: '#FF5A5F',
+						fontSize: 18,
+						fontWeight: '600',
+						textAlign: 'center',
+						marginBottom: 6,
+					},
+					message: {
+						color: colorTheme.main.text,
+						fontSize: 15,
+						textAlign: 'center',
+						marginBottom: 12,
+					},
+					okButton: {
+						backgroundColor: colorTheme.accent.primary,
+						paddingVertical: 10,
+						borderRadius: 8,
+					},
+					okText: {
+						color: colorTheme.main.primary,
+						fontWeight: 'bold',
+						textAlign: 'center',
+					},
+				},
 			})
 		}
 		setTimetable(data.timetable.timetable)
@@ -40,6 +75,41 @@ export default function TimeTableDisplay({ route }) {
 		showAlert({
 			title: 'All Set!',
 			message: 'Your timetable and attendance are now up to date.',
+			styles: {
+				overlay: {
+					backgroundColor: '#000000B0',
+				},
+				container: {
+					backgroundColor: colorTheme.main.secondary,
+					width: '85%',
+					padding: 16,
+					borderRadius: 12,
+					borderColor: colorTheme.main.primary,
+				},
+				title: {
+					color: colorTheme.accent.primary,
+					fontSize: 18,
+					fontWeight: '600',
+					marginBottom: 4,
+					textAlign: 'center',
+				},
+				message: {
+					marginTop: 10,
+					color: colorTheme.main.text,
+					fontSize: 15,
+					marginBottom: 12,
+				},
+				okButton: {
+					backgroundColor: colorTheme.accent.primary,
+					paddingVertical: 10,
+					borderRadius: 8,
+				},
+				okText: {
+					color: colorTheme.main.primary,
+					fontWeight: 'bold',
+					textAlign: 'center',
+				},
+			},
 		})
 	}, [])
 
