@@ -210,7 +210,7 @@ function MainApp() {
 		}
 
 		setUserProperties()
-	}, [])
+	}, [username])
 
 	if (!colorTheme) {
 		return (
