@@ -58,7 +58,7 @@ export default async function wifiLoginVITAP(username, password) {
 		}
 
 		if (responseText.includes('user&apos;s concurrent authentication is over limit')) {
-			// 🔹 Try multiple bypass attempts
+			// Try multiple bypass attempts
 			for (let i = 0; i < 3; i++) {
 				const bypassUsername = generateBypassUsername(username)
 				console.log(`Retrying with bypass username: ${bypassUsername}`)
