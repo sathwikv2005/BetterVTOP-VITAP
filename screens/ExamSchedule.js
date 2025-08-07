@@ -55,7 +55,7 @@ export default function ExamSchedule() {
 		setExamSchedule(data.examScheduleData)
 		setRefreshing(false)
 		ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
-	}, [])
+	}, [sem])
 
 	async function handleSemChange(prevSem, newSem) {
 		setSem(newSem)
@@ -103,13 +103,12 @@ export default function ExamSchedule() {
 function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 	const COLUMNS = [
 		{ key: 'courseCode', label: 'Course Code' },
-		{ key: 'courseTitle', label: 'Course Title' },
-		{ key: 'examDate', label: 'Date' },
-		{ key: 'examTime', label: 'Exam Time' },
-		{ key: 'slot', label: 'Slot' },
+		{ key: 'dateTime', label: 'Date & Time' },
 		{ key: 'venue', label: 'Venue' },
 		{ key: 'seatLocation', label: 'Seat Location' },
 		{ key: 'seatNo', label: 'Seat No.' },
+		{ key: 'courseTitle', label: 'Course Title' },
+		{ key: 'slot', label: 'Slot' },
 	]
 
 	if (!schedule || schedule.length === 0)
@@ -162,19 +161,20 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 			borderWidth: 1,
 			borderColor: colorTheme.accent.primary,
 			borderRadius: 5,
-			minWidth: 700,
+			// minWidth: 500,
 		},
 		row: {
 			flexDirection: 'row',
 		},
 		cell: {
-			width: 120,
+			width: 95,
 			paddingVertical: 10,
-			paddingHorizontal: 8,
+			paddingHorizontal: 5,
 			borderWidth: 1,
 			borderColor: colorTheme.accent.tertiary,
 			textAlign: 'center',
 			color: colorTheme.main.text,
+			fontSize: 12,
 		},
 		headerCell: {
 			backgroundColor: colorTheme.main.secondary,
@@ -192,27 +192,40 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 				<View key={idx} style={styles.tableWrapper}>
 					<Text style={styles.title}>{type}</Text>
 
-					<ScrollView horizontal>
-						<View style={styles.table}>
-							{/* Header Row */}
-							<View style={styles.row}>
-								{COLUMNS.map((col) => (
-									<Text key={col.key} style={[styles.cell, styles.headerCell]}>
-										{col.label}
-									</Text>
-								))}
-							</View>
-
-							{/* Data Rows */}
-							{data.map((entry, rowIdx) => (
-								<View key={rowIdx} style={styles.row}>
+					<ScrollView horizontal contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+						<View style={{ flex: 1, alignItems: 'center' }}>
+							<View style={styles.table}>
+								{/* Header Row */}
+								<View style={styles.row}>
 									{COLUMNS.map((col) => (
-										<Text key={col.key} style={styles.cell}>
-											{entry[col.key] || '-'}
+										<Text key={col.key} style={[styles.cell, styles.headerCell]}>
+											{col.label}
 										</Text>
 									))}
 								</View>
-							))}
+
+								{/* Data Rows */}
+								{data.map((entry, rowIdx) => (
+									<View key={rowIdx} style={styles.row}>
+										{COLUMNS.map((col) => {
+											let value = entry[col.key] || '-'
+
+											// If column is "dateTime", combine date and time
+											if (col.key === 'dateTime') {
+												const date = entry.examDate || '-'
+												const time = entry.examTime || '-'
+												value = `${date}\n${time}`
+											}
+
+											return (
+												<Text key={col.key} style={styles.cell}>
+													{value}
+												</Text>
+											)
+										})}
+									</View>
+								))}
+							</View>
 						</View>
 					</ScrollView>
 				</View>

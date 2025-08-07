@@ -11,7 +11,6 @@ export default function ClassItem({ item, day, ...props }) {
 	const hour = new Date().getHours()
 	const minutes = new Date().getMinutes()
 	const weekdayMap = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-
 	var todayIndex = new Date().getDay()
 
 	const routeName = weekdayMap[todayIndex]
@@ -26,6 +25,7 @@ export default function ClassItem({ item, day, ...props }) {
 			marginBottom: '5%',
 			flexDirection: 'column',
 			justifyContent: 'space-between',
+
 			backgroundColor: colorTheme.main.primary,
 			color: colorTheme.main.text,
 			elevation: 5,
@@ -111,6 +111,16 @@ export default function ClassItem({ item, day, ...props }) {
 			alignContent: 'center',
 			gap: 5,
 		},
+		// blackBorder: {
+		// 	height: '98%',
+		// 	marginTop: 1,
+		// 	borderColor: colorTheme.main.secondary,
+		// 	borderWidth: 1,
+		// 	borderRadius: 10,
+		// 	borderLeftWidth: 0,
+		// 	borderTopLeftRadius: 2,
+		// 	borderBottomLeftRadius: 2,
+		// },
 	})
 
 	const startHour = parseInt(item.timings.start.split(':')[0])
@@ -141,32 +151,35 @@ export default function ClassItem({ item, day, ...props }) {
 	return (
 		<View style={[styles.container, opacity]}>
 			<View style={[{ height: '100%' }, borderStyle]}>
-				<View style={[styles.left]}>
-					<View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
-						{item.type === 'lab' ? (
-							<Fontisto
-								name="laboratory"
-								style={styles.icon}
-								color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
-							/>
-						) : (
-							<Entypo
-								name="open-book"
-								style={styles.icon}
-								color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
-							/>
-						)}
-						<Text style={[styles.title, isOngoing ? styles.highlights : '']}>
-							{formatCourseTitle(item.courseTitle, 35)}
-						</Text>
+				<View style={[styles.blackBorder]}>
+					<View style={[styles.left]}>
+						<View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+							{item.type === 'lab' ? (
+								<Fontisto
+									name="laboratory"
+									style={styles.icon}
+									color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
+								/>
+							) : (
+								<Entypo
+									name="open-book"
+									style={styles.icon}
+									color={isOngoing ? colorTheme.accent.primary : colorTheme.main.text}
+								/>
+							)}
+							<Text style={[styles.title, isOngoing ? styles.highlights : '']}>
+								{formatCourseTitle(item.courseTitle, 35)}
+							</Text>
+						</View>
 					</View>
-				</View>
-				<View style={[styles.box, styles.right]}>
-					<Text style={styles.main}>{item.venue}</Text>
-					<View style={[styles.timings]}>
-						<Text style={styles.main}>{item.timings.start}</Text>
-						<Text style={styles.main}>-</Text>
-						<Text style={styles.sub}>{item.timings.end}</Text>
+
+					<View style={[styles.box, styles.right]}>
+						<Text style={styles.main}>{item.venue}</Text>
+						<View style={[styles.timings]}>
+							<Text style={styles.main}>{item.timings.start}</Text>
+							<Text style={styles.main}>-</Text>
+							<Text style={styles.sub}>{item.timings.end}</Text>
+						</View>
 					</View>
 				</View>
 			</View>

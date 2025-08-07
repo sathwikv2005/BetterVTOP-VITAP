@@ -175,9 +175,9 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 				const vtopData = attendanceData.attendance.log.find(
 					(x) => x.date === item.date && x.time === item.time
 				)
-
+				if (!vtopData) continue
 				// If still not posted, keep user's override
-				if (!vtopData || vtopData.status.toLowerCase() === 'not posted') {
+				if (vtopData.status.toLowerCase() === 'not posted') {
 					newData.push(item)
 					continue
 				}

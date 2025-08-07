@@ -17,14 +17,32 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 		{
 			id: 1,
 			icon: 'wifi',
-			title: 'One-click Wi-Fi Login',
-			desc: 'Login and logout from the VIT-AP Wi-Fi portal instantly with a single tap.',
+			title: 'Reliable Wi-Fi Login',
+			desc: 'Wi-Fi login now works even when VITAP blocks multiple login attempts. We’ve added a smart workaround.',
 		},
 		{
 			id: 2,
-			icon: 'palette',
-			title: 'Custom Theme Creator',
-			desc: 'Create and apply your own color theme directly from the Settings page.',
+			icon: 'lock',
+			title: 'Login Bug Fixed',
+			desc: 'Fixed a bug where passwords with special characters like #, & were not working correctly during login.',
+		},
+		{
+			id: 3,
+			icon: 'reload',
+			title: 'Auto Retry on Login Fail',
+			desc: 'Login now automatically retries when a session error or CSRF issue is detected.',
+		},
+		{
+			id: 4,
+			icon: 'calendar-clock',
+			title: 'Improved Timetable',
+			desc: 'Tap on any subject in your timetable to view detailed info in a pop-up. Faculty names are now shown too!',
+		},
+		{
+			id: 5,
+			icon: 'update',
+			title: 'Daily Auto-Update',
+			desc: 'App fetches your latest VTOP data once a day automatically.',
 		},
 	]
 

@@ -47,9 +47,10 @@ export default function Marks() {
 		}
 
 		setMarks(data.marksData)
+
 		setRefreshing(false)
 		ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
-	}, [])
+	}, [sem])
 
 	async function handleSemChange(prevSem, newSem) {
 		setSem(newSem)
