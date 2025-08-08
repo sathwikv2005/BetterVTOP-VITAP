@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { View, Text, Switch, StyleSheet } from 'react-native'
 import * as Notifications from 'expo-notifications'
+import * as Haptics from 'expo-haptics'
 import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -21,6 +22,7 @@ export default function General({ openSheet }) {
 	}, [])
 
 	async function handleUpComingClassNotiChange() {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		const newState = !upcomingClassNoti
 
 		if (!newState) {

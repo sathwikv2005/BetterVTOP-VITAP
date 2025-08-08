@@ -4,7 +4,7 @@ import { ColorThemeContext } from '../../context/ColorThemeContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Loading from '../Loading'
 import { goToDrawerTab } from '../../util/goToDrawerTab'
-
+import * as Haptics from 'expo-haptics'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import Entypo from '@expo/vector-icons/Entypo'
 import wifiLoginVITAP, {
@@ -165,6 +165,7 @@ export default function Wifi() {
 				},
 			})
 		}
+		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 		setLoading(false)
 	}
 

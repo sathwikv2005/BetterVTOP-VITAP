@@ -12,6 +12,7 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { Modalize } from 'react-native-modalize'
 import ColorPicker from 'react-native-wheel-color-picker'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
@@ -49,6 +50,7 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 	const [unsavedChanges, setUnsavedChanges] = useState(false)
 
 	const handleColorEdit = (color, setter) => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setCurrentColor(color)
 		setCurrentSetter(() => setter)
 	}
@@ -110,6 +112,7 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 			return () => {}
 		})
 		setUnsavedChanges(false)
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 	}
 
 	const handleSave = async () => {
@@ -137,6 +140,7 @@ const CustomThemeCreator = forwardRef((props, ref) => {
 			...new_theme.main,
 			...new_theme.accent,
 		})
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 	}
 
 	const styles = StyleSheet.create({
