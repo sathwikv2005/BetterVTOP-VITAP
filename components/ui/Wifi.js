@@ -6,6 +6,7 @@ import Loading from '../Loading'
 import { goToDrawerTab } from '../../util/goToDrawerTab'
 import * as Haptics from 'expo-haptics'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import Entypo from '@expo/vector-icons/Entypo'
 import wifiLoginVITAP, {
 	wifiLogoutVITAP,
@@ -277,7 +278,11 @@ export default function Wifi() {
 			color: colorTheme.main.text,
 			fontSize: 20,
 			fontWeight: 800,
-			// marginBottom: 10,
+			marginBottom: 5,
+		},
+		sub: {
+			color: colorTheme.main.text,
+			opacity: 0.9,
 		},
 		captchaImage: {
 			marginTop: 8,
@@ -327,7 +332,16 @@ export default function Wifi() {
 		<Loading />
 	) : (
 		<View style={styles.container}>
-			<Text style={styles.login}>WiFi login (VIT-AP portal):</Text>
+			<View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+				<FontAwesome5
+					name="wifi"
+					size={24}
+					color={colorTheme.accent.primary}
+					style={{ marginBottom: 5 }}
+				/>
+				<Text style={styles.login}>WiFi login (VIT-AP portal):</Text>
+			</View>
+			<Text style={styles.sub}>Unlimited Wi-Fi logins. No more overlimit 🤫</Text>
 			<View style={styles.form}>
 				<View style={styles.box}>
 					<Text style={styles.label}>Username:</Text>
