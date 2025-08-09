@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
+import * as Haptics from 'expo-haptics'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { View, Text, ToastAndroid } from 'react-native'
@@ -60,6 +61,7 @@ export default function Login() {
 		console.log(trigger)
 		setLoading(false)
 		ToastAndroid.show('Data fetched successfully! ✅', ToastAndroid.LONG)
+		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 		return goToDrawerTab('home')
 	}
 

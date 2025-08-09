@@ -9,6 +9,7 @@ import {
 	ToastAndroid,
 	Platform,
 } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import Constants from 'expo-constants'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import Feather from '@expo/vector-icons/Feather'
@@ -24,51 +25,62 @@ export default function VersionInfo() {
 	const [progress, setProgress] = useState(null)
 
 	const handleVersionPress = () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 		ToastAndroid.show(`📱 App version: v${version}`, ToastAndroid.SHORT)
 	}
 
 	const handleGithubPress = () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 		Linking.openURL('https://github.com/sathwikv2005/BetterVTOP-VITAP')
 	}
 
 	const handleUpdatePress = async () => {
-		const github = await getGitHubRelease()
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+		ToastAndroid.show(`Checking for updates...`, ToastAndroid.SHORT)
+		try {
+			const github = await getGitHubRelease()
 
-		if (!github) {
-			return showAlert({
-				title: '✅ Up to date!',
-				message: 'You’re already on the latest version.',
+			if (!github) {
+				return showAlert({
+					title: '✅ Up to date!',
+					message: 'You’re already on the latest version.',
+					styles: getAlertStyles(),
+				})
+			}
+
+			const { downloadUrl, latestVer, body } = github
+
+			showAlert({
+				title: '🚀 New Version Available',
+				message: `Version ${latestVer} is ready. Want to update now?\n\n${body}`,
+				buttons: [
+					{
+						text: 'Cancel',
+						onPress: () => setProgress(null),
+						style: { backgroundColor: colorTheme.main.tertiary },
+						textStyle: { color: colorTheme.main.text },
+					},
+					{
+						text: 'Update Now',
+						onPress: () => {
+							setProgress(0)
+							downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
+						},
+						style: { backgroundColor: colorTheme.accent.primary },
+						textStyle: {
+							color: colorTheme.main.primary,
+							fontWeight: 'bold',
+						},
+					},
+				],
 				styles: getAlertStyles(),
 			})
+		} catch (err) {
+			return ToastAndroid.show(
+				`Failed to check for updates.\nPlease try later.`,
+				ToastAndroid.SHORT
+			)
 		}
-
-		const { downloadUrl, latestVer, body } = github
-
-		showAlert({
-			title: '🚀 New Version Available',
-			message: `Version ${latestVer} is ready. Want to update now?\n\n${body}`,
-			buttons: [
-				{
-					text: 'Cancel',
-					onPress: () => setProgress(null),
-					style: { backgroundColor: colorTheme.main.tertiary },
-					textStyle: { color: colorTheme.main.text },
-				},
-				{
-					text: 'Update Now',
-					onPress: () => {
-						setProgress(0)
-						downloadAndInstallAPK(downloadUrl, latestVer, setProgress)
-					},
-					style: { backgroundColor: colorTheme.accent.primary },
-					textStyle: {
-						color: colorTheme.main.primary,
-						fontWeight: 'bold',
-					},
-				},
-			],
-			styles: getAlertStyles(),
-		})
 	}
 
 	const getAlertStyles = () => ({

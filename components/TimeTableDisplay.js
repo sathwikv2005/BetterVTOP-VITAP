@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useContext, useMemo, useRef } from 'react'
 import { Text, View, StyleSheet, FlatList, Pressable } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { getAllData } from '../util/VTOP/getAllData'
 import FooterItem from './FooterItem.js'
@@ -24,6 +25,7 @@ export default function TimeTableDisplay({ route }) {
 	}, [data])
 
 	const onRefresh = useCallback(async () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setRefreshing(true)
 		const data = await getAllData(setRefreshing)
 		if (data.error) {

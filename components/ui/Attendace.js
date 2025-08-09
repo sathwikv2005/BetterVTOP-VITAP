@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { useRef } from 'react'
 import { Pressable, Text, View, Modal } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { FlatList } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
@@ -81,6 +82,7 @@ export function Attendance() {
 	}, [lastUpdated, trigger])
 
 	const onRefresh = useCallback(async () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setRefreshing(true)
 
 		const data = await getAllData(setRefreshing)

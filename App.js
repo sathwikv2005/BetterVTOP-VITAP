@@ -66,6 +66,7 @@ export default function App() {
 			const checkVersion = await AsyncStorage.getItem('last-seen-version')
 			// const checkVersion = true
 			setShowWhatsNew(displayWhatsNew && checkVersion !== version)
+			// setShowWhatsNew(true)
 		}
 		checkFirstOpenAfterUpdate()
 	}, [])

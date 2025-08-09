@@ -11,25 +11,21 @@ export function parseExamSchedule(document) {
 	for (const row of rows) {
 		const cells = selectAll('td', row)
 
-		// Section Type (e.g., "FAT", "CAT1")
+		// Group title row
 		if (cells.length === 1 && cells[0].attribs.colspan === '13') {
-			// Before starting a new group, push the previous one only if it has data
 			if (currentGroup && currentGroup.data.length > 0) {
 				groupedData.push(currentGroup)
 			}
 
 			const type = getText(cells[0]).trim()
 			currentGroup = { type, data: [] }
-			skipNextRow = true // Skip next header row
 			continue
 		}
 
-		if (skipNextRow) {
-			skipNextRow = false
+		// Skip if not a data row (e.g., table header)
+		if (!currentGroup || cells.length !== 13 || getText(cells[0]).toLowerCase().includes('s.no')) {
 			continue
 		}
-
-		if (!currentGroup || cells.length !== 13) continue
 
 		const [
 			_, // S.No.

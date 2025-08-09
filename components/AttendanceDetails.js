@@ -1,11 +1,12 @@
 import { forwardRef, useEffect, useState } from 'react'
-import { Text, StyleSheet, View, Pressable } from 'react-native'
+import { Text, StyleSheet, View, Pressable, TouchableOpacity } from 'react-native'
 import { Modalize } from 'react-native-modalize'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Dimensions } from 'react-native'
 import Fontisto from '@expo/vector-icons/Fontisto'
 import Entypo from '@expo/vector-icons/Entypo'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
+import * as Haptics from 'expo-haptics'
 import Foundation from '@expo/vector-icons/Foundation'
 import { formatCourseTitle } from '../util/formatCourseTitle'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -23,6 +24,7 @@ const AttendanceDetails = forwardRef(
 		const [tooltipText, setTooltipText] = useState('')
 		const [userPercent, setUserPercent] = useState(0)
 		const [userModified, setUserModified] = useState(null)
+		const [buttonLoading, setButtonLoading] = useState(null)
 
 		useEffect(() => {
 			async function getUserUpdatedData() {
@@ -45,7 +47,8 @@ const AttendanceDetails = forwardRef(
 		const btwExamsGreen = parseInt(selectedItem?.cat2FatPercentage) >= parseInt(minPercent)
 
 		async function handleResetPress(item) {
-			// console.log(item)
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+			setButtonLoading(`${item.date}#${item.time}`)
 			let arr = []
 
 			if (userUpdated) arr = userUpdated.filter((x) => x.id !== `${item.date}#${item.time}`)
@@ -55,6 +58,7 @@ const AttendanceDetails = forwardRef(
 				JSON.stringify(arr)
 			)
 			setUserUpdated(arr)
+			setButtonLoading(null)
 		}
 
 		function callUserPercent() {
@@ -79,6 +83,9 @@ const AttendanceDetails = forwardRef(
 		}
 
 		async function handlePresentPress(item, isPresent) {
+			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+			// Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+			setButtonLoading(`${item.date}#${item.time}`)
 			let arr = []
 			if (userUpdated) arr = [...userUpdated]
 			const updateObj = {
@@ -95,6 +102,7 @@ const AttendanceDetails = forwardRef(
 				JSON.stringify(arr)
 			)
 			setUserUpdated(arr)
+			setButtonLoading(null)
 		}
 
 		const styles = StyleSheet.create({
@@ -267,18 +275,19 @@ const AttendanceDetails = forwardRef(
 
 		function renderAction(entry, isPresent, userUpdated) {
 			if (isPresent) return null
+			if (buttonLoading === `${entry.date}#${entry.time}`) return <Loading />
 			if (userUpdated)
 				return (
 					<View style={[styles.buttonsBox]}>
 						<Text style={[styles.buttonsText]}>Reset</Text>
-						<Pressable onPress={() => handleResetPress(entry)}>
+						<TouchableOpacity onPress={() => handleResetPress(entry)}>
 							<FontAwesome
 								name="refresh"
 								size={24}
 								style={[styles.btnIcon]}
 								color={colorTheme.accent.primary}
 							/>
-						</Pressable>
+						</TouchableOpacity>
 					</View>
 				)
 
@@ -287,22 +296,22 @@ const AttendanceDetails = forwardRef(
 					<View style={[styles.buttonsBox]}>
 						<Text style={[styles.buttonsText]}>Present?</Text>
 						<View style={[styles.buttons]}>
-							<Pressable onPress={() => handlePresentPress(entry, true)}>
+							<TouchableOpacity onPress={() => handlePresentPress(entry, true)}>
 								<FontAwesome
 									name="check-circle"
 									size={24}
 									style={[styles.btnIcon]}
 									color={colorTheme.accent.primary}
 								/>
-							</Pressable>
-							<Pressable onPress={() => handlePresentPress(entry, false)}>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={() => handlePresentPress(entry, false)}>
 								<Entypo
 									name="circle-with-cross"
 									size={24}
 									style={[styles.btnIcon]}
 									color={colorTheme.accent.primary}
 								/>
-							</Pressable>
+							</TouchableOpacity>
 						</View>
 					</View>
 				)

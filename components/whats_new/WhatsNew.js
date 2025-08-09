@@ -1,9 +1,11 @@
 import { useContext } from 'react'
-import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Pressable, FlatList, Dimensions } from 'react-native'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import PopUp from './PopUp'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+
+const { height } = Dimensions.get('window')
 
 export default function WhatsNew({ setShowWhatsNew, version }) {
 	const { colorTheme } = useContext(ColorThemeContext)
@@ -114,23 +116,28 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 					<Text style={styles.heading}>✨ What's New In v{version}</Text>
 				</View>
 
-				<FlatList
-					data={features}
-					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item }) => (
-						<View style={styles.featureCard}>
-							<MaterialCommunityIcons
-								name={item.icon}
-								size={28}
-								color={colorTheme.accent.primary}
-							/>
-							<View style={styles.featureTextContainer}>
-								<Text style={styles.featureTitle}>{item.title}</Text>
-								<Text style={styles.featureDesc}>{item.desc}</Text>
+				{/* Scrollable feature list with max height */}
+				<View style={{ maxHeight: height * 0.55 }}>
+					<FlatList
+						data={features}
+						keyExtractor={(item) => item.id.toString()}
+						scrollEnabled={true}
+						showsVerticalScrollIndicator={false}
+						renderItem={({ item }) => (
+							<View style={styles.featureCard}>
+								<MaterialCommunityIcons
+									name={item.icon}
+									size={28}
+									color={colorTheme.accent.primary}
+								/>
+								<View style={styles.featureTextContainer}>
+									<Text style={styles.featureTitle}>{item.title}</Text>
+									<Text style={styles.featureDesc}>{item.desc}</Text>
+								</View>
 							</View>
-						</View>
-					)}
-				/>
+						)}
+					/>
+				</View>
 
 				<View style={styles.btnWrapper}>
 					<Pressable style={styles.btn} onPress={handleClose}>
