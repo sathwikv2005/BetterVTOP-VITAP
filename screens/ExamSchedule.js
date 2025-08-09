@@ -8,6 +8,7 @@ import {
 	Dimensions,
 	ToastAndroid,
 } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import Loading from '../components/Loading'
 import { getExamSchedule } from '../util/VTOP/examSchedule'
@@ -44,6 +45,7 @@ export default function ExamSchedule() {
 	}, [trigger])
 
 	const onRefresh = useCallback(async () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setRefreshing(true)
 
 		const data = await getExamSchedule(setRefreshing, sem)

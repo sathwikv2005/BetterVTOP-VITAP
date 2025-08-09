@@ -5,6 +5,7 @@ import DropDownPicker from 'react-native-dropdown-picker'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import { getColorTheme, getNewColorTheme } from '../../constants/colorTheme/colorThemeMap'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import * as Haptics from 'expo-haptics'
 import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
 
@@ -51,6 +52,7 @@ export default function ColorTheme({ openSheet }) {
 
 	const handleMainThemeChange = async (newMain) => {
 		if (newMain === prevMainValue) return // no change
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 		setMainValue(newMain)
 		setPrevMainValue(newMain)
 		const updated = { main: mainValue, accent: accentValue }
@@ -68,6 +70,7 @@ export default function ColorTheme({ openSheet }) {
 
 	const handleAccentThemeChange = async (newAccent) => {
 		if (newAccent === prevAccentValue) return // no change
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 		setAccentValue(newAccent)
 		setPrevAccentValue(newAccent)
 		const updated = { main: mainValue, accent: accentValue }

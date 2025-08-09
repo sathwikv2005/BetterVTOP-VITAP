@@ -1,0 +1,360 @@
+[
+	{
+		"id": 1,
+		"header": "Fun fact:",
+		"body": "Before 2024, our Central Block (CB) only had 4 floors!\nIt got an upgrade recently — more space, more hustle!",
+		"footer": null,
+		"tags": ["college", "campus", "infrastructure"]
+	},
+	{
+		"id": 2,
+		"header": "College Fact:",
+		"body": "Every student knows the real meaning of \nFFCS during registration:\n👉 Frequently Fails, Causes Stress 😅💥\nBecause the only thing “flexible” here is your patience.",
+		"footer": "For legal reasons… that’s a joke. 😉",
+		"tags": ["college", "FFCS", "stress", "academics"]
+	},
+	{
+		"id": 3,
+		"header": "Student Perk:",
+		"body": "Your college email ID isn’t just for assignments \nit’s your “deal-lightful” pass to discounts! 🎟️\nFrom jamming on Spotify to snagging gadgets on Samsung,\nbeing a student really pays off! 😎",
+		"footer": null,
+		"tags": ["student life", "discounts", "perks"]
+	},
+	{
+		"id": 4,
+		"header": "Brutal campus fact!",
+		"body": "You actually have a better chance of finding a partner\nthan connecting to the campus Wi-Fi…",
+		"footer": "But let’s be real — you’re not getting either. 💔📵",
+		"tags": ["campus", "wifi", "humor", "relatable"]
+	},
+	{
+		"id": 5,
+		"header": "Campus fact!",
+		"body": "The water coolers on campus have two modes:\n“broken” and “warm water surprise.” 💧🔥",
+		"footer": null,
+		"tags": ["campus", "amenities", "humor"]
+	},
+	{
+		"id": 6,
+		"header": "Relatable fact!",
+		"body": "Mess food menu is basically a mystery novel \nfull of plot twists your stomach never expects. 🍛😬",
+		"footer": null,
+		"tags": ["mess food", "campus life", "relatable", "humor"]
+	},
+	{
+		"id": 7,
+		"header": "Relatable fact!",
+		"body": "The only time the VTOP servers work perfectly\nis when you don’t need them. 💻🙃",
+		"footer": "But hey, Better VTOP isn’t like that — we actually work when you need us! 🚀",
+		"tags": ["VTOP", "servers", "technology", "relatable"]
+	},
+	{
+		"id": 8,
+		"header": "Relatable fact!",
+		"body": "The Wi-Fi is so slow,\nby the time your page loads, the syllabus might change. 📶📜",
+		"footer": null,
+		"tags": ["wifi", "campus", "relatable", "humor"]
+	},
+	{
+		"id": 9,
+		"header": "Student Logic:",
+		"body": "The only math every student does seriously is \n“How many classes can I bunk and still survive?” 🧮🤔",
+		"footer": null,
+		"tags": ["academics", "bunking", "student life", "humor"]
+	},
+	{
+		"id": 10,
+		"header": "Relatable fact!",
+		"body": "You can predict your attendance like the stock market \nvolatile, risky, and mostly going down. 📊📉",
+		"footer": null,
+		"tags": ["attendance", "academics", "relatable", "humor"]
+	},
+	{
+		"id": 11,
+		"header": "Did you know?",
+		"body": "The fastest runners on campus are students\nchasing attendance in the last week. 🏃💨",
+		"footer": null,
+		"tags": ["attendance", "student life", "campus", "humor"]
+	},
+	{
+		"id": 12,
+		"header": "Relatable fact!",
+		"body": "Assignments are just proof that Ctrl+C and Ctrl+V\nstill work flawlessly. ⌨️😂",
+		"footer": null,
+		"tags": ["assignments", "plagiarism", "student life", "humor"]
+	},
+	{
+		"id": 13,
+		"header": "Did you know?",
+		"body": "The fastest way to fill an auditorium?\nJust announce “OD will be given.” 📋😂",
+		"footer": null,
+		"tags": ["campus events", "OD", "student life", "humor"]
+	},
+	{
+		"id": 14,
+		"header": "Relatable fact!",
+		"body": "Your ID card photo will haunt you\nfor the rest of your degree. 🎟️📸",
+		"footer": null,
+		"tags": ["student ID", "campus life", "relatable", "humor"]
+	},
+	{
+		"id": 15,
+		"header": "Campus paradox!",
+		"body": "The Wi-Fi works best when you finally give up on using it. 📶🙃",
+		"footer": null,
+		"tags": ["wifi", "campus", "relatable", "humor", "paradox"]
+	},
+	{
+		"id": 16,
+		"header": "Relatable fact!",
+		"body": "Every semester, you promise yourself you won’t procrastinate \nand then you do it professionally. ⏳😏",
+		"footer": null,
+		"tags": ["procrastination", "student life", "academics", "relatable"]
+	},
+	{
+		"id": 17,
+		"header": "Relatable fact!",
+		"body": "The only lab experiment that always fails\nis trying to print something on time. 🖨️💥",
+		"footer": null,
+		"tags": ["printing", "labs", "student life", "humor"]
+	},
+	{
+		"id": 18,
+		"header": "Relatable fact!",
+		"body": "Group projects teach you two things:\nteamwork… and that you’ll end up doing all the work alone. 🤝📄",
+		"footer": null,
+		"tags": ["group projects", "teamwork", "student life", "relatable"]
+	},
+	{
+		"id": 19,
+		"header": "Relatable fact!",
+		"body": "Exam seating is carefully designed\nto place you as far as possible from your smartest friend. ✏️🪑",
+		"footer": null,
+		"tags": ["exams", "seating", "student life", "humor"]
+	},
+	{
+		"id": 20,
+		"header": "Relatable fact!",
+		"body": "The fastest thing on campus is the\n“last 24 hours before assignment submission.” 🏃💨⌛",
+		"footer": null,
+		"tags": ["assignments", "deadlines", "student life", "relatable"]
+	},
+	{
+		"id": 21,
+		"header": "Relatable fact:",
+		"body": "Every club meeting starts with “This will be short,”\nand ends 2 hours later. 🕑😅",
+		"footer": null,
+		"tags": ["club meetings", "student life", "relatable", "humor"]
+	},
+	{
+		"id": 22,
+		"header": "Campus fact!",
+		"body": "The Wi-Fi has only two modes:\n“Doesn’t connect” and “Too slow to matter.” 📶🐢",
+		"footer": null,
+		"tags": ["wifi", "campus", "relatable", "humor"]
+	},
+	{
+		"id": 23,
+		"header": "Student Types:",
+		"body": "There are two types of students \nthose who care about attendance, and those who ask “bro proxy pettava?” 🗣️📋",
+		"footer": null,
+		"tags": ["attendance", "proxy", "student life", "humor"]
+	},
+
+	{
+		"id": 24,
+		"header": "Campus competition!",
+		"body": "The campus printers and FFCS servers are in a constant competition\nto see who can crash more. 🖨️💥💻",
+		"footer": null,
+		"tags": ["printers", "FFCS", "servers", "campus", "humor"]
+	},
+	{
+		"id": 25,
+		"header": "Relatable fact!",
+		"body": "Exam results are like horror movies \nyou know they’re coming, but you’re never ready. 📄😱",
+		"footer": null,
+		"tags": ["exam results", "exams", "student life", "relatable", "humor"]
+	},
+	{
+		"id": 26,
+		"header": "Relatable fact!",
+		"body": "Assignments are 90% Google,\n10% formatting to make it “look original.” 🔍📄",
+		"footer": null,
+		"tags": ["assignments", "plagiarism", "student life", "relatable"]
+	},
+	{
+		"id": 27,
+		"header": "Brutal semester fact!",
+		"body": "Every semester starts with you as the “motivated topper” sitting in the first row…\n… and ends with you as the “proxy master” calculating how many classes you can safely bunk. 🎓➡️🪑😂",
+		"footer": null,
+		"tags": ["semester", "attendance", "student life", "relatable", "humor"]
+	},
+	{
+		"id": 28,
+		"header": "Brutal truth!",
+		"body": "Assignments teach you two valuable skills:\nCtrl+C and Ctrl+V. 🖱️⌨️",
+		"footer": null,
+		"tags": ["assignments", "plagiarism", "student skills", "humor"]
+	},
+	{
+		"id": 29,
+		"header": "Did you know?",
+		"body": "The servers crash faster than your hopes\nduring FFCS registration. 💥💻",
+		"footer": null,
+		"tags": ["servers", "FFCS", "registration", "student life", "humor"]
+	},
+	{
+		"id": 30,
+		"header": "Fun fact!",
+		"body": "Hostel Wi-Fi works best at 3 AM \nperfect timing for procrastinators. 📶🌙",
+		"footer": null,
+		"tags": ["hostel", "wifi", "procrastination", "student life", "humor"]
+	},
+	{
+		"id": 31,
+		"header": "Did you know?",
+		"body": "The loudest sound in hostels?\nThe fire alarm at 2 AM when you’re finally asleep. 🔔💤",
+		"footer": null,
+		"tags": ["hostel", "fire alarm", "student life", "humor"]
+	},
+	{
+		"id": 32,
+		"header": "Did you know?",
+		"body": "The hostel mess food teaches you the true value\nof Swiggy and Maggi. 🍜📱",
+		"footer": null,
+		"tags": ["hostel", "mess food", "delivery", "student life", "humor"]
+	},
+	{
+		"id": 33,
+		"header": "Fun fact!",
+		"body": "Hostel lifts are so slow,\nyou’ll reach your floor faster by climbing stairs. 🪜😂",
+		"footer": null,
+		"tags": ["hostel", "lifts", "student life", "humor"]
+	},
+	{
+		"id": 34,
+		"header": "Did you know?",
+		"body": "The fastest Wi-Fi on campus\nis the hotspot of your friend with unlimited data. 📶📱",
+		"footer": null,
+		"tags": ["wifi", "campus", "student life", "humor"]
+	},
+	{
+		"id": 35,
+		"header": "Fun fact!",
+		"body": "Late-night Maggi tastes 10× better\nwhen you’re supposed to be studying. 🍜⏳",
+		"footer": null,
+		"tags": ["food", "student life", "procrastination", "humor"]
+	},
+	{
+		"id": 36,
+		"header": "Mind-blowing fact!",
+		"body": "The mess samosas have a secret recipe \n99% air, 1% potato. 🥔😂",
+		"footer": null,
+		"tags": ["mess food", "samosa", "humor"]
+	},
+	{
+		"id": 37,
+		"header": "Fun fact!",
+		"body": "Group projects are proof that one person’s blood, sweat, and tears\ncan still get an “A” for everyone. 🧑‍💻📄",
+		"footer": null,
+		"tags": ["group projects", "student life", "academics", "humor"]
+	},
+	{
+		"id": 38,
+		"header": "Weird but true!",
+		"body": "The fan in your hostel room has seen more deep life conversations\nthan any therapist. 💭🌀",
+		"footer": null,
+		"tags": ["hostel", "student life", "humor", "relatable"]
+	},
+	{
+		"id": 39,
+		"header": "Campus paradox!",
+		"body": "The less you attend classes,\nthe faster your professors start recognizing you. 👀📋",
+		"footer": null,
+		"tags": ["attendance", "professors", "campus", "paradox", "humor"]
+	},
+	{
+		"id": 40,
+		"header": "Fun fact!",
+		"body": "Every assignment is basically a group treasure hunt\nfor the perfect Google Doc to copy from. 🔍📄",
+		"footer": null,
+		"tags": ["assignments", "plagiarism", "student life", "humor"]
+	},
+	{
+		"id": 41,
+		"header": "Relatable fact!",
+		"body": "The person who reminds the teacher about homework submissions\nis the true campus villain. 🦹‍♂️📋",
+		"footer": null,
+		"tags": ["homework", "teachers", "student life", "relatable", "humor"]
+	},
+	{
+		"id": 42,
+		"header": "Fun fact!",
+		"body": "Exam question papers have a superpower \nthey always include that one topic you skipped. 📄😅",
+		"footer": null,
+		"tags": ["exams", "academics", "student life", "humor"]
+	},
+	{
+		"id": 43,
+		"header": "Relatable truth!",
+		"body": "Hostel Wi-Fi speed and exam tension\nare inversely proportional. 📶📉📚📈",
+		"footer": null,
+		"tags": ["hostel", "wifi", "exams", "relatable", "humor"]
+	},
+	{
+		"id": 44,
+		"header": "Campus fact!",
+		"body": "There’s always one classmate who says\n“Is syllabus coming for exam?” one day before finals. 🤯📄",
+		"footer": null,
+		"tags": ["exams", "syllabus", "student life", "humor"]
+	},
+	{
+		"id": 45,
+		"header": "Fun fact!",
+		"body": "FFCS day has two types of people \nthose who pray and those who cry. 🙏😭",
+		"footer": null,
+		"tags": ["FFCS", "registration", "student life", "humor"]
+	},
+	{
+		"id": 46,
+		"header": "Relatable truth!",
+		"body": "The mess calls it “tea,”\nbut your tongue calls it hot colored water. ☕😂",
+		"footer": null,
+		"tags": ["mess food", "tea", "humor", "relatable"]
+	},
+	{
+		"id": 47,
+		"header": "Campus fact!",
+		"body": "The only subject students study deeply is\n“how to give proxy without getting caught.” 🎓🗣️",
+		"footer": null,
+		"tags": ["proxy", "attendance", "student life", "humor"]
+	},
+	{
+		"id": 48,
+		"header": "Relatable fact!",
+		"body": "Assignments are just a group activity of\ncopy, paste, and pray. ⌨️🙏",
+		"footer": null,
+		"tags": ["assignments", "plagiarism", "student life", "humor"]
+	},
+	{
+		"id": 49,
+		"header": "Did you know?",
+		"body": "The fastest runners on campus are students\nrushing to mark attendance in the last 5 minutes. 🏃💨",
+		"footer": null,
+		"tags": ["attendance", "student life", "campus", "humor"]
+	},
+	{
+		"id": 50,
+		"header": "Brutal fact!",
+		"body": "The day you decide to attend class,\nthe professor will be absent. 📋🚫",
+		"footer": null,
+		"tags": ["classes", "professors", "attendance", "humor", "brutal truth"]
+	},
+	{
+		"id": 51,
+		"header": "A Dark Fact About VIT-AP",
+		"body": "Our future…",
+		"footer": null,
+		"tags": ["student life", "campus", "humor", "college"]
+	}
+]

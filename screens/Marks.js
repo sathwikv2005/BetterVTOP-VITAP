@@ -3,6 +3,7 @@ import { Alert, FlatList, Pressable, StyleSheet, Text, ToastAndroid, View } from
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import SemDropDown from '../components/SemDropDown'
+import * as Haptics from 'expo-haptics'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Loading from '../components/Loading'
 import { getMarks } from '../util/VTOP/marks'
@@ -37,6 +38,7 @@ export default function Marks() {
 	}, [trigger])
 
 	const onRefresh = useCallback(async () => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setRefreshing(true)
 
 		const data = await getMarks(setRefreshing, sem)

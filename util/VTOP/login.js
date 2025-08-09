@@ -113,6 +113,12 @@ export async function forceVtopLogin(username, password, tries) {
 					groupYear: groupYear,
 				})
 			}
+			if (data.error.toLowerCase().includes('captcha')) {
+				if (tries < 5) return await forceVtopLogin(username, password, tries + 1)
+				await logEvent(analytics, 'login_failed_invalid_captcha', {
+					groupYear: groupYear,
+				})
+			}
 			return { error: data.error }
 		}
 
