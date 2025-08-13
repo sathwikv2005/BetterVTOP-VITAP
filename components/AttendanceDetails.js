@@ -280,7 +280,12 @@ const AttendanceDetails = forwardRef(
 				return (
 					<View style={[styles.buttonsBox]}>
 						<Text style={[styles.buttonsText]}>Reset</Text>
-						<TouchableOpacity onPress={() => handleResetPress(entry)}>
+						<TouchableOpacity
+							delayPressIn={0}
+							onPress={() => {
+								handleResetPress(entry).catch((err) => console.log(err))
+							}}
+						>
 							<FontAwesome
 								name="refresh"
 								size={24}
@@ -296,7 +301,12 @@ const AttendanceDetails = forwardRef(
 					<View style={[styles.buttonsBox]}>
 						<Text style={[styles.buttonsText]}>Present?</Text>
 						<View style={[styles.buttons]}>
-							<TouchableOpacity onPress={() => handlePresentPress(entry, true)}>
+							<TouchableOpacity
+								delayPressIn={0}
+								onPress={() => {
+									handlePresentPress(entry, true).catch((err) => console.log(err))
+								}}
+							>
 								<FontAwesome
 									name="check-circle"
 									size={24}
@@ -304,7 +314,12 @@ const AttendanceDetails = forwardRef(
 									color={colorTheme.accent.primary}
 								/>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => handlePresentPress(entry, false)}>
+							<TouchableOpacity
+								delayPressIn={0}
+								onPress={() => {
+									handlePresentPress(entry, false).catch((err) => console.log(err))
+								}}
+							>
 								<Entypo
 									name="circle-with-cross"
 									size={24}
@@ -320,6 +335,11 @@ const AttendanceDetails = forwardRef(
 		return (
 			<>
 				<Modalize
+					scrollViewProps={{
+						showsVerticalScrollIndicator: false,
+						keyboardShouldPersistTaps: 'handled',
+						nestedScrollEnabled: true,
+					}}
 					ref={ref}
 					snapPoint={height * 0.6}
 					handleStyle={{
@@ -331,7 +351,6 @@ const AttendanceDetails = forwardRef(
 						borderTopWidth: 3,
 						elevation: 5,
 					}}
-					scrollViewProps={{ showsVerticalScrollIndicator: false }}
 				>
 					{isEmpty ? (
 						<Text style={{ textAlign: 'center', padding: 20, color: colorTheme.main.text }}>
@@ -466,7 +485,11 @@ const AttendanceDetails = forwardRef(
 													)}
 												</View>
 											)}
-											<ScrollView horizontal>
+											<ScrollView
+												horizontal
+												keyboardShouldPersistTaps="handled"
+												nestedScrollEnabled
+											>
 												<View>
 													<View style={[styles.logRow, styles.logHeader]}>
 														<Text style={[styles.logCell, styles.headerText]}>Date/Time</Text>
