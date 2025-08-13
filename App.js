@@ -195,6 +195,12 @@ function MainApp() {
 			if (granted) {
 				const timetable = await AsyncStorage.getItem('timetable')
 				if (timetable) {
+					const today = new Date().toISOString().split('T')[0]
+					const lastReset = await AsyncStorage.getItem('last-reset-date')
+					if (lastReset !== today) {
+						await AsyncStorage.removeItem('scheduledClassNotifications')
+						await AsyncStorage.setItem('last-reset-date', today)
+					}
 					await scheduleClassReminders(JSON.parse(timetable))
 					await startAutoReschedule()
 				}

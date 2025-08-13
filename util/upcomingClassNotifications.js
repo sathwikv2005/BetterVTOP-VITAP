@@ -43,9 +43,12 @@ export async function scheduleClassReminders(timetableObj) {
 		classTime.setMinutes(minute)
 		classTime.setSeconds(0)
 
-		const triggerTime = new Date(classTime.getTime() - 10 * 60 * 1000)
+		const triggerTime = new Date(classTime.getTime() - 15 * 60 * 1000)
 
-		const classKey = `${cls.courseCode}-${timing.start}`
+		if (triggerTime <= new Date()) continue
+
+		const todayDate = now.toISOString().split('T')[0]
+		const classKey = `${todayDate}-${cls.courseCode}-${timing.start}`
 
 		if (scheduledClasses.includes(classKey)) {
 			continue
@@ -89,7 +92,7 @@ TaskManager.defineTask(BACKGROUND_TASK, async () => {
 		const notiEnabled = await AsyncStorage.getItem('upcomingClassNotiEnabled')
 		if (notiEnabled === 'false') return BackgroundFetch.Result.NoData
 
-		const timetableJSON = await AsyncStorage.getItem('userTimetable')
+		const timetableJSON = await AsyncStorage.getItem('timetable')
 		if (!timetableJSON) return BackgroundFetch.Result.NoData
 
 		const timetable = JSON.parse(timetableJSON)
