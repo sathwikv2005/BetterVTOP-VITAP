@@ -17,6 +17,7 @@ import Feather from '@expo/vector-icons/Feather'
 import Entypo from '@expo/vector-icons/Entypo'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
@@ -40,6 +41,7 @@ import displayWhatsNew from './constants/displayWhatsNew'
 import { getAllData } from './util/VTOP/getAllData'
 import Loading from './components/Loading'
 import { goToDrawerTab } from './util/goToDrawerTab'
+import SpeedTest from './screens/SpeedTest'
 
 const version = Constants.expoConfig.version
 const variant = Constants.expoConfig.name?.toLowerCase().includes('dev') ? 'dev' : 'prod'
@@ -277,6 +279,9 @@ function MainApp() {
 					drawerActiveBackgroundColor: colorTheme.accent.secondary,
 					drawerStyle: {
 						backgroundColor: colorTheme.main.secondary,
+						// borderRightColor: colorTheme.accent.secondary,
+						// borderRightWidth: 7,
+						// borderRadius: 0,
 					},
 					drawerLabelStyle: {
 						color: colorTheme.main.text,
@@ -305,6 +310,7 @@ function MainApp() {
 						headerTitle: 'Timetable',
 					}}
 				/>
+
 				<Drawer.Screen
 					name="login"
 					component={Login}
@@ -376,6 +382,21 @@ function MainApp() {
 					}}
 				/>
 				<Drawer.Screen
+					name="speedtest"
+					component={SpeedTest}
+					options={{
+						drawerLabel: ({ focused }) => (
+							<DrawerLabel
+								icon={<MaterialIcons name="speed" size={24} />}
+								text="Speed test"
+								focused={focused}
+							/>
+						),
+						headerTitle: 'Speed Test',
+					}}
+				/>
+
+				<Drawer.Screen
 					name="settings"
 					component={Settings}
 					options={{ drawerLabel: () => null, title: 'Settings', drawerItemStyle: { height: 0 } }}
@@ -410,7 +431,29 @@ function CustomDrawerContent(props) {
 	const { colorTheme } = useContext(ColorThemeContext)
 	const focusedRoute = props.state.routeNames[props.state.index]
 
-	const isSettingsFocused = focusedRoute === 'settings'
+	const Separator = () => (
+		<View
+			style={{
+				height: 1,
+				backgroundColor: colorTheme.main.tertiary,
+				marginVertical: 6,
+			}}
+		/>
+	)
+
+	// Helper to render a styled drawer item
+	const renderDrawerItem = (route, icon, label) => {
+		const isFocused = focusedRoute === route
+		return (
+			<DrawerItem
+				label={() => <DrawerLabel icon={icon} text={label} focused={isFocused} />}
+				onPress={() => props.navigation.navigate(route)}
+				style={{
+					backgroundColor: isFocused ? colorTheme.accent.secondary : 'transparent',
+				}}
+			/>
+		)
+	}
 
 	return (
 		<DrawerContentScrollView
@@ -418,6 +461,7 @@ function CustomDrawerContent(props) {
 			contentContainerStyle={{ flex: 1, justifyContent: 'space-between', paddingTop: 0 }}
 		>
 			<View>
+				{/* Banner */}
 				<View
 					style={{
 						backgroundColor: '#0f1012',
@@ -425,7 +469,6 @@ function CustomDrawerContent(props) {
 						alignItems: 'center',
 						justifyContent: 'center',
 						marginBottom: 10,
-						padding: 0,
 					}}
 				>
 					<Image
@@ -434,16 +477,34 @@ function CustomDrawerContent(props) {
 							backgroundColor: '#0f1012',
 							width: '111%',
 							height: 150,
-							padding: 0,
 						}}
 						resizeMode="cover"
 					/>
 				</View>
 
-				{/* Drawer Items */}
-				<DrawerItemList {...props} />
+				{/* Group 1 */}
+				{renderDrawerItem('home', <Entypo name="home" size={24} />, 'Home')}
+				{renderDrawerItem('login', <Ionicons name="person" size={24} />, 'Login')}
+				{renderDrawerItem('openVTOP', <FontAwesome name="globe" size={24} />, 'Open VTOP')}
+
+				<Separator />
+
+				{/* Group 2 */}
+				{renderDrawerItem('marks', <Entypo name="bar-graph" size={24} />, 'Marks')}
+				{renderDrawerItem('examSchedule', <Entypo name="book" size={24} />, 'Exam Schedule')}
+				{renderDrawerItem(
+					'facultyView',
+					<Entypo name="graduation-cap" size={24} />,
+					'Faculty Info'
+				)}
+
+				<Separator />
+
+				{/* Group 3 */}
+				{renderDrawerItem('speedtest', <MaterialIcons name="speed" size={24} />, 'Speed Test')}
 			</View>
 
+			{/* Settings at bottom */}
 			<View
 				style={{
 					borderTopWidth: 1,
@@ -452,27 +513,7 @@ function CustomDrawerContent(props) {
 					justifyContent: 'center',
 				}}
 			>
-				<DrawerItem
-					label="Settings"
-					icon={({ color, size }) => (
-						<Feather
-							name="settings"
-							color={isSettingsFocused ? colorTheme.main.primary : colorTheme.main.text}
-							size={size}
-						/>
-					)}
-					onPress={() => props.navigation.navigate('settings')}
-					labelStyle={{
-						fontWeight: isSettingsFocused ? '800' : '500',
-						fontSize: 16,
-						color: isSettingsFocused ? colorTheme.main.primary : colorTheme.main.text,
-					}}
-					style={{
-						backgroundColor: isSettingsFocused ? colorTheme.accent.secondary : 'transparent',
-					}}
-					activeTintColor={colorTheme.main.primary}
-					inactiveTintColor={colorTheme.main.text}
-				/>
+				{renderDrawerItem('settings', <Feather name="settings" size={24} />, 'Settings')}
 			</View>
 		</DrawerContentScrollView>
 	)
