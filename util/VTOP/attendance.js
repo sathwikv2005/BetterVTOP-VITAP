@@ -183,7 +183,7 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 				}
 
 				// If user override differs from actual VTOP data, keep it
-				if (vtopData.isPresent !== item.isPresent) {
+				if (!vtopData.isPresent && vtopData.isPresent !== item.isPresent) {
 					newData.push(item)
 				}
 			}
