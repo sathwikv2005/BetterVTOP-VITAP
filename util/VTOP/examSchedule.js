@@ -11,6 +11,7 @@ import { parseExamSchedule } from '../parse/parseExamSchedule'
 
 export async function getExamSchedule(setLoading, overrideSemID) {
 	try {
+		await vtopLogin()
 		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
@@ -26,7 +27,6 @@ export async function getExamSchedule(setLoading, overrideSemID) {
 			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
-		await vtopLogin()
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
 		params.append('semesterSubId', semID)
