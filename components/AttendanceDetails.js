@@ -368,7 +368,7 @@ const AttendanceDetails = forwardRef(
 							<ScrollView contentContainerStyle={[styles.content]}>
 								{selectedItem && courseItem ? (
 									<View>
-										<View style={styles.container}>
+										<View style={[styles.container, { maxHeight: height * 0.4 }]}>
 											<View style={styles.titleBox}>
 												{selectedItem.classType.includes('T') ? (
 													<Entypo
@@ -435,7 +435,7 @@ const AttendanceDetails = forwardRef(
 													)}
 											</View>
 										</View>
-										<View style={{ marginTop: 20, width: '100%' }}>
+										<View style={{ marginTop: 20, width: '100%', maxHeight: height * 0.6 }}>
 											{userUpdated && (
 												<View>
 													<View style={[styles.userPercentBox]}>
@@ -507,7 +507,7 @@ const AttendanceDetails = forwardRef(
 													{/* Table Body */}
 													<ScrollView
 														style={{
-															maxHeight: height * 0.5,
+															maxHeight: height * 0.55,
 															backgroundColor: colorTheme.main.primary,
 														}}
 													>
@@ -602,7 +602,7 @@ const AttendanceDetails = forwardRef(
 																)
 															})
 														)}
-														<View style={{ height: height * 0.15, width: '100%' }}></View>
+														<View style={{ height: height * 0.2, width: '100%' }}></View>
 													</ScrollView>
 												</View>
 											</ScrollView>
