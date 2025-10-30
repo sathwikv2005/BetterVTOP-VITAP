@@ -134,12 +134,12 @@ const AttendanceDetails = forwardRef(
 			},
 			text: {
 				color: colorTheme.main.text,
-				fontSize: 14,
+				fontSize: 12,
 				fontWeight: 400,
 			},
 			label: {
-				fontSize: 16,
-				fontWeight: '500',
+				fontSize: 14,
+				fontWeight: 500,
 				color: colorTheme.accent.secondary,
 			},
 			row: {
@@ -148,11 +148,15 @@ const AttendanceDetails = forwardRef(
 			},
 			courseDetails: {
 				padding: 5,
+				width: '100%',
+				display: 'flex',
+				justifyContent: 'flex-end',
 				paddingVertical: 10,
-				marginBottom: 30,
+				marginBottom: 10,
 			},
 			courseDetailsText: {
 				color: colorTheme.main.tertiary,
+				// textAlign: 'right',
 			},
 			attendanceDetails: {
 				flexDirection: 'row',
@@ -174,23 +178,24 @@ const AttendanceDetails = forwardRef(
 			},
 			logRow: {
 				flexDirection: 'row',
+				justifyContent: 'center',
 				borderBottomWidth: 1,
 				borderBottomColor: colorTheme.accent.tertiary,
-				backgroundColor: colorTheme.main.primary,
 			},
 
 			logHeader: {
-				backgroundColor: colorTheme.main.primary,
+				backgroundColor: colorTheme.accent.tertiary,
 				borderBottomWidth: 2,
-				borderBottomColor: colorTheme.accent.tertiary,
+				borderBottomColor: colorTheme.accent.primary,
 			},
 
 			logCell: {
-				width: 130,
-				paddingVertical: 8,
+				paddingVertical: 10,
+				width: '33%',
 				paddingHorizontal: 6,
+				fontSize: 13,
 				color: colorTheme.main.text,
-				fontSize: 12,
+				textAlignVertical: 'center',
 				textAlign: 'center',
 				borderRightWidth: 1,
 				borderRightColor: colorTheme.accent.tertiary,
@@ -280,7 +285,12 @@ const AttendanceDetails = forwardRef(
 				return (
 					<View style={[styles.buttonsBox]}>
 						<Text style={[styles.buttonsText]}>Reset</Text>
-						<TouchableOpacity onPress={() => handleResetPress(entry)}>
+						<TouchableOpacity
+							delayPressIn={0}
+							onPress={() => {
+								handleResetPress(entry).catch((err) => console.log(err))
+							}}
+						>
 							<FontAwesome
 								name="refresh"
 								size={24}
@@ -296,7 +306,12 @@ const AttendanceDetails = forwardRef(
 					<View style={[styles.buttonsBox]}>
 						<Text style={[styles.buttonsText]}>Present?</Text>
 						<View style={[styles.buttons]}>
-							<TouchableOpacity onPress={() => handlePresentPress(entry, true)}>
+							<TouchableOpacity
+								delayPressIn={0}
+								onPress={() => {
+									handlePresentPress(entry, true).catch((err) => console.log(err))
+								}}
+							>
 								<FontAwesome
 									name="check-circle"
 									size={24}
@@ -304,7 +319,12 @@ const AttendanceDetails = forwardRef(
 									color={colorTheme.accent.primary}
 								/>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => handlePresentPress(entry, false)}>
+							<TouchableOpacity
+								delayPressIn={0}
+								onPress={() => {
+									handlePresentPress(entry, false).catch((err) => console.log(err))
+								}}
+							>
 								<Entypo
 									name="circle-with-cross"
 									size={24}
@@ -320,6 +340,11 @@ const AttendanceDetails = forwardRef(
 		return (
 			<>
 				<Modalize
+					scrollViewProps={{
+						showsVerticalScrollIndicator: false,
+						keyboardShouldPersistTaps: 'handled',
+						nestedScrollEnabled: true,
+					}}
 					ref={ref}
 					snapPoint={height * 0.6}
 					handleStyle={{
@@ -331,7 +356,6 @@ const AttendanceDetails = forwardRef(
 						borderTopWidth: 3,
 						elevation: 5,
 					}}
-					scrollViewProps={{ showsVerticalScrollIndicator: false }}
 				>
 					{isEmpty ? (
 						<Text style={{ textAlign: 'center', padding: 20, color: colorTheme.main.text }}>
@@ -341,10 +365,10 @@ const AttendanceDetails = forwardRef(
 						<Loading />
 					) : (
 						<>
-							<ScrollView contentContainerStyle={styles.content}>
+							<ScrollView contentContainerStyle={[styles.content]}>
 								{selectedItem && courseItem ? (
 									<View>
-										<View style={styles.container}>
+										<View style={[styles.container, { maxHeight: height * 0.4 }]}>
 											<View style={styles.titleBox}>
 												{selectedItem.classType.includes('T') ? (
 													<Entypo
@@ -364,15 +388,16 @@ const AttendanceDetails = forwardRef(
 
 											<View style={styles.courseDetails}>
 												<Text style={[styles.text, styles.courseDetailsText]}>
-													{courseCode}
-													{courseTypeData}
+													{`${courseCode} ${courseTypeData},\n${courseItem.faculty},  ${
+														courseItem.classDetails.split('- ')[1]
+													}`}
 												</Text>
-												<Text style={[styles.text, styles.courseDetailsText]}>
+												{/* <Text style={[styles.text, styles.courseDetailsText]}>
 													{courseItem.faculty}
 												</Text>
 												<Text style={[styles.text, styles.courseDetailsText]}>
 													{courseItem.classDetails.split('- ')[1]}
-												</Text>
+												</Text> */}
 											</View>
 
 											<View style={styles.attendanceDetails}>
@@ -410,7 +435,7 @@ const AttendanceDetails = forwardRef(
 													)}
 											</View>
 										</View>
-										<View style={{ marginTop: 20, width: '100%' }}>
+										<View style={{ marginTop: 20, width: '100%', maxHeight: height * 0.6 }}>
 											{userUpdated && (
 												<View>
 													<View style={[styles.userPercentBox]}>
@@ -466,19 +491,23 @@ const AttendanceDetails = forwardRef(
 													)}
 												</View>
 											)}
-											<ScrollView horizontal>
-												<View>
+											<ScrollView
+												horizontal
+												keyboardShouldPersistTaps="handled"
+												nestedScrollEnabled
+											>
+												<View style={{ minWidth: '100%', flexDirection: 'column' }}>
+													{/* Table Header */}
 													<View style={[styles.logRow, styles.logHeader]}>
 														<Text style={[styles.logCell, styles.headerText]}>Date/Time</Text>
 														<Text style={[styles.logCell, styles.headerText]}>Status</Text>
 														<Text style={[styles.logCell, styles.headerText]}>Action</Text>
-														<Text style={[styles.logCell, styles.headerText, styles.lastLogCell]}>
-															Reason
-														</Text>
 													</View>
+
+													{/* Table Body */}
 													<ScrollView
 														style={{
-															maxHeight: userUpdated ? height * 0.39 : height * 0.45,
+															maxHeight: height * 0.55,
 															backgroundColor: colorTheme.main.primary,
 														}}
 													>
@@ -486,16 +515,12 @@ const AttendanceDetails = forwardRef(
 														!courseItem.attendance?.log ||
 														!(courseItem.attendance.log.length > 0) ? (
 															<Text
-																style={[
-																	styles.logRow,
-																	{
-																		color: colorTheme.main.text,
-																		padding: 10,
-																		textAlign: 'center',
-																		justifyContent: 'center',
-																		height: 40,
-																	},
-																]}
+																style={{
+																	color: colorTheme.main.text,
+																	padding: 10,
+																	textAlign: 'center',
+																	height: 40,
+																}}
 															>
 																No data available
 															</Text>
@@ -507,28 +532,29 @@ const AttendanceDetails = forwardRef(
 
 																return (
 																	<View key={index} style={styles.logRow}>
+																		{/* Date/Time */}
 																		<Text style={styles.logCell}>
 																			{entry.date}, {entry.day}
 																			{'\n'}
 																			{entry.time}, {entry.slot}
 																		</Text>
 
+																		{/* Status */}
 																		{usrUpdated ? (
 																			<Pressable
 																				onPress={() => {
 																					setTooltipText(
-																						`This class was marked as '${usrUpdated.status}' by you.\nOriginal VTOP status: '${entry.status}'.\n\nThis change will be automatically removed once the official VTOP data matches your input.`
+																						`This class was marked as '${usrUpdated.status}' by you.\nOriginal VTOP status: '${entry.status}'.\n\n` +
+																							(entry.status.toLowerCase() === 'absent'
+																								? `Reason: ${entry.reason}\n\n`
+																								: '') +
+																							`This change will be automatically removed once the official VTOP data matches your input.`
 																					)
 																					setTooltipVisible(true)
 																				}}
 																				style={[styles.logCell, styles.userStatus]}
 																			>
-																				<Text
-																					style={[
-																						styles.userDataCell,
-																						{ color: colorTheme.accent.primary },
-																					]}
-																				>
+																				<Text style={{ color: colorTheme.accent.primary }}>
 																					{usrUpdated.status}
 																				</Text>
 																				<Foundation
@@ -538,27 +564,45 @@ const AttendanceDetails = forwardRef(
 																				/>
 																			</Pressable>
 																		) : (
-																			<Text
-																				style={[
-																					styles.logCell,
-																					entry.isPresent ? styles.green : styles.red,
-																				]}
+																			<Pressable
+																				onPress={() => {
+																					setTooltipText(
+																						entry.status.toLowerCase() === 'absent'
+																							? `Reason: ${entry.reason}`
+																							: ''
+																					)
+																					setTooltipVisible(true)
+																				}}
+																				style={[styles.logCell, styles.userStatus]}
 																			>
-																				{entry.status}
-																			</Text>
+																				<Text style={entry.isPresent ? styles.green : styles.red}>
+																					{entry.status}
+																				</Text>
+																				{entry.status.toLowerCase() === 'absent' && (
+																					<Foundation
+																						name="info"
+																						style={styles.userDataInfo}
+																						color={colorTheme.accent.primary}
+																					/>
+																				)}
+																			</Pressable>
 																		)}
 
-																		<Text style={styles.logCell}>
+																		{/* Action */}
+																		<View
+																			style={[
+																				styles.logCell,
+																				{ alignItems: 'center' },
+																				styles.lastLogCell,
+																			]}
+																		>
 																			{renderAction(entry, entry.isPresent, usrUpdated)}
-																		</Text>
-
-																		<Text style={[styles.logCell, styles.lastLogCell]}>
-																			{entry.reason ? entry.reason : '-'}
-																		</Text>
+																		</View>
 																	</View>
 																)
 															})
 														)}
+														<View style={{ height: height * 0.2, width: '100%' }}></View>
 													</ScrollView>
 												</View>
 											</ScrollView>

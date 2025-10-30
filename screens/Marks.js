@@ -38,6 +38,11 @@ export default function Marks() {
 	}, [trigger])
 
 	const onRefresh = useCallback(async () => {
+		if (!sem) {
+			ToastAndroid.show('Please select a semester first', ToastAndroid.SHORT)
+			setRefreshing(false)
+			return
+		}
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setRefreshing(true)
 
