@@ -203,8 +203,10 @@ function MainApp() {
 						await AsyncStorage.removeItem('scheduledClassNotifications')
 						await AsyncStorage.setItem('last-reset-date', today)
 					}
-					await scheduleClassReminders(JSON.parse(timetable))
-					await startAutoReschedule()
+					setTimeout(async () => {
+						await scheduleClassReminders(JSON.parse(timetable))
+						await startAutoReschedule()
+					}, 1000)
 				}
 			}
 		}
