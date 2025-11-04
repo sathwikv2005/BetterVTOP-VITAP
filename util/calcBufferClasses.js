@@ -8,7 +8,8 @@ export default function calcBufferClasses(minPercent, attended, absent) {
 }
 
 function classesNeeded(a, t, p) {
-	if (p <= (a / t) * 100) return 0 // already at or above target
+	const currentPercentage = Math.ceil((a / t) * 100)
+	if (currentPercentage >= p) return 0 // already at or above target
 
 	const x = (p * t - 100 * a) / (100 - p)
 	return Math.ceil(x) // round up since you can't attend a fraction of a class

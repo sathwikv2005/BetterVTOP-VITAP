@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { View, Text, StyleSheet, Pressable, FlatList, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions } from 'react-native'
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import PopUp from './PopUp'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -18,33 +18,24 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 	const features = [
 		{
 			id: 1,
-			icon: 'wifi',
-			title: 'Reliable Wi-Fi Login',
-			desc: 'Wi-Fi login now works even when VITAP blocks multiple login attempts. We’ve added a smart workaround.',
+			icon: 'speedometer',
+			title: 'New Feature: Speed Test',
+			desc: 'Check your internet speed directly within the app with our new built-in speed test.',
+			type: 'feature',
 		},
 		{
 			id: 2,
-			icon: 'lock',
-			title: 'Login Bug Fixed',
-			desc: 'Fixed a bug where passwords with special characters like #, & were not working correctly during login.',
+			icon: 'check-circle',
+			title: 'Bug Fix: Class Reminders',
+			desc: 'Ensures consistent scheduling of class reminders so you never miss a lecture.',
+			type: 'bug',
 		},
 		{
 			id: 3,
-			icon: 'reload',
-			title: 'Auto Retry on Login Fail',
-			desc: 'Login now automatically retries when a session error or CSRF issue is detected.',
-		},
-		{
-			id: 4,
-			icon: 'calendar-clock',
-			title: 'Improved Timetable',
-			desc: 'Tap on any subject in your timetable to view detailed info in a pop-up. Faculty names are now shown too!',
-		},
-		{
-			id: 5,
-			icon: 'update',
-			title: 'Daily Auto-Update',
-			desc: 'App fetches your latest VTOP data once a day automatically.',
+			icon: 'alert-circle',
+			title: 'Bug Fix: Action Buttons',
+			desc: 'Resolved rare issue where action buttons in attendance log failed to trigger on tap.',
+			type: 'bug',
 		},
 	]
 
@@ -53,6 +44,7 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 			backgroundColor: colorTheme.main.secondary,
 			width: '88%',
 			minHeight: 280,
+			maxHeight: height * 0.55,
 			padding: 25,
 			borderRadius: 15,
 			flexDirection: 'column',
@@ -60,19 +52,25 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 		},
 		header: {
 			width: '100%',
-			marginBottom: 10,
+			marginBottom: 15,
 		},
 		heading: {
 			color: '#E0F1FF',
 			fontSize: 20,
 			fontWeight: '600',
 		},
+		sectionTitle: {
+			color: colorTheme.accent.primary,
+			fontSize: 16,
+			fontWeight: '700',
+			marginVertical: 10,
+		},
 		featureCard: {
 			flexDirection: 'row',
 			alignItems: 'flex-start',
 			backgroundColor: colorTheme.main.primary,
 			padding: 15,
-			paddingVertical: 25,
+			paddingVertical: 20,
 			borderRadius: 10,
 			marginVertical: 6,
 			gap: 10,
@@ -82,9 +80,9 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 		},
 		featureTitle: {
 			color: colorTheme.accent.primary,
-			fontSize: 16,
+			fontSize: 15,
 			fontWeight: '600',
-			marginBottom: 2,
+			marginBottom: 3,
 		},
 		featureDesc: {
 			color: colorTheme.main.text,
@@ -109,6 +107,19 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 		},
 	})
 
+	const renderFeature = (item) => (
+		<View key={item.id} style={styles.featureCard}>
+			<MaterialCommunityIcons name={item.icon} size={28} color={colorTheme.accent.primary} />
+			<View style={styles.featureTextContainer}>
+				<Text style={styles.featureTitle}>{item.title}</Text>
+				<Text style={styles.featureDesc}>{item.desc}</Text>
+			</View>
+		</View>
+	)
+
+	const newFeatures = features.filter((f) => f.type === 'feature')
+	const bugFixes = features.filter((f) => f.type === 'bug')
+
 	return (
 		<PopUp>
 			<View style={styles.container}>
@@ -116,28 +127,22 @@ export default function WhatsNew({ setShowWhatsNew, version }) {
 					<Text style={styles.heading}>✨ What's New In v{version}</Text>
 				</View>
 
-				{/* Scrollable feature list with max height */}
-				<View style={{ maxHeight: height * 0.55 }}>
-					<FlatList
-						data={features}
-						keyExtractor={(item) => item.id.toString()}
-						scrollEnabled={true}
-						showsVerticalScrollIndicator={false}
-						renderItem={({ item }) => (
-							<View style={styles.featureCard}>
-								<MaterialCommunityIcons
-									name={item.icon}
-									size={28}
-									color={colorTheme.accent.primary}
-								/>
-								<View style={styles.featureTextContainer}>
-									<Text style={styles.featureTitle}>{item.title}</Text>
-									<Text style={styles.featureDesc}>{item.desc}</Text>
-								</View>
-							</View>
-						)}
-					/>
-				</View>
+				{/* Scrollable content */}
+				<ScrollView showsVerticalScrollIndicator={true}>
+					{newFeatures.length > 0 && (
+						<>
+							<Text style={styles.sectionTitle}>🆕 New Features</Text>
+							{newFeatures.map(renderFeature)}
+						</>
+					)}
+
+					{bugFixes.length > 0 && (
+						<>
+							<Text style={styles.sectionTitle}>🐞 Bug Fixes</Text>
+							{bugFixes.map(renderFeature)}
+						</>
+					)}
+				</ScrollView>
 
 				<View style={styles.btnWrapper}>
 					<Pressable style={styles.btn} onPress={handleClose}>

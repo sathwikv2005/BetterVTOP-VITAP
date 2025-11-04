@@ -7,6 +7,7 @@ import {
 	RefreshControl,
 	Dimensions,
 	ToastAndroid,
+	Alert,
 } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import { ColorThemeContext } from '../context/ColorThemeContext'
@@ -36,7 +37,6 @@ export default function ExamSchedule() {
 				setLoading(false)
 				return goToDrawerTab('login')
 			}
-			const savedSem = JSON.parse(semStr)
 			const savedSemData = JSON.parse(semDataStr)
 			setSemData(savedSemData.semData)
 			setLoading(false)
@@ -45,34 +45,41 @@ export default function ExamSchedule() {
 	}, [trigger])
 
 	const onRefresh = useCallback(async () => {
+		if (!sem) {
+			ToastAndroid.show('Please select a semester first', ToastAndroid.SHORT)
+			setRefreshing(false)
+			return
+		}
+
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 		setRefreshing(true)
 
 		const data = await getExamSchedule(setRefreshing, sem)
 		if (data.error) {
 			console.log(data.error)
-			setRefreshing(false)
-			return Alert.alert('Failed to login, please try again.')
+			Alert.alert('Error', 'Failed to refresh data. Please try again.')
+		} else {
+			setExamSchedule(data.examScheduleData)
+			ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
 		}
-		setExamSchedule(data.examScheduleData)
 		setRefreshing(false)
-		ToastAndroid.show('Data refreshed', ToastAndroid.SHORT)
 	}, [sem])
 
 	async function handleSemChange(prevSem, newSem) {
 		setSem(newSem)
 		setLoading(true)
 		const examStr = await AsyncStorage.getItem(`examSchedule-${newSem}`)
+
 		if (!examStr) {
 			const data = await getExamSchedule(setLoading, newSem)
 			if (data.error) {
-				setLoading(false)
-				return Alert.alert(
+				Alert.alert(
 					'Failed to get exam schedule!',
-					'Failed to get data from vtop, please try again later.'
+					'Failed to get data from VTOP, please try again later.'
 				)
+			} else {
+				setExamSchedule(data.examScheduleData)
 			}
-			setExamSchedule(data.examScheduleData)
 			setLoading(false)
 			return
 		}
@@ -84,6 +91,18 @@ export default function ExamSchedule() {
 	const styles = StyleSheet.create({
 		text: {
 			color: colorTheme.main.text,
+		},
+		emptyTitle: {
+			color: colorTheme.main.text,
+			fontSize: 18,
+			fontWeight: '600',
+			textAlign: 'center',
+			marginBottom: 6,
+		},
+		emptySub: {
+			color: colorTheme.main.tertiary,
+			fontSize: 15,
+			textAlign: 'center',
 		},
 	})
 
@@ -97,12 +116,35 @@ export default function ExamSchedule() {
 				colorTheme={colorTheme}
 				refreshing={refreshing}
 				onRefresh={onRefresh}
+				ListEmptyComponent={
+					<View
+						style={{
+							flex: 1,
+							alignItems: 'center',
+							paddingHorizontal: 20,
+							marginTop: 50,
+						}}
+					>
+						<FontAwesome
+							name="info-circle"
+							size={40}
+							color={colorTheme.accent.primary}
+							style={{ marginBottom: 10 }}
+						/>
+						<Text style={[styles.emptyTitle]}>No Data Available</Text>
+						<Text style={[styles.emptySub]}>
+							{sem
+								? 'Pull down to refresh the schedule.'
+								: 'Please select a semester to view schedule.'}
+						</Text>
+					</View>
+				}
 			/>
 		</View>
 	)
 }
 
-function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
+function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh, ListEmptyComponent }) {
 	const COLUMNS = [
 		{ key: 'courseCode', label: 'Course Code' },
 		{ key: 'dateTime', label: 'Date & Time' },
@@ -113,41 +155,13 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 		{ key: 'slot', label: 'Slot' },
 	]
 
-	if (!schedule || schedule.length === 0)
-		return (
-			<View style={{ alignItems: 'center', marginTop: 50, paddingHorizontal: 20 }}>
-				<FontAwesome
-					name="info-circle"
-					size={40}
-					color={colorTheme.accent.primary}
-					style={{ marginBottom: 10 }}
-				/>
-				<Text
-					style={{
-						color: colorTheme.main.text,
-						fontSize: 18,
-						fontWeight: '600',
-						textAlign: 'center',
-						marginBottom: 6,
-					}}
-				>
-					No Data Available
-				</Text>
-				<Text
-					style={{
-						color: colorTheme.main.tertiary,
-						fontSize: 15,
-						textAlign: 'center',
-					}}
-				>
-					Please select a semester to view schedule.
-				</Text>
-			</View>
-		)
-
 	const styles = StyleSheet.create({
 		wrapper: {
 			flex: 1,
+		},
+
+		contentContainer: {
+			flexGrow: 1,
 		},
 		tableWrapper: {
 			marginBottom: 30,
@@ -163,7 +177,6 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 			borderWidth: 1,
 			borderColor: colorTheme.accent.primary,
 			borderRadius: 5,
-			// minWidth: 500,
 		},
 		row: {
 			flexDirection: 'row',
@@ -188,50 +201,53 @@ function ExamScheduleTable({ schedule, colorTheme, refreshing, onRefresh }) {
 	return (
 		<ScrollView
 			style={styles.wrapper}
+			contentContainerStyle={styles.contentContainer}
 			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 		>
-			{schedule.map(({ type, data }, idx) => (
-				<View key={idx} style={styles.tableWrapper}>
-					<Text style={styles.title}>{type}</Text>
+			{schedule && schedule.length > 0
+				? schedule.map(({ type, data }, idx) => (
+						<View key={idx} style={styles.tableWrapper}>
+							<Text style={styles.title}>{type}</Text>
 
-					<ScrollView horizontal contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
-						<View style={{ flex: 1, alignItems: 'center' }}>
-							<View style={styles.table}>
-								{/* Header Row */}
-								<View style={styles.row}>
-									{COLUMNS.map((col) => (
-										<Text key={col.key} style={[styles.cell, styles.headerCell]}>
-											{col.label}
-										</Text>
-									))}
-								</View>
-
-								{/* Data Rows */}
-								{data.map((entry, rowIdx) => (
-									<View key={rowIdx} style={styles.row}>
-										{COLUMNS.map((col) => {
-											let value = entry[col.key] || '-'
-
-											// If column is "dateTime", combine date and time
-											if (col.key === 'dateTime') {
-												const date = entry.examDate || '-'
-												const time = entry.examTime || '-'
-												value = `${date}\n${time}`
-											}
-
-											return (
-												<Text key={col.key} style={styles.cell}>
-													{value}
+							<ScrollView
+								horizontal
+								contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+							>
+								<View style={{ flex: 1, alignItems: 'center' }}>
+									<View style={styles.table}>
+										{/* Header Row */}
+										<View style={styles.row}>
+											{COLUMNS.map((col) => (
+												<Text key={col.key} style={[styles.cell, styles.headerCell]}>
+													{col.label}
 												</Text>
-											)
-										})}
+											))}
+										</View>
+
+										{/* Data Rows */}
+										{data.map((entry, rowIdx) => (
+											<View key={rowIdx} style={styles.row}>
+												{COLUMNS.map((col) => {
+													let value = entry[col.key] || '-'
+													if (col.key === 'dateTime') {
+														const date = entry.examDate || '-'
+														const time = entry.examTime || '-'
+														value = `${date}\n${time}`
+													}
+													return (
+														<Text key={col.key} style={styles.cell}>
+															{value}
+														</Text>
+													)
+												})}
+											</View>
+										))}
 									</View>
-								))}
-							</View>
+								</View>
+							</ScrollView>
 						</View>
-					</ScrollView>
-				</View>
-			))}
+				  ))
+				: ListEmptyComponent}
 		</ScrollView>
 	)
 }
