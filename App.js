@@ -42,6 +42,7 @@ import { getAllData } from './util/VTOP/getAllData'
 import Loading from './components/Loading'
 import { goToDrawerTab } from './util/goToDrawerTab'
 import SpeedTest from './screens/SpeedTest'
+import MessMenu from './screens/MessMenu'
 
 const version = Constants.expoConfig.version
 const variant = Constants.expoConfig.name?.toLowerCase().includes('dev') ? 'dev' : 'prod'
@@ -370,6 +371,13 @@ function MainApp() {
 					}}
 				/>
 				<Drawer.Screen
+					name="messMenu"
+					component={MessMenu}
+					options={{
+						headerTitle: 'Mess Menu',
+					}}
+				/>
+				<Drawer.Screen
 					name="openVTOP"
 					component={openVTOP}
 					options={{
@@ -487,6 +495,7 @@ function CustomDrawerContent(props) {
 				{/* Group 1 */}
 				{renderDrawerItem('home', <Entypo name="home" size={24} />, 'Home')}
 				{renderDrawerItem('login', <Ionicons name="person" size={24} />, 'Login')}
+				{renderDrawerItem('messMenu', <FontAwesome name="building-o" size={24} />, 'Mess Menu')}
 				{renderDrawerItem('openVTOP', <FontAwesome name="globe" size={24} />, 'Open VTOP')}
 
 				<Separator />
