@@ -9,11 +9,17 @@ import { Alert, ToastAndroid } from 'react-native'
 export async function getAllData(setLoading) {
 	const login = await vtopLogin()
 	if (login.error) {
-		if (login.error.includes('csrf')) {
+		if (login.error.toLowerCase().includes('csrf')) {
 			if (setLoading) setLoading(false)
 			return { error: 'failed to login, please try again.' }
 		}
-		ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+		if (login.error.toLowerCase().includes('invalid')) {
+			if (setLoading) setLoading(false)
+			ToastAndroid.show('Incorrect username or password', ToastAndroid.LONG)
+			goToDrawerTab('login')
+			return { error: 'failed to login, please try again. (Invalid username/password).' }
+		}
+		ToastAndroid.show('Failed to fetch data from VTOP. \n' + login.error, ToastAndroid.SHORT)
 		if (setLoading) setLoading(false)
 		return goToDrawerTab('login')
 	}
