@@ -8,7 +8,11 @@ import {
 	Dimensions,
 	ToastAndroid,
 	Animated,
+	Platform,
+	Modal,
 } from 'react-native'
+import { Calendar } from 'react-native-calendars'
+import Octicons from '@expo/vector-icons/Octicons'
 import { ColorThemeContext } from '../context/ColorThemeContext'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FileSystem from 'expo-file-system'
@@ -17,13 +21,30 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Buffer } from 'buffer'
 global.Buffer = Buffer
 
+function isSameOrBeforeDay(d1, d2) {
+	const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate())
+	const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate())
+	return a <= b
+}
+function isSameOrAfterDay(d1, d2) {
+	const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate())
+	const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate())
+	return a >= b
+}
+
 export default function MessMenu() {
 	const { colorTheme } = useContext(ColorThemeContext)
+
 	const [title, setTitle] = useState(null)
 	const [todayMenu, setTodayMenu] = useState(null)
 	const [specialItems, setSpecialItems] = useState({})
 	const [filePicked, setFilePicked] = useState(false)
 	const [loading, setLoading] = useState(true)
+	const [showDatePicker, setShowDatePicker] = useState(false)
+	const [selectedDate, setSelectedDate] = useState(new Date())
+	const [fileUri, setFileUri] = useState(null)
+	const [parsed, setParsed] = useState(null)
+
 	const scrollRef = useRef(null)
 	const screenWidth = Dimensions.get('window').width
 	const screenHeight = Dimensions.get('window').height
@@ -31,12 +52,23 @@ export default function MessMenu() {
 	const mealKeys = ['breakfast', 'lunch', 'snacks', 'dinner']
 	const animatedHeights = useRef(mealKeys.map(() => new Animated.Value(screenHeight * 0.3))).current
 
+	const currentMealIndexRef = useRef(getCurrentMealIndex())
+
+	const hasAutoScrolledRef = useRef(false)
+
 	useEffect(() => {
 		loadSavedFile()
 	}, [])
 
 	useEffect(() => {
-		if (filePicked && todayMenu) setTimeout(() => scrollToCurrentMeal(), 200)
+		if (filePicked && todayMenu && !hasAutoScrolledRef.current) {
+			setTimeout(() => {
+				const target = getCurrentMealIndex()
+				currentMealIndexRef.current = target
+				scrollRef.current?.scrollTo({ x: target * screenWidth, animated: true })
+				hasAutoScrolledRef.current = true
+			}, 180)
+		}
 	}, [filePicked, todayMenu])
 
 	useEffect(() => {
@@ -63,16 +95,24 @@ export default function MessMenu() {
 		return 3
 	}
 
+	function scrollToMealIndex(index, animated = true) {
+		if (scrollRef.current) {
+			scrollRef.current.scrollTo({ x: index * screenWidth, animated })
+		}
+	}
+
 	function scrollToCurrentMeal() {
 		const index = getCurrentMealIndex()
-		if (scrollRef.current) scrollRef.current.scrollTo({ x: index * screenWidth, animated: true })
+		scrollToMealIndex(index)
+		currentMealIndexRef.current = index
 	}
 
 	async function loadSavedFile() {
 		try {
 			const savedUri = await AsyncStorage.getItem('mess_menu_file_uri')
 			if (savedUri) {
-				await parseExcelFile(savedUri)
+				setFileUri(savedUri)
+				await parseExcelFile(savedUri, selectedDate)
 				setFilePicked(true)
 			}
 		} catch (err) {
@@ -81,7 +121,6 @@ export default function MessMenu() {
 			setLoading(false)
 		}
 	}
-
 	async function pickExcelFile() {
 		try {
 			const result = await DocumentPicker.getDocumentAsync({
@@ -100,7 +139,8 @@ export default function MessMenu() {
 
 			const file = result.assets[0]
 			await AsyncStorage.setItem('mess_menu_file_uri', file.uri)
-			await parseExcelFile(file.uri)
+			setFileUri(file.uri)
+			await parseExcelFile(file.uri, selectedDate)
 			setFilePicked(true)
 		} catch (err) {
 			console.error('❌ Error picking file:', err)
@@ -109,13 +149,17 @@ export default function MessMenu() {
 		}
 	}
 
-	async function parseExcelFile(fileUri) {
+	async function parseExcelFile(fileUri, dateObj = new Date()) {
 		try {
-			const base64 = await FileSystem.readAsStringAsync(fileUri, {
-				encoding: FileSystem.EncodingType.Base64,
-			})
-			const binary = Buffer.from(base64, 'base64')
-			const workbook = XLSX.read(binary, { type: 'buffer' })
+			let workbook = parsed
+			if (!workbook) {
+				const base64 = await FileSystem.readAsStringAsync(fileUri, {
+					encoding: FileSystem.EncodingType.Base64,
+				})
+				const binary = Buffer.from(base64, 'base64')
+				workbook = XLSX.read(binary, { type: 'buffer' })
+				setParsed(workbook)
+			}
 
 			const mainSheetName = workbook.SheetNames[0]
 			const extraSheetName = workbook.SheetNames[1] || null
@@ -154,18 +198,15 @@ export default function MessMenu() {
 				dinners2 = getColumn(extraSheet, rangeExtra, 'E')
 			}
 
-			// Extract a title that contains the word "menu" (case-insensitive)
 			const extractedTitle =
 				Object.values(mainSheet)
 					.map((c) => (c?.v && typeof c.v === 'string' ? c.v.trim() : ''))
 					.find((text) => /menu/i.test(text)) || 'Mess Menu'
 
-			const today = new Date()
-			const dayNum = today.getDate()
-			const currentDate = dayNum.toString().padStart(2, '0')
+			const currentDate = dateObj.getDate().toString().padStart(2, '0')
 
 			let startIndex = dates.findIndex((v) => new RegExp(`\\b${currentDate}\\b`).test(v))
-			if (startIndex === -1) throw new Error(`No menu found for today (${currentDate})`)
+			if (startIndex === -1) throw new Error(`No menu found for ${currentDate}`)
 
 			let endIndex = startIndex + 1
 			while (endIndex < dates.length && !dates[endIndex]) endIndex++
@@ -184,7 +225,7 @@ export default function MessMenu() {
 
 			setTitle(extractedTitle)
 			setTodayMenu({
-				day: dates[startIndex],
+				day: dateObj.toDateString(),
 				breakfast: breakfastData.all,
 				lunch: lunchData.all,
 				snacks: snackData.all,
@@ -196,6 +237,13 @@ export default function MessMenu() {
 				snacks: snackData.special,
 				dinner: dinnerData.special,
 			})
+
+			setTimeout(() => {
+				const idx = hasAutoScrolledRef.current ? currentMealIndexRef.current : getCurrentMealIndex()
+				currentMealIndexRef.current = idx
+				scrollToMealIndex(idx, true)
+				hasAutoScrolledRef.current = true
+			}, 140)
 		} catch (err) {
 			console.error('❌ Error parsing Excel:', err)
 			ToastAndroid.show('Failed to parse Excel file', ToastAndroid.SHORT)
@@ -209,6 +257,33 @@ export default function MessMenu() {
 		setTodayMenu(null)
 		setTitle(null)
 		setSpecialItems({})
+		setFileUri(null)
+		setParsed(null)
+		hasAutoScrolledRef.current = false
+		currentMealIndexRef.current = getCurrentMealIndex()
+	}
+
+	const currentMonth = new Date().getMonth()
+	const currentYear = new Date().getFullYear()
+	const minDate = new Date(currentYear, currentMonth, 1)
+	const maxDate = new Date(currentYear, currentMonth + 1, 0)
+
+	const prevDay = async () => {
+		const newDate = new Date(selectedDate)
+		newDate.setDate(selectedDate.getDate() - 1)
+
+		if (!isSameOrBeforeDay(newDate, minDate)) {
+			setSelectedDate(newDate)
+			await parseExcelFile(fileUri, newDate)
+		}
+	}
+	const nextDay = async () => {
+		const newDate = new Date(selectedDate)
+		newDate.setDate(selectedDate.getDate() + 1)
+		if (!isSameOrAfterDay(newDate, maxDate)) {
+			setSelectedDate(newDate)
+			await parseExcelFile(fileUri, newDate)
+		}
 	}
 
 	if (loading) {
@@ -269,50 +344,172 @@ export default function MessMenu() {
 
 	return (
 		<View style={{ paddingVertical: 10, flex: 1 }}>
-			<Text
+			<View
 				style={{
-					fontSize: 18,
-					padding: 10,
-					fontWeight: '600',
-					color: colorTheme.accent.primary,
-					textAlign: 'center',
+					flexDirection: 'row',
+					alignItems: 'center',
+					justifyContent: 'center',
+					marginVertical: 25,
 				}}
 			>
-				{title}
-			</Text>
+				<Pressable
+					disabled={isSameOrBeforeDay(selectedDate, minDate)}
+					onPress={prevDay}
+					style={{
+						paddingHorizontal: 15,
+						paddingVertical: 8,
+						opacity: isSameOrBeforeDay(selectedDate, minDate) ? 0.3 : 1,
+					}}
+				>
+					<Octicons name="chevron-left" size={26} color={colorTheme.accent.secondary} />
+				</Pressable>
 
-			<Text
-				style={{
-					fontSize: 15,
-					fontWeight: '500',
-					color: colorTheme.main.text,
-					textAlign: 'center',
-					marginBottom: 20,
-					opacity: 0.8,
-				}}
+				<Pressable
+					onPress={() => setShowDatePicker(true)}
+					style={{
+						// backgroundColor: colorTheme.accent.secondary,
+						paddingVertical: 10,
+						paddingHorizontal: 0,
+						borderRadius: 10,
+						elevation: 8,
+						marginHorizontal: 20,
+					}}
+				>
+					<Text
+						style={{
+							fontSize: 16,
+							fontWeight: '700',
+							color: colorTheme.accent.primary,
+							textAlign: 'center',
+						}}
+					>
+						{todayMenu?.day ?? selectedDate.toDateString()}
+					</Text>
+				</Pressable>
+
+				<Pressable
+					disabled={isSameOrAfterDay(selectedDate, maxDate)}
+					onPress={nextDay}
+					style={{
+						paddingHorizontal: 15,
+						paddingVertical: 8,
+						opacity: isSameOrAfterDay(selectedDate, maxDate) ? 0.3 : 1,
+					}}
+				>
+					<Octicons name="chevron-right" size={26} color={colorTheme.accent.secondary} />
+				</Pressable>
+			</View>
+
+			{title && (
+				<Text
+					style={{
+						textAlign: 'center',
+						color: colorTheme.main.text,
+						opacity: 0.6,
+						fontSize: 12,
+						paddingHorizontal: 40,
+						marginTop: -10,
+						marginBottom: 10,
+						fontStyle: 'italic',
+					}}
+				>
+					🗂️ {title}
+				</Text>
+			)}
+
+			<Modal
+				visible={showDatePicker}
+				transparent
+				animationType="fade"
+				onRequestClose={() => setShowDatePicker(false)}
 			>
-				{todayMenu.day}
-			</Text>
+				<Pressable
+					onPress={() => setShowDatePicker(false)}
+					style={{
+						flex: 1,
+						backgroundColor: 'rgba(0,0,0,0.85)',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}
+				>
+					<Pressable
+						onPress={(e) => e.stopPropagation()}
+						style={{
+							backgroundColor: colorTheme.main.primary,
+							marginHorizontal: 20,
+							borderRadius: 16,
+							borderColor: colorTheme.main.tertiary,
+							borderWidth: 2,
+							elevation: 5,
+							shadowColor: colorTheme.accent.primary,
+							padding: 10,
+							width: '90%',
+							maxWidth: 400,
+						}}
+					>
+						<Calendar
+							current={selectedDate.toISOString().split('T')[0]}
+							minDate={minDate.toISOString().split('T')[0]}
+							onDayPress={async (day) => {
+								const selected = new Date(day.dateString)
+								setSelectedDate(selected)
+								if (fileUri) await parseExcelFile(fileUri, selected)
+								setShowDatePicker(false)
+							}}
+							hideArrows
+							hideExtraDays
+							enableSwipeMonths={false}
+							markedDates={{
+								[selectedDate.toISOString().split('T')[0]]: {
+									selected: true,
+									selectedColor: colorTheme.accent.secondary,
+									selectedTextColor: colorTheme.main.primary,
+								},
+							}}
+							theme={{
+								backgroundColor: colorTheme.main.primary,
+								calendarBackground: colorTheme.main.primary,
+								textSectionTitleColor: colorTheme.accent.primary,
+								selectedDayBackgroundColor: colorTheme.accent.primary,
+								selectedDayTextColor: colorTheme.main.primary,
+								todayTextColor: colorTheme.accent.primary,
+								dayTextColor: colorTheme.main.text,
+								monthTextColor: colorTheme.accent.primary,
+								textMonthFontWeight: 'bold',
+								textMonthFontSize: 18,
+								arrowColor: colorTheme.accent.primary,
+							}}
+							style={{
+								borderRadius: 12,
+							}}
+						/>
+					</Pressable>
+				</Pressable>
+			</Modal>
 
 			<ScrollView
 				horizontal
 				pagingEnabled
-				showsHorizontalScrollIndicator
+				showsHorizontalScrollIndicator={true}
 				ref={scrollRef}
-				style={{ paddingVertical: 0 }}
+				onMomentumScrollEnd={(e) => {
+					const page = Math.round(e.nativeEvent.contentOffset.x / screenWidth)
+					if (page >= 0 && page < mealKeys.length) {
+						currentMealIndexRef.current = page
+					}
+				}}
 			>
 				{mealKeys.map((mealKey, i) => (
 					<Animated.View
 						key={mealKey}
 						style={{
 							width: screenWidth - 50,
+							marginTop: 20,
 							marginHorizontal: 25,
-							backgroundColor: colorTheme.main.secondary,
 							borderColor: colorTheme.main.tertiary,
 							borderWidth: 1.8,
 							borderRadius: 18,
 							padding: 20,
-							elevation: 6,
 							shadowColor: colorTheme.accent.secondary,
 							height: animatedHeights[i],
 							overflow: 'hidden',
@@ -342,9 +539,9 @@ export default function MessMenu() {
 
 						<ScrollView
 							contentContainerStyle={{ paddingBottom: 10 }}
-							showsVerticalScrollIndicator={false}
+							showsVerticalScrollIndicator={true}
 						>
-							{todayMenu[mealKey].length ? (
+							{todayMenu?.[mealKey]?.length ? (
 								todayMenu[mealKey].map((item, j) => {
 									const isSpecial = specialItems[mealKey]?.includes(item)
 									return (
@@ -379,7 +576,7 @@ export default function MessMenu() {
 			<Pressable
 				onPress={resetFile}
 				style={{
-					marginTop: 30,
+					marginTop: 15,
 					backgroundColor: colorTheme.accent.secondary,
 					paddingVertical: 12,
 					borderRadius: 12,

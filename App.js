@@ -18,6 +18,7 @@ import Entypo from '@expo/vector-icons/Entypo'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { StatusBar } from 'expo-status-bar'
 import { ColorThemeProvider, ColorThemeContext } from './context/ColorThemeContext'
 import Settings from './screens/Settings'
@@ -495,7 +496,11 @@ function CustomDrawerContent(props) {
 				{/* Group 1 */}
 				{renderDrawerItem('home', <Entypo name="home" size={24} />, 'Home')}
 				{renderDrawerItem('login', <Ionicons name="person" size={24} />, 'Login')}
-				{renderDrawerItem('messMenu', <FontAwesome name="building-o" size={24} />, 'Mess Menu')}
+				{renderDrawerItem(
+					'messMenu',
+					<MaterialCommunityIcons name="noodles" size={24} />,
+					'Mess Menu'
+				)}
 				{renderDrawerItem('openVTOP', <FontAwesome name="globe" size={24} />, 'Open VTOP')}
 
 				<Separator />
