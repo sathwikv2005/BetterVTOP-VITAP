@@ -21,15 +21,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Buffer } from 'buffer'
 global.Buffer = Buffer
 
-function isSameOrBeforeDay(d1, d2) {
-	const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate())
-	const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate())
-	return a <= b
-}
-function isSameOrAfterDay(d1, d2) {
-	const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate())
-	const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate())
-	return a >= b
+function isSameMonth(d1, d2) {
+	return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth()
 }
 
 export default function MessMenu() {
@@ -75,7 +68,7 @@ export default function MessMenu() {
 		if (!todayMenu) return
 		mealKeys.forEach((mealKey, index) => {
 			const itemCount = todayMenu[mealKey]?.length || 1
-			const targetHeight = Math.max(itemCount * 26 + 120, screenHeight * 0.25)
+			const targetHeight = Math.max(itemCount * 26 + 130, screenHeight * 0.25)
 			Animated.spring(animatedHeights[index], {
 				toValue: targetHeight,
 				useNativeDriver: false,
@@ -265,25 +258,36 @@ export default function MessMenu() {
 
 	const currentMonth = new Date().getMonth()
 	const currentYear = new Date().getFullYear()
-	const minDate = new Date(currentYear, currentMonth, 1)
-	const maxDate = new Date(currentYear, currentMonth + 1, 0)
+	const minDate = new Date(currentYear, currentMonth - 1)
+	const maxDate = new Date(currentYear, currentMonth + 1, 1)
+	const lastDay = new Date(currentYear, currentMonth + 1, 0)
 
 	const prevDay = async () => {
 		const newDate = new Date(selectedDate)
 		newDate.setDate(selectedDate.getDate() - 1)
 
-		if (!isSameOrBeforeDay(newDate, minDate)) {
-			setSelectedDate(newDate)
-			await parseExcelFile(fileUri, newDate)
-		}
+		if (!isSameMonth(newDate, selectedDate)) return
+
+		setSelectedDate(newDate)
+		await parseExcelFile(fileUri, newDate)
 	}
 	const nextDay = async () => {
 		const newDate = new Date(selectedDate)
 		newDate.setDate(selectedDate.getDate() + 1)
-		if (!isSameOrAfterDay(newDate, maxDate)) {
-			setSelectedDate(newDate)
-			await parseExcelFile(fileUri, newDate)
-		}
+
+		if (!isSameMonth(newDate, selectedDate)) return
+
+		setSelectedDate(newDate)
+		await parseExcelFile(fileUri, newDate)
+	}
+
+	function isToday(date) {
+		const now = new Date()
+		return (
+			date.getDate() === now.getDate() &&
+			date.getMonth() === now.getMonth() &&
+			date.getFullYear() === now.getFullYear()
+		)
 	}
 
 	if (loading) {
@@ -353,12 +357,30 @@ export default function MessMenu() {
 				}}
 			>
 				<Pressable
-					disabled={isSameOrBeforeDay(selectedDate, minDate)}
+					disabled={
+						!isSameMonth(
+							new Date(
+								selectedDate.getFullYear(),
+								selectedDate.getMonth(),
+								selectedDate.getDate() - 1
+							),
+							selectedDate
+						)
+					}
 					onPress={prevDay}
 					style={{
 						paddingHorizontal: 15,
 						paddingVertical: 8,
-						opacity: isSameOrBeforeDay(selectedDate, minDate) ? 0.3 : 1,
+						opacity: !isSameMonth(
+							new Date(
+								selectedDate.getFullYear(),
+								selectedDate.getMonth(),
+								selectedDate.getDate() - 1
+							),
+							selectedDate
+						)
+							? 0.3
+							: 1,
 					}}
 				>
 					<Octicons name="chevron-left" size={26} color={colorTheme.accent.secondary} />
@@ -379,7 +401,10 @@ export default function MessMenu() {
 						style={{
 							fontSize: 16,
 							fontWeight: '700',
-							color: colorTheme.accent.primary,
+							color: isToday(selectedDate)
+								? colorTheme.accent.primary
+								: colorTheme.accent.secondary,
+							opacity: isToday(selectedDate) ? 1 : 0.9,
 							textAlign: 'center',
 						}}
 					>
@@ -388,12 +413,30 @@ export default function MessMenu() {
 				</Pressable>
 
 				<Pressable
-					disabled={isSameOrAfterDay(selectedDate, maxDate)}
+					disabled={
+						!isSameMonth(
+							new Date(
+								selectedDate.getFullYear(),
+								selectedDate.getMonth(),
+								selectedDate.getDate() + 1
+							),
+							selectedDate
+						)
+					}
 					onPress={nextDay}
 					style={{
 						paddingHorizontal: 15,
 						paddingVertical: 8,
-						opacity: isSameOrAfterDay(selectedDate, maxDate) ? 0.3 : 1,
+						opacity: !isSameMonth(
+							new Date(
+								selectedDate.getFullYear(),
+								selectedDate.getMonth(),
+								selectedDate.getDate() + 1
+							),
+							selectedDate
+						)
+							? 0.3
+							: 1,
 					}}
 				>
 					<Octicons name="chevron-right" size={26} color={colorTheme.accent.secondary} />
@@ -510,6 +553,7 @@ export default function MessMenu() {
 							borderWidth: 1.8,
 							borderRadius: 18,
 							padding: 20,
+							paddingBottom: 0,
 							shadowColor: colorTheme.accent.secondary,
 							height: animatedHeights[i],
 							overflow: 'hidden',
@@ -538,7 +582,7 @@ export default function MessMenu() {
 						</Text>
 
 						<ScrollView
-							contentContainerStyle={{ paddingBottom: 10 }}
+							contentContainerStyle={{ paddingBottom: 0 }}
 							showsVerticalScrollIndicator={true}
 						>
 							{todayMenu?.[mealKey]?.length ? (
@@ -569,6 +613,16 @@ export default function MessMenu() {
 								</Text>
 							)}
 						</ScrollView>
+
+						<Text
+							style={{
+								color: colorTheme.accent.secondary,
+								marginBottom: 8,
+								textAlign: 'right',
+							}}
+						>
+							*special items
+						</Text>
 					</Animated.View>
 				))}
 			</ScrollView>
