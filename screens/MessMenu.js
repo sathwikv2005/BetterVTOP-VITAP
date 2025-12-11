@@ -68,7 +68,7 @@ export default function MessMenu() {
 		if (!todayMenu) return
 		mealKeys.forEach((mealKey, index) => {
 			const itemCount = todayMenu[mealKey]?.length || 1
-			const targetHeight = Math.max(itemCount * 26 + 130, screenHeight * 0.25)
+			const targetHeight = Math.min(itemCount * 26 + 130, screenHeight * 0.55)
 			Animated.spring(animatedHeights[index], {
 				toValue: targetHeight,
 				useNativeDriver: false,
