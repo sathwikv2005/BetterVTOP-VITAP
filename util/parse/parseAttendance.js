@@ -10,11 +10,11 @@ export function parseAttendance(doc) {
 
 	for (const row of rows) {
 		const cols = selectAll('td', row)
-		if (cols.length < 11) continue
+		if (cols.length < 10) continue
 
 		const getSpanText = (col) => textContent(selectOne('span', col))?.trim() || ''
 
-		const onclick = selectOne('a', cols[10])?.attribs?.onclick
+		const onclick = selectOne('a', cols[9])?.attribs?.onclick
 		const match = onclick?.match(
 			/callStudentAttendanceDetailDisplay\('([^']+)','([^']+)','([^']+)','([^']+)'\)/
 		)
@@ -28,7 +28,7 @@ export function parseAttendance(doc) {
 			attended: getSpanText(cols[5]),
 			totalClasses: getSpanText(cols[6]),
 			percentage: getSpanText(cols[7])?.replace('%', ''),
-			cat2FatPercentage: getSpanText(cols[8])?.replace('%', ''),
+			// cat2FatPercentage: getSpanText(cols[8])?.replace('%', ''),
 			semesterId,
 			courseID,
 			classType,

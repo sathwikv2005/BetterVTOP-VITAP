@@ -159,7 +159,6 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 		const document = parseDocument(html)
 
 		const attendanceData = parseAttendanceByID(document)
-
 		// console.log('attendance data:')
 		// console.log(attendanceData)
 		// console.log('attendance data log:')

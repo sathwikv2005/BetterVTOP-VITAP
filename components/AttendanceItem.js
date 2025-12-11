@@ -21,7 +21,7 @@ export default function AttendanceItem({
 	const { colorTheme } = useContext(ColorThemeContext)
 	// console.log(attendanceData)
 	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
-	const btwExamsGreen = parseInt(data.cat2FatPercentage) >= parseInt(minPercent)
+	// const btwExamsGreen = parseInt(data.cat2FatPercentage) >= parseInt(minPercent)
 	const splitData = data.courseDetails.split('-')
 	const courseCode = splitData[0]
 	const courseTitle = splitData[1]
@@ -102,7 +102,7 @@ export default function AttendanceItem({
 		},
 		details: {
 			flexDirection: 'row',
-			justifyContent: 'space-evenly',
+			justifyContent: 'space-between',
 			marginTop: -8,
 		},
 		// detailsBox: {
@@ -172,7 +172,7 @@ export default function AttendanceItem({
 								</Text>
 							</View>
 						</View>
-						<View style={[style.betweenExams, style.detailsBox]}>
+						{/* <View style={[style.betweenExams, style.detailsBox]}>
 							<View style={[style.backGround]}>
 								<Text
 									style={[
@@ -193,7 +193,7 @@ export default function AttendanceItem({
 									{data.cat2FatPercentage}%
 								</Text>
 							</View>
-						</View>
+						</View> */}
 						<View style={[style.buffer, style.detailsBox]}>
 							<View style={[style.backGround]}>
 								<View style={[style.bufferBox]}>
