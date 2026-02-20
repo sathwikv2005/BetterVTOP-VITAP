@@ -182,7 +182,7 @@ export function Home() {
 					tabBarStyle: { borderWidth: 0, borderColor: colorTheme.main.primary },
 				}}
 			>
-				<Tab.Screen
+				{/* <Tab.Screen
 					name="WiFi"
 					component={Wifi}
 					options={{
@@ -200,7 +200,7 @@ export function Home() {
 							/>
 						),
 					}}
-				/>
+				/> */}
 				<Tab.Screen
 					name="timetable"
 					component={Timetable}
