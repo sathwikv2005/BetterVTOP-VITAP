@@ -71,7 +71,7 @@ export async function getSemData(setLoading) {
 			createdAt: getTime(),
 		}
 	} catch (err) {
-		console.error('Error fetching sem data:', err)
+		console.error('Error fetching sem data:', err.message)
 		return { error: err }
 	}
 }
