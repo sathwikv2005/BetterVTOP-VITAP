@@ -1,6 +1,7 @@
 import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from 'expo-secure-store'
 import Constants from 'expo-constants'
 import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
@@ -64,7 +65,7 @@ export async function checkLogin() {
 				},
 				credentials: 'omit',
 				body: params.toString(),
-			}
+			},
 		)
 		if (!response.ok) return false
 		console.log('Already loggedIn')
@@ -80,10 +81,8 @@ export async function checkLogin() {
 
 export async function forceVtopLogin(username, password, tries) {
 	if (!tries) tries = 0
-	const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
-		'username',
-		'password',
-	])
+	const [[, savedUsername]] = await AsyncStorage.multiGet(['username'])
+	const savedPassword = await SecureStore.getItemAsync('password')
 
 	username = username || savedUsername
 	password = password || savedPassword
@@ -119,12 +118,23 @@ export async function forceVtopLogin(username, password, tries) {
 					groupYear: groupYear,
 				})
 			}
+			await clearVtopAuth()
 			return { error: data.error }
 		}
-
 		const newCsrf = data.csrf
 
 		const newJsessId = data.cookies.find((c) => c.key === 'JSESSIONID')?.value
+
+		if (!newCsrf || !newJsessId) {
+			if (tries < 5) return await forceVtopLogin(username, password, tries + 1)
+			console.error('[VTOP login] Invalid login response', data)
+			await clearVtopAuth()
+			await logEvent(analytics, 'login_failed_invalid_response', {
+				hasCsrf: !!newCsrf,
+				hasSession: !!newJsessId,
+			})
+			return { error: 'Login failed. Invalid session data.' }
+		}
 
 		// Save csrf and session ID in AsyncStorage
 
@@ -132,8 +142,9 @@ export async function forceVtopLogin(username, password, tries) {
 			['csrfToken', newCsrf],
 			['sessionId', newJsessId],
 			['username', username.toUpperCase()],
-			['password', password],
 		])
+
+		await SecureStore.setItemAsync('password', password)
 
 		await setUserProperty(analytics, 'group_year', groupYear)
 		await logEvent(analytics, 'user_group_year', {
@@ -149,5 +160,23 @@ export async function forceVtopLogin(username, password, tries) {
 		await logEvent(analytics, 'login_failed', { groupYear })
 		console.error('Error in vtopLogin:', error)
 		return { error: 'Failed to login' }
+	}
+}
+
+export async function clearVtopAuth() {
+	try {
+		// Clear AsyncStorage items
+		await AsyncStorage.multiRemove([
+			'username',
+			'csrfToken',
+			'sessionId', // JSESSIONID
+		])
+
+		await SecureStore.deleteItemAsync('password')
+
+		return true
+	} catch (err) {
+		console.error('[VTOP login] Failed to clear VTOP credentials', err)
+		return false
 	}
 }

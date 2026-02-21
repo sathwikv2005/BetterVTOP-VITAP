@@ -7,7 +7,7 @@ import { StyleSheet } from 'react-native'
 import { TextInput } from 'react-native'
 import { Pressable } from 'react-native'
 import { vtopLogin } from '../util/VTOP/login'
-import { Alert } from 'react-native'
+import { useAlert } from 'custom-react-native-alert'
 import { fetchVtopData } from '../util/VTOP/getAllData'
 import { ForceUpdateContext } from '../context/ForceUpdateContext'
 import Loading from '../components/Loading'
@@ -17,21 +17,21 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import Entypo from '@expo/vector-icons/Entypo'
 
 export default function Login() {
+	const { showAlert } = useAlert()
 	const { colorTheme } = useContext(ColorThemeContext)
 	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState(false)
+	const [prevCredFound, setPrevCredFound] = useState(false)
 	const [userName, setUserName] = useState('')
 	const [password, setPassword] = useState('')
 
 	useEffect(() => {
 		async function getSavedCred() {
-			const [[, savedUsername], [, savedPassword]] = await AsyncStorage.multiGet([
-				'username',
-				'password',
-			])
-			setUserName(savedUsername)
-			setPassword(savedPassword)
+			const [[, savedUsername]] = await AsyncStorage.multiGet(['username'])
+			setUserName(savedUsername || '')
+			setPrevCredFound(!!savedUsername)
+			setPassword('')
 		}
 		getSavedCred()
 	}, [])
@@ -51,14 +51,56 @@ export default function Login() {
 			console.log(data.error)
 			setLoading(false)
 			setError(true)
-			return Alert.alert(
-				'Login setup failed',
-				`Failed to login! Please try again later. \n error: ${data.error}`
-			)
+			showAlert({
+				title: '❌ Login Failed',
+				message: `${data.error}.\n\nPlease try again.`,
+				buttons: [
+					{
+						text: 'OK',
+						style: {
+							backgroundColor: colorTheme.accent.primary,
+						},
+						textStyle: {
+							color: colorTheme.main.primary,
+							fontWeight: 'bold',
+						},
+					},
+				],
+				styles: {
+					overlay: {
+						backgroundColor: '#000000B0',
+					},
+					container: {
+						backgroundColor: colorTheme.main.secondary,
+						width: '95%',
+						padding: 16,
+						borderRadius: 12,
+					},
+					title: {
+						color: colorTheme.accent.primary,
+						fontSize: 18,
+						fontWeight: '600',
+						textAlign: 'center',
+					},
+					message: {
+						marginTop: 10,
+						color: colorTheme.main.text,
+						fontSize: 16,
+						marginBottom: 4,
+						textAlign: 'center',
+					},
+					buttons: {
+						justifyContent: 'flex-end',
+						flexDirection: 'row',
+					},
+				},
+			})
+			return
 		}
 		const vtopData = await fetchVtopData(setLoading)
 		forceUpdate()
-		console.log(trigger)
+		setPassword('')
+		setPrevCredFound(true)
 		setLoading(false)
 		ToastAndroid.show('Data fetched successfully! ✅', ToastAndroid.LONG)
 		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
@@ -210,7 +252,8 @@ export default function Login() {
 							<FontAwesome name="user" style={[styles.icon]} />
 						</View>
 						<TextInput
-							placeholder="User Name"
+							placeholder="Enter your username"
+							placeholderTextColor={colorTheme.main.tertiary}
 							style={styles.input}
 							onChangeText={onChangeUserName}
 							value={userName}
@@ -224,15 +267,15 @@ export default function Login() {
 							<Entypo name="lock-open" style={[styles.icon]} />
 						</View>
 						<TextInput
-							placeholder="Password"
 							style={styles.input}
 							secureTextEntry={true}
 							onChangeText={onChangePassword}
 							value={password}
+							placeholder={prevCredFound ? 'Using saved password' : 'Enter your password'}
+							placeholderTextColor={colorTheme.main.tertiary}
 						/>
 					</View>
 				</View>
-
 				<View style={styles.btnWrapper}>
 					<Pressable
 						onPress={handleLogin}

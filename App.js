@@ -33,6 +33,7 @@ import {
 	startAutoReschedule,
 } from './util/upcomingClassNotifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from 'expo-secure-store'
 import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
 import Constants from 'expo-constants'
@@ -68,12 +69,30 @@ export default function App() {
 	useEffect(() => {
 		async function checkFirstOpenAfterUpdate() {
 			const checkVersion = await AsyncStorage.getItem('last-seen-version')
+			const firstOpenAfterUpdate = checkVersion !== version
 			// const checkVersion = true
-			setShowWhatsNew(displayWhatsNew && checkVersion !== version)
+			setShowWhatsNew(displayWhatsNew && firstOpenAfterUpdate)
 			// setShowWhatsNew(true)
+			if (firstOpenAfterUpdate) await migratePasswordToSecureStore()
+			await AsyncStorage.setItem('last-seen-version', version)
 		}
 		checkFirstOpenAfterUpdate()
 	}, [])
+
+	async function migratePasswordToSecureStore() {
+		try {
+			const password = await AsyncStorage.getItem('password')
+
+			if (password) {
+				await SecureStore.setItemAsync('password', password)
+				await AsyncStorage.removeItem('password')
+
+				console.log('[VTOP LOGIN] Password migrated to SecureStore')
+			}
+		} catch (err) {
+			console.error('[VTOP LOGIN] Password migration failed', err)
+		}
+	}
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
@@ -179,7 +198,7 @@ function MainApp() {
 					console.log(err)
 					return ToastAndroid.show(
 						'⚠️ Unable to fetch the latest VTOP data.\nPlease check your internet connection and try again.',
-						ToastAndroid.LONG
+						ToastAndroid.LONG,
 					)
 				}
 				ToastAndroid.show('✅ Your VTOP data has been updated automatically.', ToastAndroid.LONG)
@@ -499,7 +518,7 @@ function CustomDrawerContent(props) {
 				{renderDrawerItem(
 					'messMenu',
 					<MaterialCommunityIcons name="noodles" size={24} />,
-					'Mess Menu'
+					'Mess Menu',
 				)}
 				{renderDrawerItem('openVTOP', <FontAwesome name="globe" size={24} />, 'Open VTOP')}
 
@@ -511,7 +530,7 @@ function CustomDrawerContent(props) {
 				{renderDrawerItem(
 					'facultyView',
 					<Entypo name="graduation-cap" size={24} />,
-					'Faculty Info'
+					'Faculty Info',
 				)}
 
 				<Separator />
