@@ -104,6 +104,10 @@ export async function forceVtopLogin(username, password, tries) {
 		})
 
 		const data = await response.json()
+		if (response.status === 500) {
+			console.error('Error from the API:', data.error)
+			return { error: 'Failed to login. VTOP server might be down. Please try again later.' }
+		}
 		if (response.status === 401) {
 			console.log('api error:', data.error)
 			if (data.error.toLowerCase().includes('csrf')) {
