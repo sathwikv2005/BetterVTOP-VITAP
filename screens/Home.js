@@ -53,7 +53,7 @@ export function Home() {
 
 				showAlert({
 					title: '🚀 Update Available',
-					message: `Version ${latestVer} is available. Would you like to update now?\n\n${body}`,
+					message: `Version ${latestVer} is available. Would you like to update now?\n\n${body}\n\nAs always, thanks for using the app! ❤️\nYour feedback helps make it better every update.`,
 					buttons: [
 						{
 							text: 'Later',
