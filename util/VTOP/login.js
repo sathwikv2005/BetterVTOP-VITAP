@@ -21,7 +21,6 @@ export async function getCaptcha() {
 		}
 		const { captcha, csrf } = data
 		const jsessionId = data.jsessionId.value
-		console.log(jsessionId, csrf)
 		return {
 			captcha,
 			csrf,
