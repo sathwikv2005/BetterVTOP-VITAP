@@ -13,11 +13,12 @@ export default {
 			withInstallPermission,
 			withCustomGradleFix,
 			'@react-native-firebase/app',
+			'expo-secure-store',
 			withFirebaseGoogleServicesFileSwap,
 			withNetworkSecurityConfig,
 		],
 		slug: 'BetterVTOP',
-		version: '2.0.0',
+		version: '2.0.1',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
