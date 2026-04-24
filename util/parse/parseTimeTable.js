@@ -5,7 +5,7 @@ export function parseTimeTable(document) {
 	const rows = selectAll('tr', table)
 	const courseMap = getCourseTitleMap(document)
 	const facultyMap = getFacultyMap(document)
-	console.log('>', facultyMap)
+
 	// Extract time slots
 	const thTimeCells = selectAll('td', rows[0]).slice(2)
 	const thEndTimeCells = selectAll('td', rows[1]).slice(1)
