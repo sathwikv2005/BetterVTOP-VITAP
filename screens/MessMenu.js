@@ -196,9 +196,9 @@ export default function MessMenu() {
 					.map((c) => (c?.v && typeof c.v === 'string' ? c.v.trim() : ''))
 					.find((text) => /menu/i.test(text)) || 'Mess Menu'
 
-			const currentDate = dateObj.getDate().toString().padStart(2, '0')
+			const currentDate = dateObj.getDate()
 
-			let startIndex = dates.findIndex((v) => new RegExp(`\\b${currentDate}\\b`).test(v))
+			let startIndex = dates.findIndex((v) => new RegExp(`\\b0?${currentDate}\\b`).test(v))
 			if (startIndex === -1) throw new Error(`No menu found for ${currentDate}`)
 
 			let endIndex = startIndex + 1
@@ -238,7 +238,7 @@ export default function MessMenu() {
 				hasAutoScrolledRef.current = true
 			}, 140)
 		} catch (err) {
-			console.error('❌ Error parsing Excel:', err)
+			console.error('Error parsing Excel:', err)
 			ToastAndroid.show('Failed to parse Excel file', ToastAndroid.SHORT)
 			await AsyncStorage.removeItem('mess_menu_file_uri')
 		}
@@ -362,9 +362,9 @@ export default function MessMenu() {
 							new Date(
 								selectedDate.getFullYear(),
 								selectedDate.getMonth(),
-								selectedDate.getDate() - 1
+								selectedDate.getDate() - 1,
 							),
-							selectedDate
+							selectedDate,
 						)
 					}
 					onPress={prevDay}
@@ -375,9 +375,9 @@ export default function MessMenu() {
 							new Date(
 								selectedDate.getFullYear(),
 								selectedDate.getMonth(),
-								selectedDate.getDate() - 1
+								selectedDate.getDate() - 1,
 							),
-							selectedDate
+							selectedDate,
 						)
 							? 0.3
 							: 1,
@@ -418,9 +418,9 @@ export default function MessMenu() {
 							new Date(
 								selectedDate.getFullYear(),
 								selectedDate.getMonth(),
-								selectedDate.getDate() + 1
+								selectedDate.getDate() + 1,
 							),
-							selectedDate
+							selectedDate,
 						)
 					}
 					onPress={nextDay}
@@ -431,9 +431,9 @@ export default function MessMenu() {
 							new Date(
 								selectedDate.getFullYear(),
 								selectedDate.getMonth(),
-								selectedDate.getDate() + 1
+								selectedDate.getDate() + 1,
 							),
-							selectedDate
+							selectedDate,
 						)
 							? 0.3
 							: 1,
@@ -575,10 +575,10 @@ export default function MessMenu() {
 							{mealKey === 'breakfast'
 								? '🍽️ Breakfast'
 								: mealKey === 'lunch'
-								? '🥗 Lunch'
-								: mealKey === 'snacks'
-								? '☕ Snacks'
-								: '🌙 Dinner'}
+									? '🥗 Lunch'
+									: mealKey === 'snacks'
+										? '☕ Snacks'
+										: '🌙 Dinner'}
 						</Text>
 
 						<ScrollView
