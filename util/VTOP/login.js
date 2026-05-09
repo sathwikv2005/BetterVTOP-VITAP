@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store'
 import Constants from 'expo-constants'
 import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
+import { requestOtp } from './otpManager'
 
 const app = getApp()
 const analytics = getAnalytics(app)
@@ -114,12 +115,14 @@ export async function forceVtopLogin(username, password, tries) {
 				await logEvent(analytics, 'login_failed_invalid_csrf', {
 					groupYear: groupYear,
 				})
-			}
-			if (data.error.toLowerCase().includes('captcha')) {
+			} else if (data.error.toLowerCase().includes('captcha')) {
 				if (tries < 5) return await forceVtopLogin(username, password, tries + 1)
 				await logEvent(analytics, 'login_failed_invalid_captcha', {
 					groupYear: groupYear,
 				})
+			} else if (data.error.toLowerCase().includes('otp')) {
+				await SecureStore.setItemAsync('password', password)
+				return await validateOTP(data.cookies, data.csrf, username)
 			}
 			await clearVtopAuth()
 			return { error: data.error }
@@ -181,5 +184,41 @@ export async function clearVtopAuth() {
 	} catch (err) {
 		console.error('[VTOP login] Failed to clear VTOP credentials', err)
 		return false
+	}
+}
+
+export async function validateOTP(cookie, csrf, username) {
+	try {
+		const otp = await requestOtp()
+
+		if (!otp || otp.length < 6) return { error: 'OTP must be 6 digits.' }
+
+		const response = await fetch(
+			Constants.expoConfig.extra.apiUrl +
+				`/api/login/validate/otp?otp=${otp}&jsessionId=${cookie}&csrf=${csrf}`,
+		)
+
+		const data = await response.json()
+
+		if (response.status !== 200) {
+			return { error: data.error }
+		}
+
+		if (csrf && cookie)
+			await AsyncStorage.multiSet([
+				['csrfToken', csrf],
+				['sessionId', cookie],
+			])
+		await AsyncStorage.setItem('username', username.toUpperCase())
+
+		return await vtopLogin()
+	} catch (err) {
+		if (err.message === 'OTP cancelled') {
+			console.log('OTP cancelled')
+			return { error: 'Login cancelled' }
+		}
+
+		console.error('OTP validation failed:', err)
+		return { error: 'Something went wrong. Please try again.' }
 	}
 }

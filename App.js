@@ -9,7 +9,17 @@ import {
 } from '@react-navigation/drawer'
 import { navigationRef } from './navigation/RootNavigation'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
-import { Text, View, ActivityIndicator, Pressable, Image, ToastAndroid } from 'react-native'
+import {
+	Text,
+	View,
+	ActivityIndicator,
+	Pressable,
+	Image,
+	ToastAndroid,
+	TextInput,
+	StyleSheet,
+} from 'react-native'
+import { Modalize } from 'react-native-modalize'
 import * as Notifications from 'expo-notifications'
 import { DrawerItem } from '@react-navigation/drawer'
 import { Home } from './screens/Home'
@@ -41,6 +51,7 @@ import FacultyView from './screens/FacultyView'
 import WhatsNew from './components/whats_new/WhatsNew'
 import displayWhatsNew from './constants/displayWhatsNew'
 import { getAllData } from './util/VTOP/getAllData'
+import { registerOtpHandler, requestOtp } from './util/VTOP/otpManager'
 import Loading from './components/Loading'
 import { goToDrawerTab } from './util/goToDrawerTab'
 import SpeedTest from './screens/SpeedTest'
@@ -114,6 +125,50 @@ function MainApp() {
 	const [username, setUserName] = useState(null)
 	const [loading, setLoading] = useState(false)
 	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
+
+	const otpPromiseRef = useRef(null)
+	const modalRef = useRef(null)
+	const inputsRef = useRef([])
+	const [otpArray, setOtpArray] = useState(['', '', '', '', '', ''])
+
+	const handleChange = (text, index) => {
+		if (!/^\d?$/.test(text)) return
+
+		const newOtp = [...otpArray]
+		newOtp[index] = text
+		setOtpArray(newOtp)
+
+		if (text && index < 5) {
+			inputsRef.current[index + 1]?.focus()
+		}
+	}
+
+	const handleKeyPress = (e, index) => {
+		const key = e?.nativeEvent?.key
+
+		if (key === 'Backspace') {
+			const newOtp = [...otpArray]
+
+			if (otpArray[index] !== '') {
+				newOtp[index] = ''
+				setOtpArray(newOtp)
+			} else if (index > 0) {
+				newOtp[index - 1] = ''
+				setOtpArray(newOtp)
+
+				inputsRef.current[index - 1]?.focus()
+			}
+		}
+	}
+
+	const otp = otpArray.join('')
+
+	useEffect(() => {
+		registerOtpHandler(({ resolve, reject }) => {
+			otpPromiseRef.current = { resolve, reject }
+			modalRef.current?.open()
+		})
+	}, [])
 
 	useEffect(() => {
 		async function checkUserName() {
@@ -432,6 +487,125 @@ function MainApp() {
 					options={{ drawerLabel: () => null, title: 'Settings', drawerItemStyle: { height: 0 } }}
 				/>
 			</Drawer.Navigator>
+			<Modalize
+				ref={modalRef}
+				adjustToContentHeight
+				withHandle
+				keyboardAvoidingOffset={100}
+				handleStyle={{ backgroundColor: colorTheme.accent.primary }}
+				modalStyle={{
+					backgroundColor: colorTheme.main.primary,
+					padding: 20,
+					paddingTop: 30,
+					paddingBottom: 30,
+					borderColor: colorTheme.accent.secondary,
+					borderTopWidth: 4,
+					borderTopLeftRadius: 20,
+					borderTopRightRadius: 20,
+				}}
+				onOpened={() => {
+					inputsRef.current[0]?.focus()
+				}}
+				onClosed={() => {
+					setOtpArray(['', '', '', '', '', ''])
+
+					if (otpPromiseRef.current) {
+						otpPromiseRef.current.reject(new Error('OTP cancelled'))
+						otpPromiseRef.current = null
+					}
+				}}
+			>
+				<View>
+					<View
+						style={{
+							minHeight: 200,
+							flexDirection: 'column',
+							justifyContent: 'space-evenly',
+							width: '100%',
+							marginBottom: 25,
+						}}
+					>
+						<Text
+							style={{
+								color: colorTheme.main.text,
+								fontSize: 20,
+								fontWeight: '800',
+								marginBottom: 15,
+							}}
+						>
+							Enter OTP
+						</Text>
+
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+							{otpArray.map((digit, index) => (
+								<View
+									key={index}
+									style={{
+										width: 45,
+										height: 60,
+										borderRadius: 10,
+										overflow: 'hidden',
+										borderWidth: 1,
+										borderColor: colorTheme.accent.secondary,
+									}}
+								>
+									<View
+										pointerEvents="none"
+										style={{
+											...StyleSheet.absoluteFillObject,
+											backgroundColor: colorTheme.accent.secondary,
+											opacity: 0.35,
+										}}
+									/>
+
+									<TextInput
+										ref={(ref) => (inputsRef.current[index] = ref)}
+										value={digit}
+										onChangeText={(text) => handleChange(text, index)}
+										onKeyPress={(e) => handleKeyPress(e, index)}
+										keyboardType="number-pad"
+										maxLength={1}
+										style={{
+											flex: 1,
+											textAlign: 'center',
+											fontSize: 20,
+											color: colorTheme.main.text,
+										}}
+									/>
+								</View>
+							))}
+						</View>
+
+						<Pressable
+							onPress={() => {
+								const otp = otpArray.join('')
+								otpPromiseRef.current?.resolve(otp)
+								otpPromiseRef.current = null
+								modalRef.current?.close()
+							}}
+							style={{
+								marginTop: 20,
+								backgroundColor: colorTheme.accent.primary,
+								paddingVertical: 12,
+								paddingHorizontal: 20,
+								borderRadius: 10,
+								width: '100%',
+								alignItems: 'center',
+							}}
+						>
+							<Text
+								style={{
+									color: colorTheme.main.primary,
+									fontWeight: 'bold',
+									fontSize: 16,
+								}}
+							>
+								Verify OTP
+							</Text>
+						</Pressable>
+					</View>
+				</View>
+			</Modalize>
 		</NavigationContainer>
 	)
 }
@@ -552,4 +726,16 @@ function CustomDrawerContent(props) {
 			</View>
 		</DrawerContentScrollView>
 	)
+}
+
+const withOpacity = (color, opacity) => {
+	if (color.startsWith('#')) {
+		const hex = color.replace('#', '')
+		const bigint = parseInt(hex, 16)
+		const r = (bigint >> 16) & 255
+		const g = (bigint >> 8) & 255
+		const b = bigint & 255
+		return `rgba(${r}, ${g}, ${b}, ${opacity})`
+	}
+	return color // fallback
 }
