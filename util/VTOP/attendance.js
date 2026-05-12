@@ -10,15 +10,15 @@ import { parseAttendanceByID } from '../parse/parseAttendanceDetails'
 
 export async function getAttendance(setLoading, overrideSemID) {
 	try {
-		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
+		const [[, csrf], [, jsessionId], [, regNo], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
-			'username',
+			'regNo',
 			'sem',
 		])
 		const sem = await JSON.parse(savedSem)
 		const semID = overrideSemID || sem?.semID
-		if (!csrf || !jsessionId || !username || !semID) {
+		if (!csrf || !jsessionId || !regNo || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
 			if (setLoading) setLoading(false)
@@ -28,7 +28,7 @@ export async function getAttendance(setLoading, overrideSemID) {
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
 		params.append('semesterSubId', semID)
-		params.append('authorizedID', username.toUpperCase())
+		params.append('authorizedID', regNo.toUpperCase())
 		params.append('x', new Date().toUTCString())
 		const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.ViewStudentAttendance, {
 			method: 'POST',
@@ -60,7 +60,7 @@ export async function getAttendance(setLoading, overrideSemID) {
 			JSON.stringify({
 				attendance,
 				createdAt: getTime(),
-			})
+			}),
 		)
 
 		const attendanceData = await getAttendanceDetails()
@@ -90,8 +90,8 @@ export async function getAttendanceDetails(setLoading) {
 
 		const attendanceData = await Promise.all(
 			attendanceArray.map(({ courseID, classType }) =>
-				fetchAttendanceDetails(setLoading, courseID, classType)
-			)
+				fetchAttendanceDetails(setLoading, courseID, classType),
+			),
 		)
 
 		// const attendanceData = [await fetchAttendanceDetails('AM_CSE1005_00100', 'ETH')]
@@ -101,7 +101,7 @@ export async function getAttendanceDetails(setLoading) {
 			JSON.stringify({
 				attendanceData,
 				createdAt: getTime(),
-			})
+			}),
 		)
 
 		return attendanceData
@@ -113,15 +113,15 @@ export async function getAttendanceDetails(setLoading) {
 
 export async function fetchAttendanceDetails(setLoading, ID, type) {
 	try {
-		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
+		const [[, csrf], [, jsessionId], [, regNo], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
-			'username',
+			'regNo',
 			'sem',
 		])
 		const sem = await JSON.parse(savedSem)
 		const semID = sem?.semID
-		if (!csrf || !jsessionId || !username || !semID) {
+		if (!csrf || !jsessionId || !regNo || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
 			if (setLoading) setLoading(false)
@@ -131,8 +131,8 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
 		params.append('semesterSubId', semID)
-		params.append('registerNumber', username.toUpperCase())
-		params.append('authorizedID', username.toUpperCase())
+		params.append('registerNumber', regNo.toUpperCase())
+		params.append('authorizedID', regNo.toUpperCase())
 		params.append('courseId', ID)
 		params.append('courseType', type)
 		params.append('x', new Date().toUTCString())
@@ -172,7 +172,7 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 
 			for (const item of cachedData) {
 				const vtopData = attendanceData.attendance.log.find(
-					(x) => x.date === item.date && x.time === item.time
+					(x) => x.date === item.date && x.time === item.time,
 				)
 				if (!vtopData) continue
 				// If still not posted, keep user's override

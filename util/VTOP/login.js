@@ -2,6 +2,8 @@ import VtopConfig from '../../vtop_config.json'
 import Headers from '../../headers.json'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SecureStore from 'expo-secure-store'
+import { parseDocument } from 'htmlparser2'
+import { selectOne } from 'css-select'
 import Constants from 'expo-constants'
 import { getApp } from '@react-native-firebase/app'
 import { getAnalytics, logEvent, setUserProperty } from '@react-native-firebase/analytics'
@@ -44,16 +46,16 @@ export async function vtopLogin(username, password) {
 
 export async function checkLogin() {
 	try {
-		const [[, csrf], [, jsessionId], [, username]] = await AsyncStorage.multiGet([
+		const [[, csrf], [, jsessionId], [, regNo]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
-			'username',
+			'regNo',
 		])
-		if (!csrf || !jsessionId || !username) return false
+		if (!csrf || !jsessionId || !regNo) return false
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
 		params.append('verifyMenu', 'true')
-		params.append('authorizedID', username.toUpperCase())
+		params.append('authorizedID', regNo.toUpperCase())
 		params.append('x', `@(new Date().toUTCString())`)
 		const response = await fetch(
 			VtopConfig.domain + VtopConfig.backEndApi.commonStudentAttendance,
@@ -90,7 +92,7 @@ export async function forceVtopLogin(username, password, tries) {
 	if (!username || !password) {
 		return { error: 'Missing required parameters.' }
 	}
-	const groupYear = username.slice(0, 5).toUpperCase()
+	let groupYear = username.slice(0, 5).toUpperCase()
 	try {
 		// POST login request
 
@@ -142,23 +144,39 @@ export async function forceVtopLogin(username, password, tries) {
 			return { error: 'Login failed. Invalid session data.' }
 		}
 
-		// Save csrf and session ID in AsyncStorage
+		const regNo = await getRegNo(newJsessId)
 
+		if (regNo.error) {
+			return { error: regNo.error }
+		}
+
+		if (!regNo.value) {
+			return { error: 'Failed to login' }
+		}
+
+		// Save csrf and session ID in AsyncStorage
 		await AsyncStorage.multiSet([
 			['csrfToken', newCsrf],
 			['sessionId', newJsessId],
 			['username', username.toUpperCase()],
+			['regNo', regNo.value.toUpperCase()],
 		])
 
-		await SecureStore.setItemAsync('password', password)
+		groupYear = regNo.slice(0, 5).toUpperCase()
 
-		await setUserProperty(analytics, 'group_year', groupYear)
-		await logEvent(analytics, 'user_group_year', {
-			groupYear,
-			group: groupYear.slice(2),
-			year: groupYear.slice(0, 2),
-		})
-		await logEvent(analytics, 'login_success', { groupYear })
+		await Promise.all([
+			SecureStore.setItemAsync('password', password),
+
+			setUserProperty(analytics, 'group_year', groupYear),
+
+			logEvent(analytics, 'user_group_year', {
+				groupYear,
+				group: groupYear.slice(2),
+				year: groupYear.slice(0, 2),
+			}),
+
+			logEvent(analytics, 'login_success', { groupYear }),
+		])
 
 		return { message: 'Login successful', csrf: newCsrf, jsessionId: newJsessId }
 	} catch (error) {
@@ -166,6 +184,35 @@ export async function forceVtopLogin(username, password, tries) {
 		await logEvent(analytics, 'login_failed', { groupYear })
 		console.error('Error in vtopLogin:', error)
 		return { error: 'Failed to login' }
+	}
+}
+
+async function getRegNo(cookie) {
+	try {
+		const response = await fetch(VtopConfig.domain + VtopConfig.vtopUrls.homepage, {
+			method: 'GET',
+			headers: {
+				...Headers,
+				Cookie: `JSESSIONID=${cookie}`,
+			},
+			credentials: 'omit',
+		})
+		if (response.status === 404) {
+			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+			return { error: `Session not found` }
+		}
+		if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
+
+		const html = await response.text()
+		const document = parseDocument(html)
+		const input = selectOne('#authorizedIDX', document)
+
+		const value = input?.attribs?.value
+
+		return { value }
+	} catch (err) {
+		return { error: 'failed to fetch registraion number' }
 	}
 }
 

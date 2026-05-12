@@ -10,16 +10,16 @@ import { getTime } from '../getTime'
 
 export async function getTimeTable(setLoading, overrideSemID) {
 	try {
-		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
+		const [[, csrf], [, jsessionId], [, regNo], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
-			'username',
+			'regNo',
 			'sem',
 		])
 		const sem = await JSON.parse(savedSem)
 		console.log(sem)
 		const semID = overrideSemID || sem?.semID
-		if (!csrf || !jsessionId || !username || !semID) {
+		if (!csrf || !jsessionId || !regNo || !semID) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
 			if (setLoading) setLoading(false)
@@ -29,7 +29,7 @@ export async function getTimeTable(setLoading, overrideSemID) {
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
 		params.append('semesterSubId', semID)
-		params.append('authorizedID', username.toUpperCase())
+		params.append('authorizedID', regNo.toUpperCase())
 		params.append('x', new Date().toUTCString())
 		const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.viewTimeTable, {
 			method: 'POST',
@@ -60,7 +60,7 @@ export async function getTimeTable(setLoading, overrideSemID) {
 			JSON.stringify({
 				timetable,
 				createdAt: getTime(),
-			})
+			}),
 		)
 
 		return {
