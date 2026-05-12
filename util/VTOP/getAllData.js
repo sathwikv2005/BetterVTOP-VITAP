@@ -30,10 +30,15 @@ export async function getAllData(setLoading) {
 
 export async function fetchVtopData(setLoading) {
 	const semData = await getSemData(setLoading)
+
 	if (semData.error) return semData
-	const timetable = await getTimeTable(setLoading)
+
+	const [timetable, attendance] = await Promise.all([
+		getTimeTable(setLoading),
+		getAttendance(setLoading),
+	])
+
 	if (timetable.error) return timetable
-	const attendance = await getAttendance(setLoading)
 	if (attendance.error) return attendance
 
 	return {
