@@ -9,14 +9,14 @@ import { parseSemesterOptions } from '../parse/parseSemData'
 
 export async function getSemData(setLoading) {
 	try {
-		const [[, csrf], [, jsessionId], [, username], [, savedSem]] = await AsyncStorage.multiGet([
+		const [[, csrf], [, jsessionId], [, regNo], [, savedSem]] = await AsyncStorage.multiGet([
 			'csrfToken',
 			'sessionId',
-			'username',
+			'regNo',
 			'sem',
 		])
 
-		if (!csrf || !jsessionId || !username) {
+		if (!csrf || !jsessionId || !regNo) {
 			await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
 			ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
 			if (setLoading) setLoading(false)
@@ -26,7 +26,7 @@ export async function getSemData(setLoading) {
 		const params = new URLSearchParams()
 		params.append('_csrf', csrf)
 		params.append('verifyMenu', 'true')
-		params.append('authorizedID', username.toUpperCase())
+		params.append('authorizedID', regNo.toUpperCase())
 		params.append('x', `@(new Date().toUTCString())`)
 		const response = await fetch(
 			VtopConfig.domain + VtopConfig.backEndApi.commonStudentAttendance,
@@ -38,7 +38,7 @@ export async function getSemData(setLoading) {
 				},
 				credentials: 'omit',
 				body: params.toString(),
-			}
+			},
 		)
 
 		if (response.status === 404) {
@@ -60,7 +60,7 @@ export async function getSemData(setLoading) {
 			JSON.stringify({
 				semData,
 				createdAt: getTime(),
-			})
+			}),
 		)
 		if (!savedSem || savedSem === null) {
 			await AsyncStorage.setItem('sem', JSON.stringify(semData[0]))
