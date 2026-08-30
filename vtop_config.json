@@ -14,7 +14,8 @@
 		"ViewStudentAttendance": "/vtop/processViewStudentAttendance",
 		"ViewAttendanceDetail": "/vtop/processViewAttendanceDetail",
 		"StudentMarkView": "/vtop/examinations/doStudentMarkView",
-		"SearchExamScheduleForStudent": "/vtop/examinations/doSearchExamScheduleForStudent"
+		"SearchExamScheduleForStudent": "/vtop/examinations/doSearchExamScheduleForStudent",
+		"processSdpAttendance": "/vtop/processSdpAttendance"
 	},
 	"VITAPWifi": {
 		"baseURL": "http://172.18.10.10:1000",
