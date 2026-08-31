@@ -285,32 +285,34 @@ export function Attendance() {
 						/>
 					)}
 				/>
-				<Tab.Screen
-					name="Capstone/SDP"
-					children={() => (
-						<RenderCapstoneSDP
-							attendance={capstoneSDP}
-							attendanceData={attendanceData}
-							colorTheme={colorTheme}
-							styles={styles}
-							minPercentage={minPercentage}
-							tooltipVisible={tooltipVisible}
-							setTooltipVisible={setTooltipVisible}
-							setTooltipText={setTooltipText}
-							refreshing={refreshing}
-							onRefresh={onRefresh}
-							lastUpdated={lastUpdated}
-							savedSem={savedSem}
-							capstoneSDPSheetRef={capstoneSDPSheetRef}
-							selectedItem={selectedItem}
-							courseItem={courseItem}
-							userUpdated={userUpdated}
-							setUserUpdated={setUserUpdated}
-							onChangeMinPercent={onChangeMinPercent}
-							openSheet={openSheet}
-						/>
-					)}
-				/>
+				{capstoneSDP && Object.keys(capstoneSDP).length > 0 && (
+					<Tab.Screen
+						name="Capstone/SDP"
+						children={() => (
+							<RenderCapstoneSDP
+								attendance={capstoneSDP}
+								attendanceData={attendanceData}
+								colorTheme={colorTheme}
+								styles={styles}
+								minPercentage={minPercentage}
+								tooltipVisible={tooltipVisible}
+								setTooltipVisible={setTooltipVisible}
+								setTooltipText={setTooltipText}
+								refreshing={refreshing}
+								onRefresh={onRefresh}
+								lastUpdated={lastUpdated}
+								savedSem={savedSem}
+								capstoneSDPSheetRef={capstoneSDPSheetRef}
+								selectedItem={selectedItem}
+								courseItem={courseItem}
+								userUpdated={userUpdated}
+								setUserUpdated={setUserUpdated}
+								onChangeMinPercent={onChangeMinPercent}
+								openSheet={openSheet}
+							/>
+						)}
+					/>
+				)}
 				<Tab.Screen
 					name="Lab"
 					children={() => (
