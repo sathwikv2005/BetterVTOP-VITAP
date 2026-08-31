@@ -57,12 +57,12 @@ export async function getAttendance(setLoading, overrideSemID) {
 		const attendance = parseAttendance(document)
 
 		const [attendanceData, capstoneSDP] = await Promise.all([
-			getAttendanceDetails(),
+			getAttendanceDetails(setLoading),
 			fetchSDPAttendance(setLoading, jsessionId, csrf, semID, regNo),
 		])
 
-		if (capstoneSDP.error) return capstoneSDP
-		if (attendanceData.error) return attendanceData
+		if (capstoneSDP && capstoneSDP.error) return capstoneSDP
+		if (attendanceData && attendanceData.error) return attendanceData
 
 		await AsyncStorage.setItem(
 			'attendance',
@@ -162,9 +162,9 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 			if (setLoading) setLoading(false)
 			return goToDrawerTab('login')
 		}
-		if (!response.ok)
-			if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
+		if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
 		const html = await response.text()
+
 		const document = parseDocument(html)
 
 		const attendanceData = parseAttendanceByID(document)
