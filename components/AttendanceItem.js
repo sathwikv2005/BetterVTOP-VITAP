@@ -210,7 +210,7 @@ export default function AttendanceItem({
 									<Pressable
 										onPress={() => {
 											setTooltipText(
-												`This calculation excludes classes marked as "Not Posted" on VTOP.`
+												`This calculation excludes classes marked as "Not Posted" on VTOP.`,
 											)
 
 											setTooltipVisible(true)
@@ -231,7 +231,7 @@ export default function AttendanceItem({
 													: parseInt(attendanceData.attendance.attended) / 2,
 												data.classType.includes('T')
 													? attendanceData.attendance.absent
-													: parseInt(attendanceData.attendance.absent) / 2
+													: parseInt(attendanceData.attendance.absent) / 2,
 											)}
 										</Text>
 										<Foundation
@@ -247,5 +247,212 @@ export default function AttendanceItem({
 				</View>
 			</View>
 		</>
+	)
+}
+
+export function CapstoneSDPItem({ data, minPercent, setTooltipText, setTooltipVisible }) {
+	if (!data) return null
+
+	const { colorTheme } = useContext(ColorThemeContext)
+
+	const attendanceGreen = parseInt(data.percentage) >= parseInt(minPercent)
+
+	const style = StyleSheet.create({
+		container: {
+			width: '95%',
+			height: 105,
+			borderRadius: 5,
+			overflow: 'hidden',
+			alignSelf: 'center',
+			marginBottom: '5%',
+			display: 'flex',
+			justifyContent: 'space-evenly',
+			flexDirection: 'column',
+			backgroundColor: colorTheme.main.primary,
+			color: colorTheme.main.text,
+			elevation: 10,
+			shadowColor: colorTheme.accent.primary,
+			shadowOffset: { width: -2, height: -4 },
+			shadowOpacity: 0.3,
+			shadowRadius: 5,
+		},
+
+		box: {
+			padding: 8,
+			paddingHorizontal: 20,
+			width: '100%',
+			justifyContent: 'center',
+			flexDirection: 'row',
+		},
+
+		mainText: {
+			color: colorTheme.main.text,
+		},
+
+		header: {
+			marginTop: 5,
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+		},
+
+		course: {
+			gap: 5,
+			flexDirection: 'row',
+			alignItems: 'center',
+		},
+
+		headerText: {
+			fontSize: 14,
+			fontWeight: '600',
+		},
+
+		percentage: {
+			fontSize: 16,
+			fontWeight: '600',
+			backgroundColor: colorTheme.main.text,
+			borderRadius: 5,
+			padding: 3,
+			paddingHorizontal: 8,
+			marginRight: -2,
+		},
+
+		green: {
+			color: '#01BD39FF',
+		},
+
+		red: {
+			color: '#DA2C00FF',
+		},
+
+		greenBorder: {
+			height: '100%',
+			borderRadius: 10,
+			borderLeftWidth: 10,
+			borderLeftColor: '#01BD39FF',
+		},
+
+		redBorder: {
+			height: '100%',
+			borderRadius: 10,
+			borderLeftWidth: 10,
+			borderLeftColor: '#DA2C00FF',
+		},
+
+		details: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			marginTop: -8,
+		},
+
+		detailsBox: {
+			width: '33%',
+		},
+
+		buffer: {
+			flexDirection: 'row-reverse',
+		},
+
+		icon: {
+			fontSize: 18,
+			marginTop: 0,
+		},
+
+		userStatus: {
+			flexDirection: 'row',
+			justifyContent: 'center',
+			alignItems: 'center',
+			gap: 4,
+		},
+
+		userDataInfo: {
+			marginTop: 3,
+			fontSize: 15,
+		},
+	})
+
+	// SDP doesn't have totalClasses directly.
+	// Calculate it from the attendance summary.
+	const attended = parseInt(data.present) || 0
+	const absent = parseInt(data.absent) || 0
+	const onduty = parseInt(data.onduty) || 0
+	const totalClasses = attended + absent + onduty
+
+	return (
+		<View style={style.container}>
+			<View style={attendanceGreen ? style.greenBorder : style.redBorder}>
+				<View style={[style.box, style.header]}>
+					<View style={style.course}>
+						<Foundation
+							name="clipboard-notes"
+							style={style.icon}
+							size={18}
+							color={colorTheme.main.text}
+						/>
+
+						<Text style={[style.mainText, style.headerText]}>{data.title}</Text>
+					</View>
+
+					<Text style={[style.percentage, attendanceGreen ? style.green : style.red]}>
+						{data.percentage}%
+					</Text>
+				</View>
+
+				<View style={[style.box, style.details]}>
+					<View style={style.detailsBox}>
+						<View style={style.backGround}>
+							<Text style={style.mainText}>Attended</Text>
+
+							<Text style={style.mainText}>
+								{attended}/{totalClasses}
+							</Text>
+						</View>
+					</View>
+
+					<View style={[style.buffer, style.detailsBox]}>
+						<View style={style.backGround}>
+							<View style={style.bufferBox}>
+								<Text
+									style={[
+										style.mainText,
+										{ textAlign: 'center' },
+										attendanceGreen ? style.green : style.red,
+									]}
+								>
+									{attendanceGreen ? 'Can Skip' : 'Must Attend'}
+								</Text>
+
+								<Pressable
+									onPress={() => {
+										setTooltipText(
+											`This calculation excludes classes marked as "Not Posted" on VTOP.`,
+										)
+
+										setTooltipVisible(true)
+									}}
+									style={style.userStatus}
+								>
+									<Text
+										style={[
+											style.mainText,
+											{ textAlign: 'center' },
+											attendanceGreen ? style.green : style.red,
+										]}
+									>
+										{calcBufferClasses(minPercent, attended, absent)}
+									</Text>
+
+									<Foundation
+										name="info"
+										style={style.userDataInfo}
+										color={colorTheme.accent.primary}
+									/>
+								</Pressable>
+							</View>
+						</View>
+					</View>
+				</View>
+			</View>
+		</View>
 	)
 }
