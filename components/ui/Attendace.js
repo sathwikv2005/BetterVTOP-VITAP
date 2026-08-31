@@ -8,13 +8,14 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { ColorThemeContext } from '../../context/ColorThemeContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { TextInput } from 'react-native-gesture-handler'
-import AttendanceItem from '../AttendanceItem'
+import AttendanceItem, { CapstoneSDPItem } from '../AttendanceItem'
 import { Alert } from 'react-native'
 import { getAllData } from '../../util/VTOP/getAllData.js'
 import { getTime } from '../../util/getTime.js'
 import FooterItem from '../FooterItem.js'
 import { ForceUpdateContext } from '../../context/ForceUpdateContext.js'
 import AttendanceDetails from '../AttendanceDetails.js'
+import CapstoneSDPDetails from '../capstoneSDPDetails.js'
 import { Dimensions } from 'react-native'
 import Loading from '../Loading.js'
 import { useAlert } from 'custom-react-native-alert'
@@ -29,6 +30,7 @@ export function Attendance() {
 	const { trigger, forceUpdate } = useContext(ForceUpdateContext)
 	const [refreshing, setRefreshing] = useState(false)
 	const [lastUpdated, setLastUpdated] = useState(getTime())
+	const [capstoneSDP, setCapstoneSDP] = useState([])
 	const [attendance, setAttendance] = useState([])
 	const [attendanceData, setAttendanceData] = useState([])
 	const [userUpdated, setUserUpdated] = useState(null)
@@ -42,6 +44,7 @@ export function Attendance() {
 	const [courseItem, setCourseItem] = useState(null)
 
 	const sheetRef = useRef(null)
+	const capstoneSDPSheetRef = useRef(null)
 
 	const openSheet = async (item) => {
 		const target = attendanceData.find((x) => x.classDetails === item.classDetails)
@@ -67,14 +70,16 @@ export function Attendance() {
 			if (!cachedMinPercentage || isNaN(cachedMinPercentage)) cachedMinPercentage = 75
 			let sem = (await JSON.parse(semStr)) || null
 			setSavedSem(sem)
-			if (!savedAttendanceData) savedAttendanceData = { attendanceData: [], createdAt: getTime() }
+			if (!savedAttendanceData)
+				savedAttendanceData = { attendanceData: [], capstoneSDP: {}, createdAt: getTime() }
 			setAttendanceData(savedAttendanceData.attendanceData)
-
+			setCapstoneSDP(savedAttendanceData.capstoneSDP)
 			setMinPercentage(cachedMinPercentage)
 
-			if (!data) data = { attendance: [], createdAt: getTime() }
+			if (!data) data = { attendance: [], capstoneSDP: {}, createdAt: getTime() }
 			// console.log(savedAttendanceData.attendanceData)
 			setAttendance(data.attendance)
+			setCapstoneSDP(data.capstoneSDP)
 			setLastUpdated(data.createdAt)
 			setLoading(false)
 		}
@@ -131,6 +136,7 @@ export function Attendance() {
 		}
 
 		setAttendance(data.attendance.attendance)
+		setCapstoneSDP(data.attendance.capstoneSDP)
 		setLastUpdated(data.attendance.createdAt)
 		setRefreshing(false)
 		forceUpdate()
@@ -280,6 +286,32 @@ export function Attendance() {
 					)}
 				/>
 				<Tab.Screen
+					name="Capstone/SDP"
+					children={() => (
+						<RenderCapstoneSDP
+							attendance={capstoneSDP}
+							attendanceData={attendanceData}
+							colorTheme={colorTheme}
+							styles={styles}
+							minPercentage={minPercentage}
+							tooltipVisible={tooltipVisible}
+							setTooltipVisible={setTooltipVisible}
+							setTooltipText={setTooltipText}
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+							lastUpdated={lastUpdated}
+							savedSem={savedSem}
+							capstoneSDPSheetRef={capstoneSDPSheetRef}
+							selectedItem={selectedItem}
+							courseItem={courseItem}
+							userUpdated={userUpdated}
+							setUserUpdated={setUserUpdated}
+							onChangeMinPercent={onChangeMinPercent}
+							openSheet={openSheet}
+						/>
+					)}
+				/>
+				<Tab.Screen
 					name="Lab"
 					children={() => (
 						<RenderAttendance
@@ -314,6 +346,14 @@ export function Attendance() {
 				minPercent={minPercentage}
 				userUpdated={userUpdated && userUpdated.length > 0 ? userUpdated : null}
 				setUserUpdated={setUserUpdated}
+			/>
+			<CapstoneSDPDetails
+				ref={capstoneSDPSheetRef}
+				capstoneSDP={capstoneSDP}
+				colorTheme={colorTheme}
+				minPercent={minPercentage}
+				setTooltipText={setTooltipText}
+				setTooltipVisible={setTooltipVisible}
 			/>
 			{tooltipVisible && (
 				<View
@@ -404,5 +444,50 @@ function RenderAttendance({
 				ListFooterComponentStyle={{ flexGrow: 1 }}
 			/>
 		</View>
+	)
+}
+
+const openCapstoneSheet = async (item) => {
+	if (!item) return
+
+	setSelectedItem(item)
+	setCourseItem(null)
+	setUserUpdated(null)
+
+	sheetRef.current?.open()
+}
+
+function RenderCapstoneSDP({
+	styles,
+	attendance,
+	minPercentage,
+	onChangeMinPercent,
+	setTooltipText,
+	setTooltipVisible,
+	capstoneSDPSheetRef,
+}) {
+	if (!attendance) return null
+	const openCapstoneSheet = () => {
+		capstoneSDPSheetRef.current?.open()
+	}
+	return (
+		<>
+			<View style={[styles.minPercent]}>
+				<Text style={[styles.mainText]}>Minimum Percentage:</Text>
+				<TextInput
+					value={minPercentage.toString()}
+					style={styles.input}
+					onChangeText={onChangeMinPercent}
+				/>
+			</View>
+			<Pressable onPress={() => openCapstoneSheet(attendance)}>
+				<CapstoneSDPItem
+					data={attendance}
+					minPercent={minPercentage}
+					setTooltipText={setTooltipText}
+					setTooltipVisible={setTooltipVisible}
+				/>
+			</Pressable>
+		</>
 	)
 }

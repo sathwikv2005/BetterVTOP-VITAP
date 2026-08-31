@@ -7,6 +7,7 @@ import { goToDrawerTab } from '../goToDrawerTab'
 import { parseAttendance } from '../parse/parseAttendance'
 import { getTime } from '../getTime'
 import { parseAttendanceByID } from '../parse/parseAttendanceDetails'
+import { parseSDPAttendance } from '../parse/parseSDPAttendance'
 
 export async function getAttendance(setLoading, overrideSemID) {
 	try {
@@ -55,19 +56,27 @@ export async function getAttendance(setLoading, overrideSemID) {
 
 		const attendance = parseAttendance(document)
 
+		const [attendanceData, capstoneSDP] = await Promise.all([
+			getAttendanceDetails(),
+			fetchSDPAttendance(setLoading, jsessionId, csrf, semID, regNo),
+		])
+
+		if (capstoneSDP.error) return capstoneSDP
+		if (attendanceData.error) return attendanceData
+
 		await AsyncStorage.setItem(
 			'attendance',
 			JSON.stringify({
 				attendance,
+				capstoneSDP,
 				createdAt: getTime(),
 			}),
 		)
 
-		const attendanceData = await getAttendanceDetails()
-		if (attendanceData.error) return attendanceData
 		return {
 			attendance,
 			attendanceData,
+			capstoneSDP,
 			createdAt: getTime(),
 		}
 	} catch (err) {
@@ -195,4 +204,39 @@ export async function fetchAttendanceDetails(setLoading, ID, type) {
 		console.error('Error fetching attendance details:', err)
 		return { error: err }
 	}
+}
+
+async function fetchSDPAttendance(setLoading, jsessionId, csrf, semID, regNo) {
+	const params = new URLSearchParams()
+	params.append('_csrf', csrf)
+	params.append('semesterSubId', semID)
+	params.append('regNo', regNo.toUpperCase())
+	params.append('authorizedID', regNo.toUpperCase())
+	params.append('x', new Date().toUTCString())
+	const response = await fetch(VtopConfig.domain + VtopConfig.backEndApi.processSdpAttendance, {
+		method: 'POST',
+		headers: {
+			...Headers,
+			Cookie: `JSESSIONID=${jsessionId}`,
+		},
+		credentials: 'omit',
+		body: params.toString(),
+	})
+
+	if (response.status === 404) {
+		console.log(await response.text())
+		await AsyncStorage.multiRemove(['csrfToken', 'sessionId'])
+		ToastAndroid.show('Failed to fetch data from VTOP. Please try again.', ToastAndroid.SHORT)
+		if (setLoading) setLoading(false)
+		return goToDrawerTab('login')
+	}
+	if (!response.ok)
+		if (!response.ok) return { error: `HTTP Error: ${response.status} ${response.statusText}` }
+
+	const html = await response.text()
+	const document = parseDocument(html)
+
+	const attendance = parseSDPAttendance(document)
+
+	return attendance
 }
