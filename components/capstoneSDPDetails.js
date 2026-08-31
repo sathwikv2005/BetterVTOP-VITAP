@@ -264,7 +264,7 @@ const CapstoneSDPDetails = forwardRef(({ capstoneSDP, colorTheme, minPercent }, 
 						style={{
 							marginTop: 20,
 							width: '100%',
-							maxHeight: height * 0.6,
+							maxHeight: height * 0.64,
 						}}
 					>
 						{/* Show All Days Toggle */}
