@@ -13,6 +13,13 @@ const CapstoneSDPDetails = forwardRef(({ capstoneSDP, colorTheme, minPercent }, 
 
 	const percentageGreen = parseInt(capstoneSDP?.percentage ?? 0) >= parseInt(minPercent ?? 0)
 
+	const validStatuses = new Set(['Present', 'On Duty', 'Absent'])
+	let totalClasses = 0
+
+	for (const x of capstoneSDP?.logs ?? []) {
+		if (validStatuses.has(x.status)) totalClasses++
+	}
+
 	const styles = StyleSheet.create({
 		content: {
 			width: '100%',
@@ -233,10 +240,7 @@ const CapstoneSDPDetails = forwardRef(({ capstoneSDP, colorTheme, minPercent }, 
 						{/* Summary */}
 						<View style={styles.summary}>
 							<View style={styles.summaryBox}>
-								{renderRow(
-									'Present',
-									`${capstoneSDP.present}/${capstoneSDP.present + capstoneSDP.absent}`,
-								)}
+								{renderRow('Present', `${totalClasses - capstoneSDP.absent}/${totalClasses}`)}
 
 								{renderRow('Absent', capstoneSDP.absent)}
 							</View>
@@ -269,7 +273,10 @@ const CapstoneSDPDetails = forwardRef(({ capstoneSDP, colorTheme, minPercent }, 
 					>
 						{/* Show All Days Toggle */}
 						<View style={styles.logHeaderContainer}>
-							<Text style={styles.toggleText}>Show all days</Text>
+							<Text style={styles.toggleText}>
+								Show Holidays (
+								{(showAllDays ? capstoneSDP?.logs?.length : filteredLogs.length) ?? 0})
+							</Text>
 
 							<Switch
 								value={showAllDays}
@@ -321,7 +328,9 @@ const CapstoneSDPDetails = forwardRef(({ capstoneSDP, colorTheme, minPercent }, 
 										filteredLogs.map((entry, index) => {
 											const isAbsent = entry.status?.toLowerCase() === 'absent'
 
-											const isPresent = entry.status?.toLowerCase() === 'present'
+											const isPresent =
+												entry.status?.toLowerCase() === 'present' ||
+												entry.status?.toLowerCase() === 'on duty'
 
 											const isNonAttendance = entry.status === '-' || !entry.status
 

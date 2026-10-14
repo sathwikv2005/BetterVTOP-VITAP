@@ -467,29 +467,53 @@ function RenderCapstoneSDP({
 	setTooltipText,
 	setTooltipVisible,
 	capstoneSDPSheetRef,
+	colorTheme,
+	refreshing,
+	onRefresh,
+	lastUpdated,
+	savedSem,
 }) {
 	if (!attendance) return null
 	const openCapstoneSheet = () => {
 		capstoneSDPSheetRef.current?.open()
 	}
+
 	return (
 		<>
-			<View style={[styles.minPercent]}>
-				<Text style={[styles.mainText]}>Minimum Percentage:</Text>
+			<View style={styles.minPercent}>
+				<Text style={styles.mainText}>Minimum Percentage:</Text>
 				<TextInput
 					value={minPercentage.toString()}
 					style={styles.input}
 					onChangeText={onChangeMinPercent}
 				/>
 			</View>
-			<Pressable onPress={() => openCapstoneSheet(attendance)}>
-				<CapstoneSDPItem
-					data={attendance}
-					minPercent={minPercentage}
-					setTooltipText={setTooltipText}
-					setTooltipVisible={setTooltipVisible}
-				/>
-			</Pressable>
+
+			<FlatList
+				style={{ backgroundColor: colorTheme.main.primary }}
+				contentContainerStyle={styles.list}
+				data={attendance ? [attendance] : []}
+				keyExtractor={() => 'capstone-sdp'}
+				renderItem={({ item }) => (
+					<Pressable onPress={openCapstoneSheet}>
+						<CapstoneSDPItem
+							data={item}
+							minPercent={minPercentage}
+							setTooltipText={setTooltipText}
+							setTooltipVisible={setTooltipVisible}
+						/>
+					</Pressable>
+				)}
+				refreshing={refreshing}
+				onRefresh={onRefresh}
+				ListEmptyComponent={
+					<Text style={styles.emptyText}>No data available. Please try refreshing.</Text>
+				}
+				ListFooterComponent={
+					<FooterItem style={styles.lastUpdated} lastUpdated={lastUpdated} savedSem={savedSem} />
+				}
+				ListFooterComponentStyle={{ flexGrow: 1 }}
+			/>
 		</>
 	)
 }

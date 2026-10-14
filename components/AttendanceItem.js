@@ -404,7 +404,7 @@ export function CapstoneSDPItem({ data, minPercent, setTooltipText, setTooltipVi
 							<Text style={style.mainText}>Attended</Text>
 
 							<Text style={style.mainText}>
-								{attended}/{totalClasses}
+								{attended + onduty}/{totalClasses}
 							</Text>
 						</View>
 					</View>
@@ -439,7 +439,7 @@ export function CapstoneSDPItem({ data, minPercent, setTooltipText, setTooltipVi
 											attendanceGreen ? style.green : style.red,
 										]}
 									>
-										{calcBufferClasses(minPercent, attended, absent)}
+										{calcBufferClasses(minPercent, attended + onduty, absent)}
 									</Text>
 
 									<Foundation

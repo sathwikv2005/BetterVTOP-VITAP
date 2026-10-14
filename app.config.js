@@ -18,7 +18,7 @@ export default {
 			withNetworkSecurityConfig,
 		],
 		slug: 'BetterVTOP',
-		version: '2.3.0',
+		version: '2.3.1',
 		ios: {
 			supportsTablet: true,
 			bundleIdentifier: 'com.anonymous.BetterVTOP',
