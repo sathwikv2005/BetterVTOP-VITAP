@@ -2,7 +2,8 @@ export default function calcBufferClasses(minPercent, attended, absent) {
 	const p = parseInt(minPercent)
 	const a = parseInt(attended)
 	const t = a + parseInt(absent)
-	const percentage = (a * 100) / t
+	const percentage = Math.ceil((a * 100) / t)
+
 	if (percentage < p) return classesNeeded(a, t, p)
 	return classesCanSkip(a, t, p)
 }
@@ -16,6 +17,6 @@ function classesNeeded(a, t, p) {
 }
 
 function classesCanSkip(a, t, p) {
-	const x = (a * 100) / p - t
+	const x = (a * 100) / (p - 1) - t
 	return Math.floor(x >= 0 ? x : 0)
 }
